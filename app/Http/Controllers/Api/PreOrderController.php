@@ -8,6 +8,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\PreOrderRequest;
 use App\IsActive;
 use App\TableName;
+use App\Transaction;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -59,6 +60,9 @@ class PreOrderController extends Controller
 
     public function store(PreOrderRequest $request, $phone)
     {
+
+        dd($request);
+
         $distributor = Distributor::where('phone', $phone)->first();
 
         if(!$distributor) {
@@ -78,6 +82,7 @@ class PreOrderController extends Controller
 
                 Schema::create($tableName->table_name, function (Blueprint $table) {
                     $table->id();
+                    $table->integer('transaction_code_id')->constrained('transactions');
                     $table->integer('clothes_id')->constrained('clothes');
                     $table->boolean('veil')->default(0);
                     $table->integer('size_s')->default(0);
@@ -97,10 +102,25 @@ class PreOrderController extends Controller
                 });
             }
 
+            $transaction = Transaction::where('distributor_id', $distributor->id)->get();
+
+            if (!$transaction) {
+                $transaction_code = Transaction::create([
+                    'distributor_id' => $distributor->id,
+                    'transaction_code' => 'PO-'.time().'/'.date('dmy').'/NUMBER/'.$distributor->id.'/PRE-ORDER/1'
+                ]);
+            } else {
+                $transaction_code = Transaction::create([
+                    'distributor_id' => $distributor->id,
+                    'transaction_code' => 'PO-'.time().'/'.date('dmy').'/DISTRIBUTOR/'.$distributor->id.'/PRE-ORDER/'.$transaction->count() + 1
+                ]);
+            }
+
             $tableName = TableName::where('distributor_id', $distributor->id)->first();
 
             DB::table($tableName->table_name)->insert([
                 [
+                    'transaction_code_id' => $transaction_code->id,
                     'clothes_id' => $request->clothes_id,
                     'size_s' => $request->size_s,
                     'size_m' => $request->size_m,

@@ -15,4 +15,9 @@ class Distributor extends Model
     {
         return $this->hasOne(TableName::class);
     }
+
+    public function Transaction()
+    {
+        return $this->hasMany(Transaction::class);
+    }
 }
