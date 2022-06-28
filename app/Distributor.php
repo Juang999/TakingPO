@@ -20,4 +20,9 @@ class Distributor extends Model
     {
         return $this->hasMany(Transaction::class);
     }
+
+    public function TemporaryStorage()
+    {
+        return $this->hasMany(TemporaryStorage::class);
+    }
 }

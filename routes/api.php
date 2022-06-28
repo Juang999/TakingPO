@@ -26,18 +26,27 @@ Route::middleware('jwt.verify')->group(function () {
     Route::apiResources([
         'clothes' => 'Api\ClothesController',
         'distributor' => 'Api\DistributorController',
-        'total-pre-order' => 'Api\TotalPreOrderController'
     ]);
+
 
     Route::put('/photo/{id}', 'Api\UploadPhoto');
     Route::put('/is-active/{clothes}', 'Api\ActivateClothes');
+    Route::get('/detail-transaction/{id}', 'Api\DetailTransaction');
+
+    Route::apiResource('total-pre-order', 'Api\TotalPreOrderController')
+    ->only('index', 'show');
+
     Route::apiResource('entity', 'Api\EntityController')
     ->parameters(['entity' => 'entity'])
     ->only('index', 'update');
+
+    Route::apiResource('last-brand', 'Api\LastBrandController')
+    ->parameters(['last-brand' => 'entity'])
+    ->except('show', 'store');
 });
 
 Route::prefix('pre-order')->group( function () {
-    Route::post('/', 'Api\DistributorController@store');
     Route::get('/{phone}', 'Api\PreOrderController@getClothes');
     Route::post('/{phone}', 'Api\PreOrderController@storeClothes');
+    Route::post('/store-all/{phone}', 'Api\PreOrderController@storeAllClothes');
 });

@@ -15,4 +15,14 @@ class Clothes extends Model
     {
         return $this->belongsTo(Type::class);
     }
+
+    public function TemporaryStorage()
+    {
+        return $this->hasMany(TemporaryStorage::class);
+    }
+
+    public function TotalProduct()
+    {
+        return $this->hasMany(TotalProduct::class);
+    }
 }

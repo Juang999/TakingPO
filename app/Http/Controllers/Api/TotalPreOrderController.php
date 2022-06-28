@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use App\Distributor;
 use App\TableName;
+use App\Transaction;
 
 class TotalPreOrderController extends Controller
 {
@@ -65,9 +66,23 @@ class TotalPreOrderController extends Controller
      */
     public function show($id)
     {
-        $table_name = TableName::where('user_id', $id)->first();
+        try {
+            $data = Transaction::where('distributor_id', $id)->get();
 
         // $history = DB::table('clothes')->select('clothes.id','clothes.product_code', 'clothes.product_name', 'db_'.$distributor->phone.'.size_s', 'db_'.$distributor->phone.'.size_m', 'db_'.$distributor->phone.'.size_l', 'db_'.$distributor->phone.'.size_xl', 'db_'.$distributor->phone.'.size_xxl', 'db_'.$distributor->phone.'.size_xxxl', 'db_'.$distributor->phone.'.size_2', 'db_'.$distributor->phone.'.size_4', 'db_'.$distributor->phone.'.size_6', 'db_'.$distributor->phone.'.size_8', 'db_'.$distributor->phone.'.size_10', 'db_'.$distributor->phone.'.size_12')->join('db_'.$distributor->phone, 'clothes.id', '=', 'db_'.$distributor->phone.'.clothes_id')->get();
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'success get PO distributor',
+                'data' => $data
+            ]);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'status' => 'success',
+                'message' => 'success get PO distributor',
+                'error' => $th->getMessage()
+            ]);
+        }
     }
 
     /**
