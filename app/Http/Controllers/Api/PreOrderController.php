@@ -14,6 +14,7 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
+use Carbon\Carbon;
 
 class PreOrderController extends Controller
 {
@@ -162,12 +163,12 @@ class PreOrderController extends Controller
                 if (!$transaction) {
                     $transaction_code = Transaction::create([
                         'distributor_id' => $distributor->id,
-                        'transaction_code' => 'PO-'.time().'/'.date('dmy').'/NUMBER/'.$distributor->id.'/PRE-ORDER/' . 1
+                        'transaction_code' => 'PO-'.Carbon::now()->format('HIS').'/'.date('dmy').'/NUMBER/'.$distributor->id.'/PRE-ORDER/' . 1
                     ]);
                 } else {
                     $transaction_code = Transaction::create([
                         'distributor_id' => $distributor->id,
-                        'transaction_code' => 'PO-'.time().'/'.date('dmy').'/DISTRIBUTOR/'.$distributor->id.'/PRE-ORDER/'. ($transaction->count() + 1)
+                        'transaction_code' => 'PO-'.Carbon::now()->format('HIS').'/'.date('dmy').'/DISTRIBUTOR/'.$distributor->id.'/PRE-ORDER/'. ($transaction->count() + 1)
                     ]);
                 }
 
