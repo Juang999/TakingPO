@@ -6,7 +6,9 @@ use Illuminate\Database\Eloquent\Model;
 
 class TableName extends Model
 {
-    protected $fillable = ['user_id', 'table_name'];
+    protected $fillable = ['distributor_id', 'table_name'];
+
+    protected $hidden = ['created_at', 'updated_at'];
 
     public function Distributor()
     {

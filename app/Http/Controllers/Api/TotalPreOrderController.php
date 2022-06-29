@@ -28,9 +28,13 @@ class TotalPreOrderController extends Controller
 
         try {
         foreach ($table_names as $table_name) {
-            $total_preorder = DB::table($table_name->table_name)->select(DB::raw('SUM('.$table_name->table_name.'.size_s + '.$table_name->table_name.'.size_m + '.$table_name->table_name.'.size_l + '.$table_name->table_name.'.size_xl + '.$table_name->table_name.'.size_xxl + '.$table_name->table_name.'.size_xxxl + '.$table_name->table_name.'.size_2 + '.$table_name->table_name.'.size_4 + '.$table_name->table_name.'.size_6 + '.$table_name->table_name.'.size_8 + '.$table_name->table_name.'.size_10 + '.$table_name->table_name.'.size_12) AS total'))->get();
+            // $total_preorder = DB::table($table_name->table_name)->select(DB::raw('SUM('.$table_name->table_name.'.size_s + '.$table_name->table_name.'.size_m + '.$table_name->table_name.'.size_l + '.$table_name->table_name.'.size_xl + '.$table_name->table_name.'.size_xxl + '.$table_name->table_name.'.size_xxxl + '.$table_name->table_name.'.size_2 + '.$table_name->table_name.'.size_4 + '.$table_name->table_name.'.size_6 + '.$table_name->table_name.'.size_8 + '.$table_name->table_name.'.size_10 + '.$table_name->table_name.'.size_12) AS total'))->get();
+            // $table_name['total_preorder'] = $total_preorder[0]->total;
 
-            $distributor['total_preorder'] = $total_preorder[0];
+            $transaction_count = Transaction::where('distributor_id', $table_name->Distributor->id)->get();
+            $table_name['total_preorder'] = $transaction_count->count();
+
+            $table_name->Distributor->makeHidden(['image', 'address']);
         }
 
             return response()->json([
@@ -38,6 +42,7 @@ class TotalPreOrderController extends Controller
             'message' => 'success get data',
             'data' => $table_names,
         ], 200);
+
         } catch (\Throwable $th) {
             return response()->json([
                 'status' => 'failed',
@@ -68,8 +73,6 @@ class TotalPreOrderController extends Controller
     {
         try {
             $data = Transaction::where('distributor_id', $id)->get();
-
-        // $history = DB::table('clothes')->select('clothes.id','clothes.product_code', 'clothes.product_name', 'db_'.$distributor->phone.'.size_s', 'db_'.$distributor->phone.'.size_m', 'db_'.$distributor->phone.'.size_l', 'db_'.$distributor->phone.'.size_xl', 'db_'.$distributor->phone.'.size_xxl', 'db_'.$distributor->phone.'.size_xxxl', 'db_'.$distributor->phone.'.size_2', 'db_'.$distributor->phone.'.size_4', 'db_'.$distributor->phone.'.size_6', 'db_'.$distributor->phone.'.size_8', 'db_'.$distributor->phone.'.size_10', 'db_'.$distributor->phone.'.size_12')->join('db_'.$distributor->phone, 'clothes.id', '=', 'db_'.$distributor->phone.'.clothes_id')->get();
 
             return response()->json([
                 'status' => 'success',

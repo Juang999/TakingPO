@@ -43,6 +43,8 @@ Route::middleware('jwt.verify')->group(function () {
     Route::apiResource('last-brand', 'Api\LastBrandController')
     ->parameters(['last-brand' => 'entity'])
     ->except('show', 'store');
+
+    Route::apiResource('total-product', 'Api\TotalProductController');
 });
 
 Route::prefix('pre-order')->group( function () {

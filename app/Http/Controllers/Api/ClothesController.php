@@ -55,6 +55,7 @@ class ClothesController extends Controller
                     'keyword' => $request->keyword,
                     'description' => $request->description,
                     'slug' => $request->article_name,
+                    'group_article' => $request->group_article,
                     'type_id' => $type->id,
                     'size_s' => $request->size_s,
                     'size_m' => $request->size_m,

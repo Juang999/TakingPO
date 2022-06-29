@@ -32,6 +32,7 @@ class ClothesRequest extends FormRequest
             "special_feature" => 'required',
             "keyword" => 'required',
             "description" => 'required',
+            'group_article' => 'required',
             'type' => 'required',
             'size_s' => 'required',
             'size_m' => 'required',

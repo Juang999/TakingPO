@@ -26,6 +26,7 @@ class PreOrderRequest extends FormRequest
         return [
             'clothes_id' => 'required|integer',
             'info' => 'required',
+            'veil' => 'required',
             'size_s' => 'required|integer',
             'size_m' => 'required|integer',
             'size_l' => 'required|integer',

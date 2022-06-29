@@ -15,7 +15,7 @@ class CreateTableNamesTable extends Migration
     {
         Schema::create('table_names', function (Blueprint $table) {
             $table->id();
-            $table->integer('user_id')->constrained('users');
+            $table->integer('distributor_id')->constrained('distributors');
             $table->string('table_name');
             $table->timestamps();
         });

@@ -24,7 +24,7 @@ class CreateClothesTable extends Migration
             $table->string('keyword');
             $table->text('description')->nullable();
             $table->string('slug');
-            $table->string('image')->nullable();
+            $table->string('group_article')->nullable();
             $table->integer('type_id')->constrained('types');
             $table->boolean('is_active')->default(true);
             $table->integer('size_s')->default(0);

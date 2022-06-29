@@ -41,15 +41,17 @@ class PreOrderController extends Controller
                 ])->with('Type')->paginate(5);
         }
 
-        if ($entity->name == 'DONE') {
-            $data = TemporaryStorage::where('distributor_id', $distributor1->id)
+        if ($entity) {
+            if ($entity->name == 'DONE') {
+                $data = TemporaryStorage::where('distributor_id', $distributor1->id)
                     ->with('Distributor', 'Clothes')->get();
 
-            return response()->json([
-                'status' => 'success',
-                'message' => 'success get data',
-                'data' => $data
-            ], 200);
+                return response()->json([
+                    'status' => 'success',
+                    'message' => 'success get data',
+                    'data' => $data
+                ], 200);
+            }
         }
 
         foreach ($clothess as $clothes) {
@@ -124,7 +126,7 @@ class PreOrderController extends Controller
         try {
             $distributor = Distributor::where('phone', $phone)->first();
 
-            $data = TemporaryStorage::where('distributor_id', $distributor->id)->with('Clothes')->get();
+            $datas = TemporaryStorage::where('distributor_id', $distributor->id)->with('Clothes')->get();
 
             if (!TableName::where('distributor_id', $distributor->id)->first()) {
                 $tableName = TableName::create([
@@ -169,28 +171,9 @@ class PreOrderController extends Controller
                     ]);
                 }
 
-                DB::table('total_products')->insert([
-                    'clothes_id' => $data->clothes_id,
-                    'size_s' => $data->size_s,
-                    'size_m' => $data->size_m,
-                    'size_l' => $data->size_l,
-                    'size_xl' => $data->size_xl,
-                    'size_xxl' => $data->size_xxl,
-                    'size_xxxl' => $data->size_xxxl,
-                    'size_2' => $data->size_2,
-                    'size_4' => $data->size_4,
-                    'size_6' => $data->size_6,
-                    'size_8' => $data->size_8,
-                    'size_10' => $data->size_10,
-                    'size_12' => $data->size_12,
-                    'total' => $data->total
-                ]);
-
-                $tableName = TableName::where('distributor_id', $distributor->id)->first();
-
-                DB::table($tableName->table_name)->insert([
+                foreach ($datas as $data) {
+                    DB::table('total_products')->insert([
                     [
-                        'transaction_code_id' => $transaction_code->id,
                         'clothes_id' => $data->clothes_id,
                         'size_s' => $data->size_s,
                         'size_m' => $data->size_m,
@@ -206,9 +189,35 @@ class PreOrderController extends Controller
                         'size_12' => $data->size_12,
                         'total' => $data->total
                     ]
-                ]);
+                    ]);
 
-            $data->destroy();
+                $tableName = TableName::where('distributor_id', $distributor->id)->first();
+
+                    DB::table($tableName->table_name)->insert([
+                        [
+                            'transaction_code_id' => $transaction_code->id,
+                            'clothes_id' => $data->clothes_id,
+                            'info' => $data->info,
+                            'size_s' => $data->size_s,
+                            'size_m' => $data->size_m,
+                            'size_l' => $data->size_l,
+                            'size_xl' => $data->size_xl,
+                            'size_xxl' => $data->size_xxl,
+                            'size_xxxl' => $data->size_xxxl,
+                            'size_2' => $data->size_2,
+                            'size_4' => $data->size_4,
+                            'size_6' => $data->size_6,
+                            'size_8' => $data->size_8,
+                            'size_10' => $data->size_10,
+                            'size_12' => $data->size_12,
+                            'total' => $data->total
+                        ]
+                    ]);
+                }
+
+                foreach ($datas as $data) {
+                    $data->delete();
+                }
 
             DB::commit();
 
