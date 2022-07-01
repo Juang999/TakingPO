@@ -34,12 +34,12 @@ class PreOrderController extends Controller
             $clothess = Clothes::where([
                 'entity_name' => $entity->name,
                 'is_active' => 1
-                ])->with('Type')->paginate(5);
+                ])->with('Type')->get();
         } else {
             $clothess = Clothes::where([
                 'entity_name' => 'MUTIF',
                 'is_active' => 1
-                ])->with('Type')->paginate(5);
+                ])->with('Type')->get();
         }
 
         if ($entity) {

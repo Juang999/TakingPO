@@ -17,10 +17,16 @@ class TotalProductController extends Controller
      */
     public function index()
     {
-        $clothes = DB::table('clothes')->selectRaw('clothes.id, clothes.article_name, total_products.id, total_products.clothes_id ,SUM(total_products.size_s + total_products.size_m + total_products.size_l + total_products.size_xl + total_products.size_xxl + total_products.size_xxxl + total_products.size_2 + total_products.size_4 + total_products.size_6 + total_products.size_8 + total_products.size_10 + total_products.size_12) AS total')->join('total_products', 'clothes.id', '=', 'total_products.clothes_id')->groupBy('clothes.id', 'total_products.id')->get();
+        $clothess = DB::table('clothes')->selectRaw('clothes.id, clothes.article_name,SUM(total_products.size_s + total_products.size_m + total_products.size_l + total_products.size_xl + total_products.size_xxl + total_products.size_xxxl + total_products.size_2 + total_products.size_4 + total_products.size_6 + total_products.size_8 + total_products.size_10 + total_products.size_12) AS total')->leftJoin('total_products', 'clothes.id', '=', 'total_products.clothes_id')->groupBy('clothes.id')->orderBy('total', 'DESC')->get();
+
+        foreach ($clothess as $clothes) {
+            if ($clothes->total == NULL) {
+                $clothes->total = 0;
+            }
+        }
 
         return response()->json([
-            'data' => $clothes
+            'data' => $clothess
         ]);
     }
 

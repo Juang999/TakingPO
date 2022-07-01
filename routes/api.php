@@ -26,15 +26,8 @@ Route::middleware('jwt.verify')->group(function () {
     Route::apiResources([
         'clothes' => 'Api\ClothesController',
         'distributor' => 'Api\DistributorController',
+        'image' => 'Api\ImageController'
     ]);
-
-
-    Route::put('/photo/{id}', 'Api\UploadPhoto');
-    Route::put('/is-active/{clothes}', 'Api\ActivateClothes');
-    Route::get('/detail-transaction/{id}', 'Api\DetailTransaction');
-
-    Route::apiResource('total-pre-order', 'Api\TotalPreOrderController')
-    ->only('index', 'show');
 
     Route::apiResource('entity', 'Api\EntityController')
     ->parameters(['entity' => 'entity'])
@@ -44,7 +37,14 @@ Route::middleware('jwt.verify')->group(function () {
     ->parameters(['last-brand' => 'entity'])
     ->except('show', 'store');
 
-    Route::apiResource('total-product', 'Api\TotalProductController');
+    Route::apiResource('total-pre-order', 'Api\TotalPreOrderController')
+    ->only('index', 'show');
+
+    Route::apiResource('total-product', 'Api\TotalProductController')
+    ->only('index');
+
+    Route::get('/detail-transaction/{id}', 'Api\DetailTransaction');
+    Route::put('/is-active/{clothes}', 'Api\ActivateClothes');
 });
 
 Route::prefix('pre-order')->group( function () {

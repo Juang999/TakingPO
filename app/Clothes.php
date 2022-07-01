@@ -25,4 +25,9 @@ class Clothes extends Model
     {
         return $this->hasMany(TotalProduct::class);
     }
+
+    public function Image()
+    {
+        return $this->hasMany(Image::class);
+    }
 }
