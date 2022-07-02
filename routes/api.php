@@ -26,7 +26,7 @@ Route::middleware('jwt.verify')->group(function () {
     Route::apiResources([
         'clothes' => 'Api\ClothesController',
         'distributor' => 'Api\DistributorController',
-        'image' => 'Api\ImageController'
+        // 'image' => 'Api\ImageController'
     ]);
 
     Route::apiResource('entity', 'Api\EntityController')
@@ -45,6 +45,7 @@ Route::middleware('jwt.verify')->group(function () {
 
     Route::get('/detail-transaction/{id}', 'Api\DetailTransaction');
     Route::put('/is-active/{clothes}', 'Api\ActivateClothes');
+    Route::post('/photo/{id}', 'Api\UploadPhoto');
 });
 
 Route::prefix('pre-order')->group( function () {

@@ -18,10 +18,16 @@ class ClothesController extends Controller
      */
     public function index()
     {
+        $clothess = Clothes::orderBy('type_id', 'DESC')->with('Type', 'Image')->get();
+
+        foreach ($clothess as $clothes) {
+            $clothes->combo = explode(',', $clothes->combo);
+        }
+
         return response()->json([
             'status' => 'success',
             'message' => 'success get data',
-            'data' => Clothes::orderBy('type_id', 'DESC')->with('Type')->get()
+            'data' => $clothess
         ], 200);
     }
 
@@ -34,17 +40,11 @@ class ClothesController extends Controller
     public function store(ClothesRequest $request)
     {
         try {
-            $type = Type::where('type', $request->type)->firstOrCreate([
+            $type = Type::firstOrCreate([
                 'type' => $request->type
             ]);
 
             DB::beginTransaction();
-                if (!$type) {
-                    $type = DB::table('types')->insert([
-
-                    ]);
-                }
-
                 DB::table('clothes')->insert([
                     'entity_name' => $request->entity_name,
                     'article_name' => $request->article_name,
@@ -108,7 +108,7 @@ class ClothesController extends Controller
         return response()->json([
             'status' => 'success',
             'message' => 'success get data',
-            'data' => Clothes::where('id', $clothes)->with('Type')->first()
+            'data' => Clothes::where('id', $clothes)->with('Type', 'Image')->first()
         ], 200);
     }
 

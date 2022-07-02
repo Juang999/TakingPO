@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Clothes;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\PhotoRequest;
+use App\Image;
 use Illuminate\Http\Request;
 
 class UploadPhoto extends Controller
@@ -18,8 +19,9 @@ class UploadPhoto extends Controller
     public function __invoke(PhotoRequest $request, $id)
     {
         try {
-            Clothes::find($id)->update([
-                'image' => $request->image
+            Image::create([
+                'clothes_id' => $id,
+                'photo' => $request->photo
             ]);
 
             return response()->json([

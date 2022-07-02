@@ -9,7 +9,7 @@ class Image extends Model
 {
     use SoftDeletes;
 
-    protected $fillable = ['clohtes_id', 'image'];
+    protected $guarded = ['id'];
 
     public function Clothes()
     {
