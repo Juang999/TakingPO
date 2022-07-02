@@ -20,19 +20,19 @@ class PreOrderController extends Controller
 {
     public function getClothes($phone)
     {
-        $distributor1 = Distributor::where('phone', $phone)->first();
-        if (!$distributor1) {
+        $distributor = Distributor::where('phone', $phone)->first();
+        if (!$distributor) {
             return response()->json([
                 'status' => 'failed',
                 'message' => 'number '.$phone.' not registered!'
             ], 400);
         }
 
-        $entity = IsActive::find(1);
+        $entity = IsActive::find(1)->pluck('name');
 
         if ($entity) {
             $clothess = Clothes::where([
-                'entity_name' => $entity->name,
+                'entity_name' => $entity[0],
                 'is_active' => 1
                 ])->with('Type', 'Image')->get();
         } else {
@@ -43,16 +43,20 @@ class PreOrderController extends Controller
         }
 
         if ($entity) {
-            if ($entity->name == 'DONE') {
+            if ($entity[0] == 'DONE') {
                 $data = TemporaryStorage::where('distributor_id', $distributor1->id)
                     ->with('Distributor', 'Clothes')->get();
 
                 return response()->json([
                     'status' => 'success',
                     'message' => 'success get data',
-                    'data' => $data
+                    'final_data' => $data
                 ], 200);
             }
+        }
+
+        if (!$entity) {
+            $entity = "MUTIF";
         }
 
         foreach ($clothess as $clothes) {
@@ -65,12 +69,10 @@ class PreOrderController extends Controller
             $clothes['size_12'] = explode(",", $clothes->size_12);
         }
 
-        $distributor = $distributor1->name;
-
         return response()->json([
             'status' => 'success',
             'message' => 'success get clothes',
-            'data' => compact('distributor', 'clothess')
+            'data' => compact('distributor', 'clothess', 'entity')
         ], 200);
     }
 
