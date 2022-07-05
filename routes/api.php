@@ -53,3 +53,5 @@ Route::prefix('pre-order')->group( function () {
     Route::post('/{phone}', 'Api\PreOrderController@storeClothes');
     Route::post('/store-all/{phone}', 'Api\PreOrderController@storeAllClothes');
 });
+Route::post('/register-member', 'Api\PreOrderController@register');
+

@@ -24,7 +24,7 @@ class DistributorRequest extends FormRequest
     public function rules()
     {
         return [
-            "name" => 'required',
+            'name' => 'required',
             'phone' => 'required',
             'address' => 'required',
             'db_name' => 'required'

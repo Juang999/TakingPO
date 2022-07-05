@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Clothes;
 use App\Distributor;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\DistributorRequest;
 use App\Http\Requests\PreOrderRequest;
 use App\IsActive;
 use App\TableName;
@@ -28,11 +29,11 @@ class PreOrderController extends Controller
             ], 400);
         }
 
-        $entity = IsActive::find(1)->pluck('name');
+        $entity = IsActive::find(1);
 
         if ($entity) {
             $clothess = Clothes::where([
-                'entity_name' => $entity[0],
+                'entity_name' => $entity->name,
                 'is_active' => 1
                 ])->with('Type', 'Image')->get();
         } else {
@@ -43,14 +44,20 @@ class PreOrderController extends Controller
         }
 
         if ($entity) {
-            if ($entity[0] == 'DONE') {
-                $data = TemporaryStorage::where('distributor_id', $distributor1->id)
+            if ($entity->name == 'DONE') {
+                $data = TemporaryStorage::where('distributor_id', $distributor->id)
                     ->with('Distributor', 'Clothes')->get();
 
                 return response()->json([
                     'status' => 'success',
-                    'message' => 'success get data',
+                    'message' => 'success get final data',
+                    'distributor' => $distributor,
                     'final_data' => $data
+                ], 200);
+            } else if ($entity->name == 'NON-ACTIVE') {
+                return response()->json([
+                    'status' => 'closed',
+                    'message' => 'website sedang ditutup'
                 ], 200);
             }
         }
@@ -72,7 +79,8 @@ class PreOrderController extends Controller
         return response()->json([
             'status' => 'success',
             'message' => 'success get clothes',
-            'data' => compact('distributor', 'clothess', 'entity')
+            'distributor' => $distributor,
+            'data' => compact('clothess', 'entity')
         ], 200);
     }
 
@@ -234,6 +242,34 @@ class PreOrderController extends Controller
             return response()->json([
                 'status' => 'failed',
                 'message' => 'failed to store data',
+                'error' => $th->getMessage()
+            ], 400);
+        }
+    }
+
+    public function register(Request $request)
+    {
+        $request->validate([
+            'name' => 'required',
+            'phone' => 'required',
+            'address' => 'required',
+            'db_name' => 'required'
+        ]);
+
+        try {
+            $distributor = Distributor::create($request->all());
+
+            return response()->json([
+                'success' => 'success',
+                'message' => 'register successfully',
+                'data' => $distributor
+            ], 200);
+
+        } catch (\Throwable $th) {
+
+            return response()->json([
+                'status' => 'failed',
+                'message' => 'failed to register',
                 'error' => $th->getMessage()
             ], 400);
         }
