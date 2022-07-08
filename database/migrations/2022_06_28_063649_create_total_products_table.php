@@ -16,6 +16,7 @@ class CreateTotalProductsTable extends Migration
         Schema::create('total_products', function (Blueprint $table) {
             $table->id();
             $table->integer('clothes_id')->constrained('clothes');
+            $table->string('info');
             $table->boolean('veil')->default(0);
             $table->integer('size_s')->default(0);
             $table->integer('size_m')->default(0);

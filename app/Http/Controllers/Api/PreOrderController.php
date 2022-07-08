@@ -186,6 +186,8 @@ class PreOrderController extends Controller
                     DB::table('total_products')->insert([
                     [
                         'clothes_id' => $data->clothes_id,
+                        'veil' => $data->veil,
+                        'info' => $data->info,
                         'size_s' => $data->size_s,
                         'size_m' => $data->size_m,
                         'size_l' => $data->size_l,
