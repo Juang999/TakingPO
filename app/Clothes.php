@@ -30,4 +30,9 @@ class Clothes extends Model
     {
         return $this->hasMany(Image::class);
     }
+
+    public function BufferProduct()
+    {
+        return $this->hasMany(BufferProduct::class);
+    }
 }

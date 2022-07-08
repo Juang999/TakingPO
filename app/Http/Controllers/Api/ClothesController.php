@@ -2,15 +2,27 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\BufferProduct;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Clothes;
 use App\Http\Requests\ClothesRequest;
+use App\Size;
 use App\Type;
 use Illuminate\Support\Facades\DB;
 
 class ClothesController extends Controller
 {
+    protected function input_buffer($clothes_id, $size_id, $buffer)
+    {
+        BufferProduct::create([
+            'clothes_id' => $clothes_id,
+            'size_id' => $size_id,
+            'qty_avaliable' => $buffer,
+            'qty_buffer' => $buffer
+        ]);
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -45,7 +57,7 @@ class ClothesController extends Controller
             ]);
 
             DB::beginTransaction();
-                DB::table('clothes')->insert([
+                $clothes = Clothes::create([
                     'entity_name' => $request->entity_name,
                     'article_name' => $request->article_name,
                     'color' => $request->color,
@@ -69,9 +81,91 @@ class ClothesController extends Controller
                     'size_8' => $request->size_8,
                     'size_10' => $request->size_10,
                     'size_12' => $request->size_12,
-                    'created_at' => now(),
-                    'updated_at' => now(),
                 ]);
+
+                if ($clothes->size_s > 0) {
+                    $size_s = Size::firstOrCreate([
+                        'size' => 's'
+                    ]);
+                    $this->input_buffer($clothes->id, $size_s->id, $request->buffer);
+                }
+
+                if ($clothes->size_m > 0) {
+                    $size_m = Size::firstOrCreate([
+                        'size' => 'm'
+                    ]);
+                    $this->input_buffer($clothes->id, $size_m->id, $request->buffer);
+                }
+
+                if ($clothes->size_l > 0) {
+                    $size_l = Size::firstOrCreate([
+                        'size' => 'l'
+                    ]);
+                    $this->input_buffer($clothes->id, $size_l->id, $request->buffer);
+                }
+
+                if ($clothes->size_xl > 0) {
+                    $size_xl = Size::firstOrCreate([
+                        'size' => 'xl'
+                    ]);
+                    $this->input_buffer($clothes->id, $size_xl->id, $request->buffer);
+                }
+
+                if ($clothes->size_xxl > 0) {
+                    $size_xxl = Size::firstOrCreate([
+                        'size' => 'xxl'
+                    ]);
+                    $this->input_buffer($clothes->id, $size_xxl->id, $request->buffer);
+                }
+
+                if ($clothes->size_xxxl > 0) {
+                    $size_xxxl = Size::firstOrCreate([
+                        'size' => 'xxxl'
+                    ]);
+                    $this->input_buffer($clothes->id, $size_xxxl->id, $request->buffer);
+                }
+
+                if ($clothes->size_2 > 0) {
+                    $size_2 = Size::firstOrCreate([
+                        'size' => '2'
+                    ]);
+                    $this->input_buffer($clothes->id, $size_2->id, $request->buffer);
+                }
+
+                if ($clothes->size_4 > 0) {
+                    $size_4 = Size::firstOrCreate([
+                        'size' => '4'
+                    ]);
+                    $this->input_buffer($clothes->id, $size_4->id, $request->buffer);
+                }
+
+                if ($clothes->size_6 > 0) {
+                    $size_6 = Size::firstOrCreate([
+                        'size' => '6'
+                    ]);
+                    $this->input_buffer($clothes->id, $size_6->id, $request->buffer);
+                }
+
+                if ($clothes->size_8 > 0) {
+                    $size_8 = Size::firstOrCreate([
+                        'size' => '8'
+                    ]);
+                    $this->input_buffer($clothes->id, $size_8->id, $request->buffer);
+                }
+
+                if ($clothes->size_10 > 0) {
+                    $size_10 = Size::firstOrCreate([
+                        'size' => '10'
+                    ]);
+                    $this->input_buffer($clothes->id, $size_10->id, $request->buffer);
+                }
+
+                if ($clothes->size_12 > 0) {
+                    $size_12 = Size::firstOrCreate([
+                        'size' => '10'
+                    ]);
+                    $this->input_buffer($clothes->id, $size_12->id, $request->buffer);
+                }
 
             DB::commit();
 
