@@ -7,6 +7,7 @@ use App\Distributor;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\DistributorRequest;
 use App\Http\Requests\PreOrderRequest;
+use App\Http\Requests\RegisterRequest;
 use App\IsActive;
 use App\TableName;
 use App\TemporaryStorage;
@@ -249,15 +250,8 @@ class PreOrderController extends Controller
         }
     }
 
-    public function register(Request $request)
+    public function register(RegisterRequest $request)
     {
-        $request->validate([
-            'name' => 'required',
-            'phone' => 'required',
-            'address' => 'required',
-            'db_name' => 'required'
-        ]);
-
         try {
             $distributor = Distributor::create($request->all());
 

@@ -9,8 +9,7 @@ $factory->define(Distributor::class, function (Faker $faker) {
     static $phone = 62812512371;
     return [
         'name' => $faker->name(),
-        'address' => $faker->address(),
         'phone' => $phone++,
-        'db_name' => $faker->name()
+        'db_id' => 0
     ];
 });

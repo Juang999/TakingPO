@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class BufferProduct extends Model
 {
-    protected $guarded = ['id'];
+    protected $fillable = ['clothes_id', 'size_id', 'qty_avaliable', 'qty_process', 'qty_buffer'];
 
     public function Size()
     {
