@@ -12,7 +12,7 @@ class ListController extends Controller
     public function listDistributor()
     {
         try {
-        $distributor = Distributor::where('db_id', 0)->get();
+        $distributor = Distributor::get();
 
         return response()->json([
             'status' => 'success',

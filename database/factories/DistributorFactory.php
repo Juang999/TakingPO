@@ -12,6 +12,5 @@ $factory->define(Distributor::class, function (Faker $faker) {
         'phone' => $phone++,
         'group_code' => 'DB',
         'partner_group_id' => 1,
-        'db_id' => 0
     ];
 });

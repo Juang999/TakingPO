@@ -4,7 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class DistributorRequest extends FormRequest
+class AgentRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -27,18 +27,18 @@ class DistributorRequest extends FormRequest
             'db_name' => 'required',
             'level' => 'required',
             'role' => 'required',
-            'agent' => 'required',
             'name' => 'required',
             'ms_name' => 'required',
             'ms_code' => 'required',
             'training_level' => 'required',
             'address' => 'required',
-            'provice' => 'required',
-            'regency' => 'required',
             'district' => 'required',
-            'pos_code' => 'required',
+            'regency' => 'required',
+            'provice' => 'required',
+            'join_date' => 'required',
+            'status' => 'required',
+            'msdp'=> 'required',
             'phone' => 'required',
-            'partner_group_id' => 'required',
         ];
     }
 }

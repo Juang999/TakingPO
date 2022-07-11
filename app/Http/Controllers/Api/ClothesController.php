@@ -281,12 +281,12 @@ class ClothesController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(ClothesRequest $request, $id)
+    public function update(ClothesRequest $request, Clothes $clothes)
     {
         try {
-            $clothes = Clothes::findOrFail($id);
-
             $type = Type::where('type', $request->type)->firstOrFail();
+
+            DB::beginTransaction();
 
             $clothes->update([
                 'entity_name' => $request->entity_name,
@@ -314,6 +314,200 @@ class ClothesController extends Controller
                 'created_at' => now(),
                 'updated_at' => now(),
             ]);
+
+            $size_s = Size::where('size', 'S')->first();
+            $BufferStock = BufferProduct::where([
+                'clothes_id' => $clothes->id,
+                'size_id' => $size_s->id
+            ])->first();
+
+            if ($BufferStock) {
+                $avaliable = $BufferStock->qty_avaliable + $request->bs_size_s;
+                $buffer_stock = $BufferStock->qty_buffer + $request->bs_size_s;
+
+                $BufferStock->update([
+                    'qty_avaliable' => $avaliable,
+                    'qty_buffer' => $buffer_stock
+                ]);
+            }
+
+            $size_m = Size::where('size', 'M')->first();
+            $BufferStock = BufferProduct::where([
+                'clothes_id' => $clothes->id,
+                'size_id' => $size_m->id
+            ])->first();
+
+            if ($BufferStock) {
+                $avaliable = $BufferStock->qty_avaliable + $request->bs_size_s;
+                $buffer_stock = $BufferStock->qty_buffer + $request->bs_size_s;
+
+                $BufferStock->update([
+                    'qty_avaliable' => $avaliable,
+                    'qty_buffer' => $buffer_stock
+                ]);
+            }
+
+            $size_l = Size::where('size', 'L')->first();
+            $BufferStock = BufferProduct::where([
+                'clothes_id' => $clothes->id,
+                'size_id' => $size_l->id
+            ])->first();
+
+            if ($BufferStock) {
+                $avaliable = $BufferStock->qty_avaliable + $request->bs_size_s;
+                $buffer_stock = $BufferStock->qty_buffer + $request->bs_size_s;
+
+                $BufferStock->update([
+                    'qty_avaliable' => $avaliable,
+                    'qty_buffer' => $buffer_stock
+                ]);
+            }
+
+            $size_xl = Size::where('size', 'XL')->first();
+            $BufferStock = BufferProduct::where([
+                'clothes_id' => $clothes->id,
+                'size_id' => $size_xl->id
+            ])->first();
+
+            if ($BufferStock) {
+                $avaliable = $BufferStock->qty_avaliable + $request->bs_size_s;
+                $buffer_stock = $BufferStock->qty_buffer + $request->bs_size_s;
+
+                $BufferStock->update([
+                    'qty_avaliable' => $avaliable,
+                    'qty_buffer' => $buffer_stock
+                ]);
+            }
+
+            $size_xxl = Size::where('size', 'XXL')->first();
+            $BufferStock = BufferProduct::where([
+                'clothes_id' => $clothes->id,
+                'size_id' => $size_xxl->id
+            ])->first();
+
+            if ($BufferStock) {
+                $avaliable = $BufferStock->qty_avaliable + $request->bs_size_s;
+                $buffer_stock = $BufferStock->qty_buffer + $request->bs_size_s;
+
+                $BufferStock->update([
+                    'qty_avaliable' => $avaliable,
+                    'qty_buffer' => $buffer_stock
+                ]);
+            }
+
+            $size_xxxl = Size::where('size', 'XXXL')->first();
+            $BufferStock = BufferProduct::where([
+                'clothes_id' => $clothes->id,
+                'size_id' => $size_xxxl->id
+            ])->first();
+
+            if ($BufferStock) {
+                $avaliable = $BufferStock->qty_avaliable + $request->bs_size_s;
+                $buffer_stock = $BufferStock->qty_buffer + $request->bs_size_s;
+
+                $BufferStock->update([
+                    'qty_avaliable' => $avaliable,
+                    'qty_buffer' => $buffer_stock
+                ]);
+            }
+
+            $size_2 = Size::where('size', '2')->first();
+            $BufferStock = BufferProduct::where([
+                'clothes_id' => $clothes->id,
+                'size_id' => $size_2->id
+            ])->first();
+
+            if ($BufferStock) {
+                $avaliable = $BufferStock->qty_avaliable + $request->bs_size_s;
+                $buffer_stock = $BufferStock->qty_buffer + $request->bs_size_s;
+
+                $BufferStock->update([
+                    'qty_avaliable' => $avaliable,
+                    'qty_buffer' => $buffer_stock
+                ]);
+            }
+
+            $size_4 = Size::where('size', '4')->first();
+            $BufferStock = BufferProduct::where([
+                'clothes_id' => $clothes->id,
+                'size_id' => $size_4->id
+            ])->first();
+
+            if ($BufferStock) {
+                $avaliable = $BufferStock->qty_avaliable + $request->bs_size_s;
+                $buffer_stock = $BufferStock->qty_buffer + $request->bs_size_s;
+
+                $BufferStock->update([
+                    'qty_avaliable' => $avaliable,
+                    'qty_buffer' => $buffer_stock
+                ]);
+            }
+
+            $size_6 = Size::where('size', '6')->first();
+            $BufferStock = BufferProduct::where([
+                'clothes_id' => $clothes->id,
+                'size_id' => $size_6->id
+            ])->first();
+
+            if ($BufferStock) {
+                $avaliable = $BufferStock->qty_avaliable + $request->bs_size_s;
+                $buffer_stock = $BufferStock->qty_buffer + $request->bs_size_s;
+
+                $BufferStock->update([
+                    'qty_avaliable' => $avaliable,
+                    'qty_buffer' => $buffer_stock
+                ]);
+            }
+
+            $size_8 = Size::where('size', '8')->first();
+            $BufferStock = BufferProduct::where([
+                'clothes_id' => $clothes->id,
+                'size_id' => $size_8->id
+            ])->first();
+
+            if ($BufferStock) {
+                $avaliable = $BufferStock->qty_avaliable + $request->bs_size_s;
+                $buffer_stock = $BufferStock->qty_buffer + $request->bs_size_s;
+
+                $BufferStock->update([
+                    'qty_avaliable' => $avaliable,
+                    'qty_buffer' => $buffer_stock
+                ]);
+            }
+
+            $size_10 = Size::where('size', '10')->first();
+            $BufferStock = BufferProduct::where([
+                'clothes_id' => $clothes->id,
+                'size_id' => $size_10->id
+            ])->first();
+
+            if ($BufferStock) {
+                $avaliable = $BufferStock->qty_avaliable + $request->bs_size_s;
+                $buffer_stock = $BufferStock->qty_buffer + $request->bs_size_s;
+
+                $BufferStock->update([
+                    'qty_avaliable' => $avaliable,
+                    'qty_buffer' => $buffer_stock
+                ]);
+            }
+
+            $size_12 = Size::where('size', '12')->first();
+            $BufferStock = BufferProduct::where([
+                'clothes_id' => $clothes->id,
+                'size_id' => $size_12->id
+            ])->first();
+
+            if ($BufferStock) {
+                $avaliable = $BufferStock->qty_avaliable + $request->bs_size_s;
+                $buffer_stock = $BufferStock->qty_buffer + $request->bs_size_s;
+
+                $BufferStock->update([
+                    'qty_avaliable' => $avaliable,
+                    'qty_buffer' => $buffer_stock
+                ]);
+            }
+
+            DB::commit();
 
             return response()->json([
                 'status' => 'success',

@@ -27,4 +27,19 @@ class Distributor extends Model
     {
         return $this->hasMany(TemporaryStorage::class);
     }
+
+    public function PartnerAddress()
+    {
+        return $this->hasMany(PartnerAddress::class);
+    }
+
+    public function Agent()
+    {
+        return $this->hasMany(Agent::class);
+    }
+
+    public function PartnerGroup()
+    {
+        return $this->belongsTo(PartnerGroup::class);
+    }
 }

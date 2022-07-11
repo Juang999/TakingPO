@@ -25,9 +25,10 @@ Route::middleware('jwt.verify')->group(function () {
 
     // main route
     Route::apiResources([
+        'agent' => 'Api\AgentController',
         'clothes' => 'Api\ClothesController',
         'distributor' => 'Api\DistributorController',
-        'partner-group' => 'Api\PartnerGroupController'
+        'partner-group' => 'Api\PartnerGroupController',
         // 'image' => 'Api\ImageController'
     ]);
 
@@ -40,16 +41,16 @@ Route::middleware('jwt.verify')->group(function () {
     ->parameters(['last-brand' => 'entity'])
     ->except('show', 'store');
 
-    Route::apiResource('total-pre-order', 'Api\TotalPreOrderController')
-    ->only('index', 'show');
-
     Route::apiResource('total-product', 'Api\TotalProductController')
     ->only('index');
 
+    Route::apiResource('total-pre-order', 'Api\TotalPreOrderController')
+    ->only('index', 'show');
+
     // single route
-    Route::get('/detail-transaction/{id}', 'Api\DetailTransaction');
-    Route::put('/is-active/{clothes}', 'Api\ActivateClothes');
     Route::post('/photo/{id}', 'Api\UploadPhoto');
+    Route::put('/is-active/{clothes}', 'Api\ActivateClothes');
+    Route::get('/detail-transaction/{id}', 'Api\DetailTransaction');
 });
 
 // group pre-order route
@@ -61,8 +62,8 @@ Route::prefix('pre-order')->group( function () {
 
 // group registration route
 Route::prefix('registration')->group( function () {
+    Route::get('/get-list-group', 'Api\ListController@listGroup');
     Route::post('/register-member', 'Api\PreOrderController@register');
     Route::get('/get-list-distributor', 'Api\ListController@listDistributor');
-    Route::get('/get-list-group', 'Api\ListController@listGroup');
 });
 
