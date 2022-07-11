@@ -9,6 +9,7 @@ use App\Http\Requests\DistributorRequest;
 use App\Http\Requests\PreOrderRequest;
 use App\Http\Requests\RegisterRequest;
 use App\IsActive;
+use App\PartnerGroup;
 use App\TableName;
 use App\TemporaryStorage;
 use App\Transaction;
@@ -253,7 +254,15 @@ class PreOrderController extends Controller
     public function register(RegisterRequest $request)
     {
         try {
-            $distributor = Distributor::create($request->all());
+            $partner_group = PartnerGroup::where('id', $request->partner_group_id)->first();
+
+            $distributor = Distributor::create([
+                'name' => $request->name,
+                'phone' => $request->phone,
+                'db_id' => $request->db_id,
+                'group_code' => $partner_group->prtnr_code,
+                'partner_group_id' => $partner_group->id,
+            ]);
 
             return response()->json([
                 'success' => 'success',

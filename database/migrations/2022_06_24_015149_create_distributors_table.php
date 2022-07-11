@@ -20,7 +20,7 @@ class CreateDistributorsTable extends Migration
             $table->integer('prtnr_add_by')->constrained('users')->nullable();
             $table->integer('prtnr_upd_by')->constrained('users')->nullable();
             $table->integer('db_id')->default(0);
-            $table->string('group_code');
+            $table->string('group_code')->nullable();
             $table->integer('partner_group_id')->constrained('parter_groups')->nullable();
             $table->string('level')->default('bronze');
             $table->timestamps();

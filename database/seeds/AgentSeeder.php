@@ -1,9 +1,9 @@
 <?php
 
-use App\Distributor;
 use Illuminate\Database\Seeder;
+use App\Distributor;
 
-class DistributorSeeder extends Seeder
+class AgentSeeder extends Seeder
 {
     /**
      * Run the database seeds.
@@ -12,6 +12,6 @@ class DistributorSeeder extends Seeder
      */
     public function run()
     {
-        factory(Distributor::class, 2)->create();
+        factory(Distributor::class, 10)->create();
     }
 }

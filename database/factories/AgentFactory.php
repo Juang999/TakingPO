@@ -6,12 +6,11 @@ use App\Distributor;
 use Faker\Generator as Faker;
 
 $factory->define(Distributor::class, function (Faker $faker) {
-    static $phone = 62812512371;
     return [
-        'name' => $faker->name(),
-        'phone' => $phone++,
-        'group_code' => 'DB',
-        'partner_group_id' => 1,
-        'db_id' => 0
+        'name' => $faker->name,
+        'phone' => $faker->phoneNumber,
+        'group_code' => 'MS',
+        'partner_group_id' => 2,
+        'db_id' => rand(1, 2)
     ];
 });
