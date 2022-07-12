@@ -16,6 +16,9 @@ class DatabaseSeeder extends Seeder
             UserSeeder::class,
             PartnerGroupSeeder::class,
             DistributorSeeder::class,
+            AgentSeeder::class,
+            TypeSeeder::class,
+            ClothesSeeder::class
         ]);
     }
 }

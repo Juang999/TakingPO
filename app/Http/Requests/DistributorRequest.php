@@ -24,21 +24,8 @@ class DistributorRequest extends FormRequest
     public function rules()
     {
         return [
-            'db_name' => 'required',
-            'level' => 'required',
-            'role' => 'required',
-            'agent' => 'required',
             'name' => 'required',
-            'ms_name' => 'required',
-            'ms_code' => 'required',
-            'training_level' => 'required',
-            'address' => 'required',
-            'provice' => 'required',
-            'regency' => 'required',
-            'district' => 'required',
-            'pos_code' => 'required',
             'phone' => 'required',
-            'partner_group_id' => 'required',
         ];
     }
 }

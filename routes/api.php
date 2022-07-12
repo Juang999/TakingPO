@@ -62,7 +62,7 @@ Route::prefix('pre-order')->group( function () {
 
 // group registration route
 Route::prefix('registration')->group( function () {
-    Route::get('/get-list-group', 'Api\ListController@listGroup');
+    Route::get('/get-list-group', 'Api\PartnerGroupController@index');
     Route::post('/register-member', 'Api\PreOrderController@register');
     Route::get('/get-list-distributor', 'Api\ListController@listDistributor');
 });

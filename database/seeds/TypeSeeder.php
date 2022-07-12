@@ -1,6 +1,8 @@
 <?php
 
 use Illuminate\Database\Seeder;
+use App\Type;
+use Illuminate\Support\Facades\DB;
 
 class TypeSeeder extends Seeder
 {
@@ -11,6 +13,12 @@ class TypeSeeder extends Seeder
      */
     public function run()
     {
-        //
+        DB::table('types')->insert([
+            [
+                'type' => 'dewasa'
+            ],[
+                'type' => 'anak'
+            ]
+        ]);
     }
 }

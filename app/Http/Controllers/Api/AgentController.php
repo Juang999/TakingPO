@@ -22,9 +22,13 @@ class AgentController extends Controller
      */
     public function index()
     {
+        $data = Distributor::where('partner_group_id', 2)->with('PartnerGroup')->get();
+
         return response()->json([
-            'message' => 'hello world'
-        ]);
+            'status' => 'success',
+            'message' => 'success to get data',
+            'data' => $data
+        ], 200);
     }
 
     /**
@@ -33,12 +37,8 @@ class AgentController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(AgentRequest $request)
     {
-        // return response()->json([
-        //     'data' => $request->all()
-        // ]);
-
         try {
             DB::beginTransaction();
                 $partner_group = PartnerGroup::where('id', $request->partner_group_id)->first();
@@ -54,37 +54,37 @@ class AgentController extends Controller
                     'prtnr_name' => $request->role
                 ]);
 
-            $agent = Agent::firstOrCreate([
-                'name' => $request->name,
-                'phone' => $request->phone,
-                'partner_add_by' => $user_id,
-                'distributor_id' => $db_account->id,
-                'group_code' => $partner_group->prtnr_code,
-                'training_level' => $request->training_level,
-                'partner_group_id' => $partner_group->id,
-                'join_date' => $request->join_date
-            ]);
+                $agent = Distributor::firstOrCreate([
+                    'name' => $request->name,
+                    'phone' => $request->phone,
+                    'partner_add_by' => $user_id,
+                    'distributor_id' => $db_account->id,
+                    'group_code' => $partner_group->prtnr_code,
+                    'training_level' => $request->training_level,
+                    'partner_group_id' => $partner_group->id,
+                    'join_date' => $request->join_date
+                ]);
 
-            $mutif_store = MutifStoreMaster::create([
-                'mutif_store_name' => $request->ms_name,
-                'mutif_store_code' => $request->ms_code,
-                'ms_add_by' => $user_id,
-                'group_code' => $partner_group->prtnr_code,
-                'agent_id' => $agent->id,
-                'partner_group_id' => $partner_group->id,
-                'status' => $request->status,
-                'msdp' => $request->msdp
-            ]);
+                $mutif_store = MutifStoreMaster::create([
+                    'mutif_store_name' => $request->ms_name,
+                    'mutif_store_code' => $request->ms_code,
+                    'ms_add_by' => $user_id,
+                    'group_code' => $partner_group->prtnr_code,
+                    'agent_id' => $agent->id,
+                    'partner_group_id' => $partner_group->id,
+                    'status' => $request->status,
+                    'msdp' => $request->msdp
+                ]);
 
-            MutifStoreAddress::create([
-                'mutif_store_master_id' => $mutif_store->id,
-                'prtnr_add_by' => $user_id,
-                'address' => $request->address,
-                'province' => $request->province,
-                'regency' => $request->regency,
-                'district' => $request->district,
-                'phone_1' => $request->phone
-            ]);
+                MutifStoreAddress::create([
+                    'mutif_store_master_id' => $mutif_store->id,
+                    'prtnr_add_by' => $user_id,
+                    'address' => $request->address,
+                    'province' => $request->province,
+                    'regency' => $request->regency,
+                    'district' => $request->district,
+                    'phone_1' => $request->phone
+                ]);
 
             DB::commit();
 

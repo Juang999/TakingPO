@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Distributor;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\DistributorRequest;
+use App\Http\Requests\UpdateDistributorRequest;
 use App\MutifStoreAddress;
 use App\MutifStoreMaster;
 use App\PartnerGroup;
@@ -23,11 +24,13 @@ class DistributorController extends Controller
      */
     public function index()
     {
+        $data = Distributor::where('partner_group_id', 1)->with('PartnerGroup')->get();
+
         try {
             return response()->json([
                 'status' => 'success',
                 'message' => 'success get data distributor',
-                'data' => Distributor::with('PartnerGroup')->get()
+                'data' => $data
             ], 200);
         } catch (\Throwable $th) {
             return response()->json([
@@ -46,55 +49,30 @@ class DistributorController extends Controller
      */
     public function store(DistributorRequest $request)
     {
+        $user_id = Auth::user()->id;
+
         try {
-            $partner_group = PartnerGroup::where('id', $request->partner_group_id)->first();
-            $user_id = Auth::user()->id;
-            $db_account = Distributor::firstOrCreate([
-                'name' => $request->db_name,
-                'db_id' => 0,
-                'group_code' => 'DB',
-                'partner_group_id' => 1,
-                'level' => $request->level
-            ]);
+            DB::beginTransaction();
+                $distributor = Distributor::create([
+                    'name' => $request->name,
+                    'group_code' => 'DB',
+                    'distributor_id' => 0,
+                    'partner_group_id' => 1,
+                    'level' => 'bronze',
+                    'prtnr_add_by' => $user_id,
+                    'phone' => $request->phone
+                ]);
 
-            $partner_group = PartnerGroup::firstOrCreate([
-                'prtnr_name' => $request->role
-            ]);
+            DB::commit();
 
-            $agent = Distributor::create([
-                'name' => $request->name,
-                'phone' => $request->phone,
-                'prtnr_add_by' => $user_id,
-                'db_id' => $db_account->id,
-                'group_code' => $partner_group->prtnr_code,
-                'partner_group_id' => $partner_group->id,
-                'level' => $request->level,
-                'training_level' => $request->training_level,
-            ]);
-
-            $mutif_store = MutifStoreMaster::create([
-                'mutif_store_master' => $request->ms_name,
-                'mutif_store_code' => $request->ms_code,
-                'ms_add_by' => $user_id,
-                'group_code' => $partner_group->code,
-                'distributor_id' => $agent->id
-            ]);
-
-            $mutif_store_address = MutifStoreAddress::create([
-                'mutif_store_master_id' => $mutif_store->id,
-                'distributor_id' => $agent->id,
-                'prtnr_add_by' => $user_id,
-                'address' => $request->address,
-                'province' => $request->province,
-                ''
-            ]);
-
-            Distributor::create([
+            return response()->json([
                 'status' => 'success',
                 'message' => 'distributor registered',
-                // 'data' => $distributor
+                'data' => $distributor
             ]);
         } catch (\Throwable $th) {
+            DB::rollBack();
+
             return response()->json([
                 'status' => 'failed',
                 'message' => 'failed to create distributor',
@@ -109,13 +87,19 @@ class DistributorController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show(Distributor $distributor)
+    public function show($distributor)
     {
+        $data = Distributor::where('id', $distributor)->first();
+
+        $agent = Distributor::where('distributor_id', $data->id)->with('PartnerGroup')->get();
+
+        $data['agent'] = $agent;
+
         try {
             return response()->json([
                 'status' => 'success',
                 'message' => 'success get data distributor',
-                'data' => $distributor
+                'data' => $data
             ], 200);
         } catch (\Throwable $th) {
             return response()->json([
@@ -133,19 +117,26 @@ class DistributorController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(DistributorRequest $request, Distributor $distributor)
+    public function update(UpdateDistributorRequest $request, Distributor $distributor)
     {
         try {
-            $table_name = TableName::where('user_id', $distributor->id)->first();
+            $table_name = TableName::where('distributor_id', $distributor->id)->first();
 
-            if ($table_name->exists()) {
+            if ($table_name) {
                 Schema::rename($table_name->table_name, 'db_'.$request->phone);
                 $table_name->update([
                     'table_name' => 'db_'.$request->phone
                 ]);
             }
 
-            $distributor->update($request->all());
+            $user_id = Auth::user()->id;
+
+            $distributor->update([
+                'name' => $request->name,
+                'phone' => $request->phone,
+                'level' => $request->level,
+                'prtnr_upd_by' => $user_id
+            ]);
 
             return response()->json([
                 'status' => 'success',

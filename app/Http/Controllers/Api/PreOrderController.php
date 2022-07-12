@@ -25,11 +25,11 @@ class PreOrderController extends Controller
 {
     public function getClothes($phone)
     {
-        $distributor = Distributor::where('phone', $phone)->first();
-        if (!$distributor) {
+        $user = Distributor::where('phone', $phone)->with('PartnerGroup')->first();
+        if (!$user) {
             return response()->json([
                 'status' => 'failed',
-                'message' => 'number '.$phone.' not registered!'
+                'message' => 'number '.$phone.' not registered'
             ], 400);
         }
 
@@ -39,13 +39,13 @@ class PreOrderController extends Controller
 
         if ($entity) {
             if ($entity->name == 'DONE') {
-                $data = TemporaryStorage::where('distributor_id', $distributor->id)
-                    ->with('Distributor', 'Clothes')->get();
+                $data = TemporaryStorage::where('client_id', $user->id)
+                    ->with('Clothes')->get();
 
                 return response()->json([
                     'status' => 'success',
                     'message' => 'success get final data',
-                    'distributor' => $distributor,
+                    'distributor' => $user,
                     'final_data' => $data
                 ], 200);
 
@@ -58,7 +58,7 @@ class PreOrderController extends Controller
         }
 
         foreach ($clothess as $clothes) {
-            $clothes['combo'] = explode(",", $clothes->combo);
+            $clothes['combo'] = explode("-", $clothes->combo);
             $clothes['size_2'] = explode(",", $clothes->size_2);
             $clothes['size_4'] = explode(",", $clothes->size_4);
             $clothes['size_6'] = explode(",", $clothes->size_6);
@@ -69,23 +69,22 @@ class PreOrderController extends Controller
 
         return response()->json([
             'status' => 'success',
-            'message' => 'success get clothes',
-            'distributor' => $distributor,
-            'data' => compact('clothess', 'entity')
+            'message' => 'success get data',
+            'distributor' => $user,
+            'data' => compact('clothess')
         ], 200);
     }
 
     public function storeClothes(PreOrderRequest $request, $phone)
     {
         try {
-            $distributor = Distributor::where('phone', $phone)->first();
+            $user = Distributor::where('phone', $phone)->with('PartnerGroup')->first();
 
-            if(!$distributor) {
+            if (!$user) {
                 return response()->json([
-                    'status' => 'error',
-                    'message' => 'error get data',
-                    'data' => 'Distributor not found'
-                ], 404);
+                    'status' => 'failed',
+                    'message' => 'number '.$phone.' not registered'
+                ], 400);
             }
 
             DB::beginTransaction();
@@ -475,7 +474,7 @@ class PreOrderController extends Controller
             }
 
             $data = TemporaryStorage::create([
-                'distributor_id' => $distributor->id,
+                'client_id' => $user->id,
                 'clothes_id' => $request->clothes_id,
                 'info' => $request->info,
                 'veil' => $request->veil,
@@ -516,14 +515,23 @@ class PreOrderController extends Controller
     public function storeAllClothes($phone)
     {
         try {
-            $distributor = Distributor::where('phone', $phone)->first();
+            $user = Distributor::where('phone', $phone)->with('PartnerGroup')->first();
+            if (!$user) {
+                $user = Agent::where('phone', $phone)->with('PartnerGroup')->first();
+                if (!$user) {
+                    return response()->json([
+                        'status' => 'failed',
+                        'message' => 'number '.$phone.' not registered'
+                    ], 400);
+                }
+            }
 
-            $datas = TemporaryStorage::where('distributor_id', $distributor->id)->with('Clothes')->get();
+            $datas = TemporaryStorage::where('distributor_id', $user->id)->with('Clothes')->get();
 
-            if (!TableName::where('distributor_id', $distributor->id)->first()) {
+            if (!TableName::where('distributor_id', $user->id)->first()) {
                 $tableName = TableName::create([
-                    'distributor_id' => $distributor->id,
-                    'table_name' => "db_$distributor->phone"
+                    'client_id' => $user->id,
+                    'table_name' => "db_$user->phone"
                 ]);
 
                 Schema::create($tableName->table_name, function (Blueprint $table) {
@@ -550,16 +558,16 @@ class PreOrderController extends Controller
             }
 
             DB::beginTransaction();
-                $transaction = Transaction::where('distributor_id', $distributor->id)->get();
+                $transaction = Transaction::where('client_id', $user->id)->get();
                 if (!$transaction) {
                     $transaction_code = Transaction::create([
-                        'distributor_id' => $distributor->id,
-                        'transaction_code' => 'PO-'.Carbon::now()->format('HIS').'/'.date('dmy').'/NUMBER/'.$distributor->id.'/PRE-ORDER/' . 1
+                        'client_id' => $user->id,
+                        'transaction_code' => 'PO-'.Carbon::now()->format('HIS').'/'.date('dmy').'/ID/'.$user->id.'/PRE-ORDER/' . 1
                     ]);
                 } else {
                     $transaction_code = Transaction::create([
-                        'distributor_id' => $distributor->id,
-                        'transaction_code' => 'PO-'.Carbon::now()->format('HIS').'/'.date('dmy').'/DISTRIBUTOR/'.$distributor->id.'/PRE-ORDER/'. ($transaction->count() + 1)
+                        'client_id' => $user->id,
+                        'transaction_code' => 'PO-'.Carbon::now()->format('HIS').'/'.date('dmy').'/ID/'.$user->id.'/PRE-ORDER/'. ($transaction->count() + 1)
                     ]);
                 }
 
@@ -585,7 +593,7 @@ class PreOrderController extends Controller
                     ]
                     ]);
 
-                $tableName = TableName::where('distributor_id', $distributor->id)->first();
+                $tableName = TableName::where('client_id', $user->id)->first();
 
                     DB::table($tableName->table_name)->insert([
                         [
@@ -635,18 +643,18 @@ class PreOrderController extends Controller
         try {
             $partner_group = PartnerGroup::where('id', $request->partner_group_id)->first();
 
-            $distributor = Agent::create([
+            Distributor::create([
                 'name' => $request->name,
                 'phone' => $request->phone,
-                'distrihutor_id' => $request->db_id,
+                'distributor_id' => $request->distributor_id,
                 'group_code' => $partner_group->prtnr_code,
                 'partner_group_id' => $partner_group->id,
+                'level' => 'bronze'
             ]);
 
             return response()->json([
                 'success' => 'success',
                 'message' => 'register successfully',
-                'data' => $distributor
             ], 200);
 
         } catch (\Throwable $th) {
