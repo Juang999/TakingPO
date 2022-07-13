@@ -65,5 +65,8 @@ Route::prefix('registration')->group( function () {
     Route::get('/get-list-group', 'Api\PartnerGroupController@index');
     Route::post('/register-member', 'Api\PreOrderController@register');
     Route::get('/get-list-distributor', 'Api\ListController@listDistributor');
+    Route::put('/create-address/{phone}', 'Api\AddressController@createAddress');
 });
 
+// testing
+Route::get('/index', 'WilayahController@index');

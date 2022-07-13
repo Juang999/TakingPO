@@ -24,6 +24,11 @@ class PartnerGroupSeeder extends Seeder
                 'prtnr_name' => 'Mutif Store',
                 'prtnr_desc' => 'Second role',
                 'discount' => 35,
+            ],[
+                'prtnr_code' => 'PM',
+                'prtnr_name' => 'Pojok Mutif',
+                'prtnr_desc' => 'Third role',
+                'discount' => 35,
             ]
         ]);
     }

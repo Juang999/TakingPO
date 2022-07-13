@@ -20,7 +20,6 @@ class CreateDistributorsTable extends Migration
             $table->integer('distributor_id')->default(0);
             $table->string('group_code')->nullable();
             $table->integer('partner_group_id')->constrained('parter_groups')->nullable();
-            $table->date('join_date')->nullable();
             $table->string('level')->nullable();
             $table->string('training_level')->nullable();
             $table->integer('prtnr_add_by')->constrained('users')->nullable();

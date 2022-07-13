@@ -58,7 +58,7 @@ class DistributorController extends Controller
                     'group_code' => 'DB',
                     'distributor_id' => 0,
                     'partner_group_id' => 1,
-                    'level' => 'bronze',
+                    'level' => $request->level,
                     'prtnr_add_by' => $user_id,
                     'phone' => $request->phone
                 ]);

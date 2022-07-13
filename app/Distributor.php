@@ -30,7 +30,7 @@ class Distributor extends Model
 
     public function PartnerAddress()
     {
-        return $this->hasMany(PartnerAddress::class);
+        return $this->hasOne(PartnerAddress::class);
     }
 
     public function Agent()

@@ -4,7 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class DistributorRequest extends FormRequest
+class AddressRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -24,9 +24,12 @@ class DistributorRequest extends FormRequest
     public function rules()
     {
         return [
-            'name' => 'required',
-            'level' => 'required',
-            'phone' => 'required',
+            'address' => 'required',
+            'district' => 'required',
+            'regency' => 'required',
+            'province' => 'required',
+            'phone_1' => 'required',
+            // 'comment' => 'required',
         ];
     }
 }

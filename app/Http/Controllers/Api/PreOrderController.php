@@ -25,7 +25,7 @@ class PreOrderController extends Controller
 {
     public function getClothes($phone)
     {
-        $user = Distributor::where('phone', $phone)->with('PartnerGroup')->first();
+        $user = Distributor::where('phone', $phone)->with('PartnerGroup', 'PartnerAddress')->first();
         if (!$user) {
             return response()->json([
                 'status' => 'failed',

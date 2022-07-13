@@ -13,11 +13,12 @@ class CreatePartnerAddressesTable extends Migration
      */
     public function up()
     {
-        Schema::create('partner_addresses', function (Blueprint $table) {
+    Schema::create('partner_addresses', function (Blueprint $table) {
             $table->id();
-            $table->integer('mutif_store_master_id')->constrained('mutif_store_masters');
+            $table->integer('distributor_id')->constrained('distributors');
             $table->integer('prtnra_add_by')->constrained('users')->nullable();
             $table->integer('prtnra_upd_by')->constrained('users')->nullable();
+            $table->text('address');
             $table->string('district');
             $table->string('regency');
             $table->string('province');
@@ -26,7 +27,7 @@ class CreatePartnerAddressesTable extends Migration
             $table->string('fax_1')->nullable();
             $table->string('fax_2')->nullable();
             $table->string('addr_type')->default('bill');
-            $table->string('zip');
+            $table->string('zip')->nullable();
             $table->text('comment')->nullable();
             $table->boolean('active')->default(1);
             $table->timestamps();

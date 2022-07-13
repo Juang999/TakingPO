@@ -25,20 +25,20 @@ class AgentRequest extends FormRequest
     {
         return [
             'db_name' => 'required',
-            'level' => 'required',
+            'db_level' => 'required',
             'role' => 'required',
-            'name' => 'required',
             'ms_name' => 'required',
+            'ms_ms_name' => 'required',
             'ms_code' => 'required',
-            'training_level' => 'required',
-            'address' => 'required',
-            'district' => 'required',
-            'regency' => 'required',
-            'provice' => 'required',
-            'join_date' => 'required',
-            'status' => 'required',
-            'msdp'=> 'required',
-            'phone' => 'required',
+            'ms_training_level' => 'required',
+            'ms_address' => 'required',
+            'ms_district' => 'required',
+            'ns_regency' => 'required',
+            'ms_provice' => 'required',
+            'ms_open_date' => 'required',
+            'ns_phone' => 'required',
+            'ms_status' => 'required',
+            'ms_msdp'=> 'required',
         ];
     }
 }

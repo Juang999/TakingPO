@@ -22,6 +22,7 @@ class CreateMutifStoreMastersTable extends Migration
             $table->string('group_code');
             $table->integer('agent_id')->constrained('agents');
             $table->integer('partner_group_id')->constrained('partner_groups');
+            $table->string('open_date')->nullable();
             $table->string('status');
             $table->string('msdp')->default('-');
             $table->string('url')->nullable();
