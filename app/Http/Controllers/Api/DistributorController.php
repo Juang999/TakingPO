@@ -24,13 +24,17 @@ class DistributorController extends Controller
      */
     public function index()
     {
-        $data = Distributor::where('partner_group_id', 1)->with('PartnerGroup')->get();
+        $datas = Distributor::where('partner_group_id', 1)->with('PartnerGroup')->get();
+
+        foreach ($datas as $data) {
+            $data['total_agent'] = Distributor::where('distributor_id', $data->id)->count();
+        }
 
         try {
             return response()->json([
                 'status' => 'success',
                 'message' => 'success get data distributor',
-                'data' => $data
+                'data' => $datas
             ], 200);
         } catch (\Throwable $th) {
             return response()->json([

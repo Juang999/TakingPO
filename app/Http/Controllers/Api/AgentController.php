@@ -22,7 +22,51 @@ class AgentController extends Controller
      */
     public function index()
     {
-        $datas = Distributor::where('partner_group_id', '!=', 1)->with('PartnerGroup')->get();
+        $datas = MutifStoreMaster::get();
+
+        foreach ($datas as $data) {
+            $data['agent'] = Distributor::where('id', $data->distributor_id)->first();
+            $data['distributor'] = Distributor::where('id', $data->agent->distributor_id)->first();
+            $data['distributor']['total_agent'] = Distributor::where('distributor_id', $data->distributor->id)->count();
+
+            $data->makeHidden([
+                'ms_add_by',
+                'ms_upd_by',
+                'group_code',
+                'msdp',
+                'partner_group_id',
+                'url',
+                'remarks',
+                'created_at',
+                'updated_at',
+                'distributor_id'
+            ]);
+
+            $data->agent->makeHidden([
+                'distributor_id',
+                'group_code',
+                'group_code',
+                'partner_group_id',
+                'level',
+                'training_level',
+                'prtnr_add_by',
+                'prtnr_upd_by',
+                'deleted_at'
+            ]);
+
+            $data->distributor->makeHidden([
+                'distributor_id',
+                'group_code',
+                'group_code',
+                'partner_group_id',
+                'level',
+                'training_level',
+                'prtnr_add_by',
+                'prtnr_upd_by',
+                'deleted_at',
+                'phone'
+            ]);
+        }
 
         return response()->json([
             'status' => 'success',
@@ -70,7 +114,7 @@ class AgentController extends Controller
                         'mutif_store_code' => $request->ms_code,
                         'ms_add_by' => $user_id,
                         'group_code' => $partner_group->prtnr_code,
-                        'agent_id' => $agent->id,
+                        'distributor_id' => $agent->id,
                         'partner_group_id' => $partner_group->id,
                         'status' => $request->ms_status,
                         'open_date' => $request->ms_open_date,
@@ -82,7 +126,7 @@ class AgentController extends Controller
                         'mutif_store_code' => $request->ms_code,
                         'ms_add_by' => $user_id,
                         'group_code' => $partner_group->prtnr_code,
-                        'agent_id' => $agent->id,
+                        'distributor_id' => $agent->id,
                         'partner_group_id' => $partner_group->id,
                         'status' => $request->ms_status,
                         'msdp' => $request->ms_msdp
@@ -125,13 +169,23 @@ class AgentController extends Controller
      */
     public function show($id)
     {
-        $agent = Distributor::where('id',$id)->with('PartnerGroup')->first();
+        try {
+            $agent = Distributor::where('id',$id)->with('PartnerGroup', 'MutifStoreMaster')->first();
 
-        $agent->distributor = Distributor::where('id', $agent->distributor_id)->first();
+            // $agent['distributor'] = Distributor::where('id', $agent->distributor_id)->first();
 
-        return response()->json([
-            'data' => $agent
-        ]);
+            return response()->json([
+                'status' => 'success',
+                'message' => 'success to get detail data',
+                'data' => $agent
+            ], 200);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'status' => 'failed',
+                'message' => 'failed to get detail data',
+                'error' => $th->getMessage()
+            ], 400);
+        }
     }
 
     /**

@@ -8,9 +8,9 @@ class MutifStoreMaster extends Model
 {
     protected $guarded = ['id'];
 
-    public function Agent()
+    public function Distributor()
     {
-        return $this->belongsTo(Agent::class);
+        return $this->belongsTo(Distributor::class);
     }
 
     public function MutifStoreAddress()

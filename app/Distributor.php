@@ -42,4 +42,9 @@ class Distributor extends Model
     {
         return $this->belongsTo(PartnerGroup::class);
     }
+
+    public function MutifStoreMaster()
+    {
+        return $this->hasMany(MutifStoreMaster::class);
+    }
 }
