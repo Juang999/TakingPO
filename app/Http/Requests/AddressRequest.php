@@ -28,7 +28,7 @@ class AddressRequest extends FormRequest
             'district' => 'required',
             'regency' => 'required',
             'province' => 'required',
-            'phone_1' => 'required',
+            // 'phone_1' => 'required',
             // 'comment' => 'required',
         ];
     }

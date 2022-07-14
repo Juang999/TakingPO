@@ -35,7 +35,7 @@ class PreOrderController extends Controller
 
         $entity = IsActive::find(1);
 
-        $clothess = Clothes::orderBy('entity_name')->with('Type', 'Image', 'BufferProduct')->get();
+        $clothess = Clothes::orderBy('entity_name')->with('Type', 'Image', 'BufferProduct.Size')->get();
 
         if ($entity) {
             if ($entity->name == 'DONE') {
@@ -56,9 +56,12 @@ class PreOrderController extends Controller
                 ], 200);
             }
         }
+        
 
         foreach ($clothess as $clothes) {
-            $clothes['combo'] = explode("-", $clothes->combo);
+            if ($clothes->combo != '-') {
+                $clothes['combo'] = explode("-", $clothes->combo);
+            }
             $clothes['size_2'] = explode(",", $clothes->size_2);
             $clothes['size_4'] = explode(",", $clothes->size_4);
             $clothes['size_6'] = explode(",", $clothes->size_6);

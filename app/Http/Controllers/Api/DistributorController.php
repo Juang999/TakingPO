@@ -8,6 +8,7 @@ use App\Http\Requests\DistributorRequest;
 use App\Http\Requests\UpdateDistributorRequest;
 use App\MutifStoreAddress;
 use App\MutifStoreMaster;
+use App\PartnerAddress;
 use App\PartnerGroup;
 use App\TableName;
 use Illuminate\Http\Request;
@@ -95,9 +96,14 @@ class DistributorController extends Controller
     {
         $data = Distributor::where('id', $distributor)->first();
 
-        $agent = Distributor::where('distributor_id', $data->id)->with('PartnerGroup')->get();
+        $agents = Distributor::where('distributor_id', $data->id)->get(['id', 'name']);
 
-        $data['agent'] = $agent;
+        foreach ($agents as $agent) {
+            $ms_code = MutifStoreMaster::where('distributor_id', $agent->id)->first('mutif_store_code');
+            $agent['ms_code'] = $ms_code['mutif_store_code'];
+        }
+
+        $data['agent'] = $agents;
 
         try {
             return response()->json([
@@ -113,7 +119,6 @@ class DistributorController extends Controller
             ], 400);
         }
     }
-
     /**
      * Update the specified resource in storage.
      *
@@ -121,7 +126,7 @@ class DistributorController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(UpdateDistributorRequest $request, Distributor $distributor)
+    public function update(Request $request, Distributor $distributor)
     {
         try {
             $table_name = TableName::where('distributor_id', $distributor->id)->first();
@@ -136,11 +141,33 @@ class DistributorController extends Controller
             $user_id = Auth::user()->id;
 
             $distributor->update([
-                'name' => $request->name,
-                'phone' => $request->phone,
-                'level' => $request->level,
+                'name' => ($request->name)? $request->name : $distributor->name,
+                'phone' => ($request->phone)? $request->phone : $distributor->phone,
                 'prtnr_upd_by' => $user_id
             ]);
+
+
+            if ($request->address) {
+                $address = PartnerAddress::where('distributor_id', $distributor->id)->first();
+
+                if ($address) {
+                    $address->update([
+                        'distributor_id' => $distributor->id,
+                        'address' => ($request->address)? $request->address : $address->address,
+                        'district' => ($request->district)? $request->district : $address->district,
+                        'regency' => ($request->regency)? $request->regency : $address->regency,
+                        'province' => ($request->province)? $request->province : $address->province
+                    ]);
+                } else {
+                    PartnerAddress::create([
+                        'distributor_id' => $distributor->id,
+                        'address' => $request->address,
+                        'district' => $request->district,
+                        'regency' => $request->regency,
+                        'province' => $request->province
+                    ]);
+                }
+            }
 
             return response()->json([
                 'status' => 'success',

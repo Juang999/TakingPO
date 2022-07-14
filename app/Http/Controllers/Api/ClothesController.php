@@ -82,7 +82,7 @@ class ClothesController extends Controller
 
                 if ($clothes->size_s > 0) {
                     $size_s = Size::firstOrCreate([
-                        'size' => 's'
+                        'size' => strtoupper('s')
                     ]);
                     BufferProduct::create([
                         'clothes_id' => $clothes->id,
@@ -94,7 +94,7 @@ class ClothesController extends Controller
 
                 if ($clothes->size_m > 0) {
                     $size_m = Size::firstOrCreate([
-                        'size' => 'm'
+                        'size' => strtoupper('m')
                     ]);
                     BufferProduct::create([
                         'clothes_id' => $clothes->id,
@@ -106,7 +106,7 @@ class ClothesController extends Controller
 
                 if ($clothes->size_l > 0) {
                     $size_l = Size::firstOrCreate([
-                        'size' => 'l'
+                        'size' => strtoupper('l')
                     ]);
                     BufferProduct::create([
                         'clothes_id' => $clothes->id,
@@ -118,7 +118,7 @@ class ClothesController extends Controller
 
                 if ($clothes->size_xl > 0) {
                     $size_xl = Size::firstOrCreate([
-                        'size' => 'xl'
+                        'size' => strtoupper('xl')
                     ]);
                     BufferProduct::create([
                         'clothes_id' => $clothes->id,
@@ -130,7 +130,7 @@ class ClothesController extends Controller
 
                 if ($clothes->size_xxl > 0) {
                     $size_xxl = Size::firstOrCreate([
-                        'size' => 'xxl'
+                        'size' => strtoupper('xxl')
                     ]);
                     BufferProduct::create([
                         'clothes_id' => $clothes->id,
@@ -142,7 +142,7 @@ class ClothesController extends Controller
 
                 if ($clothes->size_xxxl > 0) {
                     $size_xxxl = Size::firstOrCreate([
-                        'size' => 'xxxl'
+                        'size' => strtoupper('xxxl')
                     ]);
                     BufferProduct::create([
                         'clothes_id' => $clothes->id,

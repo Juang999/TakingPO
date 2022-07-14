@@ -29,7 +29,7 @@ class AddressController extends Controller
             'district' => $request->district,
             'regency' => $request->regency,
             'province' => $request->province,
-            'phone_1' => $request->phone_1,
+            // 'phone_1' => $request->phone_1,
             // 'comment' => $request->comment
         ]);
 
