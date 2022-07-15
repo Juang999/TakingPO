@@ -8,10 +8,13 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\AgentRequest;
 use App\MutifStoreAddress;
 use App\MutifStoreMaster;
+use App\PartnerAddress;
 use App\PartnerGroup;
+use App\TableName;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 
 class AgentController extends Controller
 {
@@ -141,7 +144,8 @@ class AgentController extends Controller
                     'province' => $request->ms_province,
                     'regency' => $request->ms_regency,
                     'district' => $request->ms_district,
-                    'phone_1' => $request->ms_phone
+                    'phone_1' => $request->ms_phone,
+                    'phone_2' => ($request->ms_phone_2) ? $request->ms_phone_2 : 0
                 ]);
 
             DB::commit();
@@ -171,6 +175,7 @@ class AgentController extends Controller
     {
         try {
             $agent = Distributor::where('id',$id)->with('PartnerGroup', 'MutifStoreMaster')->first();
+            $agent['distributor'] = Distributor::where('id', $agent->distributor_id)->first();
 
             // $agent['distributor'] = Distributor::where('id', $agent->distributor_id)->first();
 
@@ -198,22 +203,73 @@ class AgentController extends Controller
     public function update(Request $request, Distributor $agent)
     {
         try {
+        DB::beginTransaction();
+            $TableName = TableName::where('distributor_id', $agent->id)->first();
+
+            if ($TableName) {
+                if ($request->phone) {
+                    Schema::rename($TableName->table_name, 'db_'.$request->phone);
+                    $TableName->update([
+                        'table_name' => 'db_'.$request->phone
+                    ]);
+                }
+            }
+
+            $user_id = Auth::user()->id;
+
             $agent->update([
-                'name' => $request->name,
-                'phone' => $request->phone,
-                'level' => $request->level
+                'name' => ($request->name) ? $request->name : $agent->name,
+                'phone' => ($request->phone) ? $request->phone : $agent->phone,
+                'prtnr_upd_by' => $user_id
             ]);
 
-            return response()->json([
-                'status' => 'success',
-                'message' => 'success to update distributor'
+            $mutif_store_master = MutifStoreMaster::where('distributor_id', $agent->id)->first();
+            $mutif_store_address = MutifStoreAddress::where('mutif_store_master_id', $mutif_store_master->id)->first();
+
+            if ($request->partner_group_id) {
+                $partner_group = PartnerGroup::where('id', $request->partner_group_id)->first();
+            }
+
+            $mutif_store_master->update([
+                'mutif_store_master' => ($request->ms_ms_name) ? $request->ms_ms_name : $mutif_store_master->mutif_store_name,
+                'mutif_store_code' => ($request->ms_code) ? $request->ms_code : $mutif_store_master->mutif_store_code,
+                'ms_upd_by' => $user_id,
+                'group_code' => ($request->partner_group_id) ? $partner_group->prtnr_code : $mutif_store_master->group_code,
+                'partner_group_id' => ($request->partner_group_id) ? $partner_group->id : $mutif_store_master->partner_group_id,
+                'distributor_id' => ($request->distributor_id) ? $request->distributor_id : $mutif_store_master->distributor_id,
+                'open_date' => ($request->open_date) ? $request->open_date : $mutif_store_master->open_date,
+                'status' => ($request->status) ? $request->status : $mutif_store_master->status,
+                'msdp' => ($request->msdp) ? $request->msdp : $mutif_store_master->msdp,
+                'url' => ($request->url) ? $request->url : $mutif_store_master->url,
+                'remarks' => ($request->remarks) ? $request->remarks : $mutif_store_master->remarks
             ]);
+
+            $mutif_store_address->update([
+                'prtnr_upd_by' => $user_id,
+                'address' => ($request->address) ? $request->address : $mutif_store_address->address,
+                'province' => ($request->province) ? $request->province : $mutif_store_address->province,
+                'regency' => ($request->regency) ? $request->regency : $mutif_store_address->regency,
+                'district' => ($request->district) ? $request->district : $mutif_store_address->district,
+                'phone_1' => ($request->phone_1) ? $request->phone_1 : $mutif_store_address->phone_1,
+                'fax_1' => ($request->fax_1) ? $request->fax_1 : '-',
+                'addr_type' => ($request->addr_type) ? $request->addr_type : $mutif_store_address->addr_type,
+                'zip' => ($request->zip) ? $request->zip : $mutif_store_address->zip,
+                'comment' => ($request->comment) ? $request->comment : $mutif_store_address->comment
+            ]);
+
+        DB::commit();
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'success to update'
+        ], 200);
+
         } catch (\Throwable $th) {
             return response()->json([
                 'status' => 'failed',
                 'message' => 'failed to update data',
                 'error' => $th->getMessage()
-            ]);
+            ], 400);
         }
     }
 
