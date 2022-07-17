@@ -49,6 +49,7 @@ Route::middleware('jwt.verify')->group(function () {
 
     // single route
     Route::post('/photo/{id}', 'Api\UploadPhoto');
+    Route::get('get-new-member', 'Api\AccRegistration');
     Route::put('/is-active/{clothes}', 'Api\ActivateClothes');
     Route::get('/detail-transaction/{id}', 'Api\DetailTransaction');
 });
@@ -58,15 +59,17 @@ Route::prefix('pre-order')->group( function () {
     Route::get('/{phone}', 'Api\PreOrderController@getClothes');
     Route::post('/{phone}', 'Api\PreOrderController@storeClothes');
     Route::post('/store-all/{phone}', 'Api\PreOrderController@storeAllClothes');
+    Route::get('/{phone}/clothes/{id}', 'Api\PreOrderController@getDetailClothes');
 });
 
 // group registration route
 Route::prefix('registration')->group( function () {
+    Route::get('login/{phone}', 'Api\LoginUser');
+    Route::post('/register-member', 'Api\SingleRegister');
+    Route::put('/update-phone/{phone}', 'Api\UpdatePhone');
     Route::get('/get-list-group', 'Api\PartnerGroupController@index');
-    Route::post('/register-member', 'Api\PreOrderController@register');
     Route::get('/get-list-distributor', 'Api\ListController@listDistributor');
     Route::post('/create-address/{phone}', 'Api\AddressController@createAddress');
-    Route::put('/update-phone/{phone}', 'Api\UpdatePhone');
 });
 
 // testing
