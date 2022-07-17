@@ -89,7 +89,7 @@ class PartnerGroupController extends Controller
      */
     public function update(PartnerGroupRequest $request, PartnerGroup $partnerGroup)
     {
-        
+
     }
 
     /**
