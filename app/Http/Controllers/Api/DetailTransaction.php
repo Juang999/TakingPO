@@ -23,7 +23,9 @@ class DetailTransaction extends Controller
 
             $transaction_code->makeHidden('distributor_id');
 
+            // return response()->json($transaction_code);
             $table_name = TableName::where('distributor_id', $transaction_code->distributor_id)->first();
+
 
             $preorders = DB::table('clothes')->select('clothes.id', 'clothes.entity_name','clothes.article_name', 'clothes.group_article', 'clothes.type_id', 'clothes.size_s AS Harga_size_s', 'clothes.size_m AS Harga_size_m', 'clothes.size_l AS Harga_size_l', 'clothes.size_xl AS Harga_size_xl', 'clothes.size_xxl AS Harga_size_xxl', 'clothes.size_xxxl AS Harga_size_xxxl', 'clothes.size_2 AS Harga_size_2', 'clothes.size_4 AS Harga_size_4', 'clothes.size_6 AS Harga_size_6', 'clothes.size_8 AS Harga_size_8', 'clothes.size_10 AS Harga_size_10', 'clothes.size_12 AS Harga_size_12', $table_name->table_name.'.info', $table_name->table_name.'.veil', $table_name->table_name.'.size_s', $table_name->table_name.'.size_m', $table_name->table_name.'.size_l', $table_name->table_name.'.size_xl', $table_name->table_name.'.size_xxl', $table_name->table_name.'.size_xxxl', $table_name->table_name.'.size_2', $table_name->table_name.'.size_4', $table_name->table_name.'.size_6', $table_name->table_name.'.size_8', $table_name->table_name.'.size_10', $table_name->table_name.'.size_12', $table_name->table_name.'.total')->join($table_name->table_name, 'clothes.id', '=', $table_name->table_name.'.clothes_id')->where('transaction_code_id', '=', $transaction_code->id)->get();
 
