@@ -25,62 +25,63 @@ class PreOrderController extends Controller
 {
     public function getClothes($phone)
     {
-        if ($phone == 0 || $phone == NULL) {
+        $user  = Distributor::where('phone', $phone)->first();
+
+        if (!$user) {
             return response()->json([
-                'message' => 'please enter your phone number'
+                'status' => 'failed to get data',
+                'message' => 'phone '.$phone.' not registered'
             ], 400);
         }
 
-        $user = Distributor::where('phone', $phone)->with('PartnerGroup', 'PartnerAddress')->first();
+        $clothess = Clothes::orderBy('entity_name')->with('Type', 'Image', 'BufferProduct.Size')->get();
+
+        if ($clothess) {
+            foreach ($clothess as $clothes) {
+                if ($clothes->combo != '-') {
+                    $clothes['combo'] = explode(",", $clothes->combo);
+                }
+                $clothes['size_2'] = explode(",", $clothes->size_2);
+                $clothes['size_4'] = explode(",", $clothes->size_4);
+                $clothes['size_6'] = explode(",", $clothes->size_6);
+                $clothes['size_8'] = explode(",", $clothes->size_8);
+                $clothes['size_10'] = explode(",", $clothes->size_10);
+                $clothes['size_12'] = explode(",", $clothes->size_12);
+            }
+        }
+        return response()->json([
+        'status' => 'success',
+            'message' => 'success get data',
+            'data' => $clothess
+        ], 200);
+    }
+
+    public function getDetailClothes($phone, $id)
+    {
+        $user = Distributor::where('phone', $phone)->first();
+
         if (!$user) {
             return response()->json([
                 'status' => 'failed',
-                'message' => 'number '.$phone.' not registered'
+                'message' => 'number '.$phone.'not registerd'
             ], 400);
         }
 
-        $entity = IsActive::find(1);
+        try {
+            $clothes = Clothes::where('id', $id)->with('Type', 'Image', 'BufferProduct')->first();
 
-        if ($entity) {
-            if ($entity->name == 'DONE') {
-                $data = TemporaryStorage::where('distributor_id', $user->id)
-                    ->with('Clothes')->get();
-
-                return response()->json([
-                    'status' => 'success',
-                    'message' => 'success get final data',
-                    'distributor' => $user,
-                    'final_data' => $data
-                ], 200);
-
-            } else if ($entity->name == 'NON-ACTIVE') {
-                return response()->json([
-                    'status' => 'closed',
-                    'message' => 'website sedang ditutup'
-                ], 200);
-            } else if ($entity->name == 'ACTIVE') {
-                $clothess = Clothes::orderBy('entity_name')->with('Type', 'Image', 'BufferProduct.Size')->get();
-            }
+            return response()->json([
+                'status' => 'success',
+                'message' => 'success to get detail clothes',
+                'data' => $clothes
+            ], 200);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'status' => 'failed',
+                'message' => 'failed to get data',
+                'error' => $th->getMessage()
+            ], 400);
         }
-
-        foreach ($clothess as $clothes) {
-            if ($clothes->combo != '-') {
-                $clothes['combo'] = explode(",", $clothes->combo);
-            }
-            $clothes['size_2'] = explode(",", $clothes->size_2);
-            $clothes['size_4'] = explode(",", $clothes->size_4);
-            $clothes['size_6'] = explode(",", $clothes->size_6);
-            $clothes['size_8'] = explode(",", $clothes->size_8);
-            $clothes['size_10'] = explode(",", $clothes->size_10);
-            $clothes['size_12'] = explode(",", $clothes->size_12);
-        }
-
-        return response()->json([
-            'status' => 'success',
-            'message' => 'success get data',
-            'distributor' => $user,
-            'data' => compact('clothess')
-        ], 200);
     }
 
     public function storeClothes(PreOrderRequest $request, $phone)
@@ -641,35 +642,6 @@ class PreOrderController extends Controller
             return response()->json([
                 'status' => 'failed',
                 'message' => 'failed to store data',
-                'error' => $th->getMessage()
-            ], 400);
-        }
-    }
-
-    public function register(RegisterRequest $request)
-    {
-        try {
-            $partner_group = PartnerGroup::where('id', $request->partner_group_id)->first();
-
-            Distributor::create([
-                'name' => $request->name,
-                'phone' => $request->phone,
-                'distributor_id' => $request->distributor_id,
-                'group_code' => $partner_group->prtnr_code,
-                'partner_group_id' => $partner_group->id,
-                'level' => 'bronze'
-            ]);
-
-            return response()->json([
-                'success' => 'success',
-                'message' => 'register successfully',
-            ], 200);
-
-        } catch (\Throwable $th) {
-
-            return response()->json([
-                'status' => 'failed',
-                'message' => 'failed to register',
                 'error' => $th->getMessage()
             ], 400);
         }
