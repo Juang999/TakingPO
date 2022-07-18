@@ -281,36 +281,36 @@ class ClothesController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(ClothesRequest $request, Clothes $clothes)
+    public function update(Request $request, Clothes $clothes)
     {
         try {
-            $type = Type::where('type', $request->type)->firstOrFail();
+            $type = Type::where('type', $request->type)->first();
 
             DB::beginTransaction();
 
             $clothes->update([
-                'entity_name' => $request->entity_name,
-                'article_name' => $request->article_name,
-                'color' => $request->color,
-                'material' => $request->material,
-                'combo' => $request->combo,
-                'special_feature' => $request->special_feature,
-                'keyword' => $request->keyword,
-                'description' => $request->description,
-                'slug' => $request->product_name,
-                'type_id' => $type->id,
-                'size_s' => $request->size_s,
-                'size_m' => $request->size_m,
-                'size_l' => $request->size_l,
-                'size_xl' => $request->size_xl,
-                'size_xxl' => $request->size_xxl,
-                'size_xxxl' => $request->size_xxxl,
-                'size_2' => $request->size_2,
-                'size_4' => $request->size_4,
-                'size_6' => $request->size_6,
-                'size_8' => $request->size_8,
-                'size_10' => $request->size_10,
-                'size_12' => $request->size_12,
+                'entity_name' => ($request->entity_name) ? $request->entity_name : $clothes->entity_name,
+                'article_name' => ($request->article_name) ? $request->article_name : $clothes->article_name,
+                'color' => ($request->color) ? $request->color : $clothes->color,
+                'material' => ($request->material) ? $request->material : $clothes->material,
+                'combo' => ($request->combo) ? $request->combo : $clothes->combo,
+                'special_feature' => ($request->special_feature) ? $request->special_feature : $clothes->special_feature,
+                'keyword' => ($request->keyword) ? $request->keyword : $clothes->keyword,
+                'description' => ($request->description) ? $request->description : $clothes->description,
+                'slug' => ($request->product_name) ? $request->product_name : $clothes->slug,
+                'type_id' => ($request->type) ? $type->id : $clothes->type_id,
+                'size_s' => ($request->size_s) ? $request->size_s : $clothes->size_s,
+                'size_m' => ($request->size_m) ? $request->size_m : $clothes->size_m,
+                'size_l' => ($request->size_l) ? $request->size_l : $clothes->size_l,
+                'size_xl' => ($request->size_xl) ? $request->size_xl : $clothes->size_xl,
+                'size_xxl' => ($request->size_xxl) ? $request->size_xxl : $clothes->size_xxl,
+                'size_xxxl' => ($request->size_xxxl) ? $request->size_xxxl : $clothes->size_xxxl,
+                'size_2' => ($request->size_2) ? $request->size_2 : $clothes->size_2,
+                'size_4' => ($request->size_4) ? $request->size_4 : $clothes->size_4,
+                'size_6' => ($request->size_6) ? $request->size_6 : $clothes->size_6,
+                'size_8' => ($request->size_6) ? $request->size_6 : $clothes->size_6,
+                'size_10' => ($request->size_10) ? $request->size_10 : $clothes->size_10,
+                'size_12' => ($request->size_12) ? $request->size_12 : $clothes->size_12,
                 'created_at' => now(),
                 'updated_at' => now(),
             ]);
@@ -322,13 +322,15 @@ class ClothesController extends Controller
             ])->first();
 
             if ($BufferStock) {
-                $avaliable = $BufferStock->qty_avaliable + $request->bs_size_s;
-                $buffer_stock = $BufferStock->qty_buffer + $request->bs_size_s;
+                if ($request->bs_size_s) {
+                    $avaliable = $BufferStock->qty_avaliable + $request->bs_size_s;
+                    $buffer_stock = $BufferStock->qty_buffer + $request->bs_size_s;
 
-                $BufferStock->update([
-                    'qty_avaliable' => $avaliable,
-                    'qty_buffer' => $buffer_stock
-                ]);
+                    $BufferStock->update([
+                        'qty_avaliable' => $avaliable,
+                        'qty_buffer' => $buffer_stock
+                    ]);
+                }
             }
 
             $size_m = Size::where('size', 'M')->first();
@@ -338,13 +340,15 @@ class ClothesController extends Controller
             ])->first();
 
             if ($BufferStock) {
-                $avaliable = $BufferStock->qty_avaliable + $request->bs_size_s;
-                $buffer_stock = $BufferStock->qty_buffer + $request->bs_size_s;
+                if ($request->bs_size_m) {
+                    $avaliable = $BufferStock->qty_avaliable + $request->bs_size_m;
+                    $buffer_stock = $BufferStock->qty_buffer + $request->bs_size_m;
 
-                $BufferStock->update([
-                    'qty_avaliable' => $avaliable,
-                    'qty_buffer' => $buffer_stock
-                ]);
+                    $BufferStock->update([
+                        'qty_avaliable' => $avaliable,
+                        'qty_buffer' => $buffer_stock
+                    ]);
+                }
             }
 
             $size_l = Size::where('size', 'L')->first();
@@ -354,13 +358,15 @@ class ClothesController extends Controller
             ])->first();
 
             if ($BufferStock) {
-                $avaliable = $BufferStock->qty_avaliable + $request->bs_size_s;
-                $buffer_stock = $BufferStock->qty_buffer + $request->bs_size_s;
+                if ($request->bs_size_l) {
+                    $avaliable = $BufferStock->qty_avaliable + $request->bs_size_l;
+                    $buffer_stock = $BufferStock->qty_buffer + $request->bs_size_l;
 
-                $BufferStock->update([
-                    'qty_avaliable' => $avaliable,
-                    'qty_buffer' => $buffer_stock
-                ]);
+                    $BufferStock->update([
+                        'qty_avaliable' => $avaliable,
+                        'qty_buffer' => $buffer_stock
+                    ]);
+                }
             }
 
             $size_xl = Size::where('size', 'XL')->first();
@@ -370,13 +376,16 @@ class ClothesController extends Controller
             ])->first();
 
             if ($BufferStock) {
-                $avaliable = $BufferStock->qty_avaliable + $request->bs_size_s;
-                $buffer_stock = $BufferStock->qty_buffer + $request->bs_size_s;
+                if ($request->bs_size_xl) {
 
-                $BufferStock->update([
-                    'qty_avaliable' => $avaliable,
-                    'qty_buffer' => $buffer_stock
-                ]);
+                    $avaliable = $BufferStock->qty_avaliable + $request->bs_size_xl;
+                    $buffer_stock = $BufferStock->qty_buffer + $request->bs_size_xl;
+
+                    $BufferStock->update([
+                        'qty_avaliable' => $avaliable,
+                        'qty_buffer' => $buffer_stock
+                    ]);
+                }
             }
 
             $size_xxl = Size::where('size', 'XXL')->first();
@@ -386,13 +395,15 @@ class ClothesController extends Controller
             ])->first();
 
             if ($BufferStock) {
-                $avaliable = $BufferStock->qty_avaliable + $request->bs_size_s;
-                $buffer_stock = $BufferStock->qty_buffer + $request->bs_size_s;
+                if ($request->bs_size_xxl) {
+                    $avaliable = $BufferStock->qty_avaliable + $request->bs_size_xxl;
+                    $buffer_stock = $BufferStock->qty_buffer + $request->bs_size_xxl;
 
-                $BufferStock->update([
-                    'qty_avaliable' => $avaliable,
-                    'qty_buffer' => $buffer_stock
-                ]);
+                    $BufferStock->update([
+                        'qty_avaliable' => $avaliable,
+                        'qty_buffer' => $buffer_stock
+                    ]);
+                }
             }
 
             $size_xxxl = Size::where('size', 'XXXL')->first();
@@ -402,13 +413,15 @@ class ClothesController extends Controller
             ])->first();
 
             if ($BufferStock) {
-                $avaliable = $BufferStock->qty_avaliable + $request->bs_size_s;
-                $buffer_stock = $BufferStock->qty_buffer + $request->bs_size_s;
+                if ($request->bs_size_xxxl) {
+                    $avaliable = $BufferStock->qty_avaliable + $request->bs_size_s;
+                    $buffer_stock = $BufferStock->qty_buffer + $request->bs_size_s;
 
-                $BufferStock->update([
-                    'qty_avaliable' => $avaliable,
-                    'qty_buffer' => $buffer_stock
-                ]);
+                    $BufferStock->update([
+                        'qty_avaliable' => $avaliable,
+                        'qty_buffer' => $buffer_stock
+                    ]);
+                }
             }
 
             $size_2 = Size::where('size', '2')->first();
@@ -418,13 +431,15 @@ class ClothesController extends Controller
             ])->first();
 
             if ($BufferStock) {
-                $avaliable = $BufferStock->qty_avaliable + $request->bs_size_s;
-                $buffer_stock = $BufferStock->qty_buffer + $request->bs_size_s;
+                if ($request->bs_size_2) {
+                    $avaliable = $BufferStock->qty_avaliable + $request->bs_size_2;
+                    $buffer_stock = $BufferStock->qty_buffer + $request->bs_size_2;
 
-                $BufferStock->update([
-                    'qty_avaliable' => $avaliable,
-                    'qty_buffer' => $buffer_stock
-                ]);
+                    $BufferStock->update([
+                        'qty_avaliable' => $avaliable,
+                        'qty_buffer' => $buffer_stock
+                    ]);
+                }
             }
 
             $size_4 = Size::where('size', '4')->first();
@@ -434,13 +449,15 @@ class ClothesController extends Controller
             ])->first();
 
             if ($BufferStock) {
-                $avaliable = $BufferStock->qty_avaliable + $request->bs_size_s;
-                $buffer_stock = $BufferStock->qty_buffer + $request->bs_size_s;
+                if ($request->bs_size_4) {
+                $avaliable = $BufferStock->qty_avaliable + $request->bs_size_4;
+                $buffer_stock = $BufferStock->qty_buffer + $request->bs_size_4;
 
                 $BufferStock->update([
                     'qty_avaliable' => $avaliable,
                     'qty_buffer' => $buffer_stock
                 ]);
+                }
             }
 
             $size_6 = Size::where('size', '6')->first();
@@ -450,13 +467,15 @@ class ClothesController extends Controller
             ])->first();
 
             if ($BufferStock) {
-                $avaliable = $BufferStock->qty_avaliable + $request->bs_size_s;
-                $buffer_stock = $BufferStock->qty_buffer + $request->bs_size_s;
+                if ($request->bs_size_6) {
+                    $avaliable = $BufferStock->qty_avaliable + $request->bs_size_6;
+                    $buffer_stock = $BufferStock->qty_buffer + $request->bs_size_6;
 
-                $BufferStock->update([
-                    'qty_avaliable' => $avaliable,
-                    'qty_buffer' => $buffer_stock
-                ]);
+                    $BufferStock->update([
+                        'qty_avaliable' => $avaliable,
+                        'qty_buffer' => $buffer_stock
+                    ]);
+                }
             }
 
             $size_8 = Size::where('size', '8')->first();
@@ -466,13 +485,15 @@ class ClothesController extends Controller
             ])->first();
 
             if ($BufferStock) {
-                $avaliable = $BufferStock->qty_avaliable + $request->bs_size_s;
-                $buffer_stock = $BufferStock->qty_buffer + $request->bs_size_s;
+                if ($request->bs_size_8) {
+                    $avaliable = $BufferStock->qty_avaliable + $request->bs_size_8;
+                    $buffer_stock = $BufferStock->qty_buffer + $request->bs_size_8;
 
-                $BufferStock->update([
-                    'qty_avaliable' => $avaliable,
-                    'qty_buffer' => $buffer_stock
-                ]);
+                    $BufferStock->update([
+                        'qty_avaliable' => $avaliable,
+                        'qty_buffer' => $buffer_stock
+                    ]);
+                }
             }
 
             $size_10 = Size::where('size', '10')->first();
@@ -482,13 +503,15 @@ class ClothesController extends Controller
             ])->first();
 
             if ($BufferStock) {
-                $avaliable = $BufferStock->qty_avaliable + $request->bs_size_s;
-                $buffer_stock = $BufferStock->qty_buffer + $request->bs_size_s;
+                if ($request->bs_size_10) {
+                    $avaliable = $BufferStock->qty_avaliable + $request->bs_size_10;
+                    $buffer_stock = $BufferStock->qty_buffer + $request->bs_size_10;
 
-                $BufferStock->update([
-                    'qty_avaliable' => $avaliable,
-                    'qty_buffer' => $buffer_stock
-                ]);
+                    $BufferStock->update([
+                        'qty_avaliable' => $avaliable,
+                        'qty_buffer' => $buffer_stock
+                    ]);
+                }
             }
 
             $size_12 = Size::where('size', '12')->first();
@@ -498,13 +521,15 @@ class ClothesController extends Controller
             ])->first();
 
             if ($BufferStock) {
-                $avaliable = $BufferStock->qty_avaliable + $request->bs_size_s;
-                $buffer_stock = $BufferStock->qty_buffer + $request->bs_size_s;
+                if ($request->bs_size_12) {
+                    $avaliable = $BufferStock->qty_avaliable + $request->bs_size_12;
+                    $buffer_stock = $BufferStock->qty_buffer + $request->bs_size_12;
 
-                $BufferStock->update([
-                    'qty_avaliable' => $avaliable,
-                    'qty_buffer' => $buffer_stock
-                ]);
+                    $BufferStock->update([
+                        'qty_avaliable' => $avaliable,
+                        'qty_buffer' => $buffer_stock
+                    ]);
+                }
             }
 
             DB::commit();
