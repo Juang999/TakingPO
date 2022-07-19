@@ -15,9 +15,8 @@ class CreateQueuesTable extends Migration
     {
         Schema::create('queues', function (Blueprint $table) {
             $table->id();
-            $table->boolean('queue');
-            $table->integer('distributor_id')->constrained('distributors');
-            $table->text('session');
+            $table->integer('clothes_id')->constrained('clothes');
+            $table->boolean('queue')->nullable();
             $table->timestamps();
         });
     }
