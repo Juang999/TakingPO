@@ -39,6 +39,7 @@ class PreOrderRequest extends FormRequest
             'size_8' => 'required|integer',
             'size_10' => 'required|integer',
             'size_12' => 'required|integer',
+            'total' => 'required'
         ];
     }
 }
