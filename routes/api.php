@@ -27,9 +27,9 @@ Route::middleware('jwt.verify')->group(function () {
     Route::apiResources([
         'agent' => 'Api\AgentController',
         'clothes' => 'Api\ClothesController',
+        'image' => 'Api\Admin\PhotoController',
         'distributor' => 'Api\DistributorController',
         'partner-group' => 'Api\PartnerGroupController',
-        // 'image' => 'Api\ImageController'
     ]);
 
     // route with exception
