@@ -479,12 +479,16 @@ class PreOrderController extends Controller
                 'total' => $request->total
             ]);
 
+            DB::commit();
+
             return response()->json([
                 'status' => 'success',
                 'message' => 'success input to cart',
                 'data' => $cart
             ], 200);
         } catch (\Throwable $th) {
+
+            DB::rollBack();
             return response()->json([
                 'status' => 'failed',
                 'message' => 'failed input to cart',
@@ -1011,11 +1015,15 @@ class PreOrderController extends Controller
                 'total' => $request->total
             ]);
 
+            DB::commit();
+
             return response()->json([
                 'status' => 'success',
                 'message' => 'success to update cart'
             ], 200);
         } catch (\Throwable $th) {
+
+            DB::rollBack();
             return response()->json([
                 'status' => 'failed',
                 'message' => 'failed to update cart',
@@ -1028,7 +1036,6 @@ class PreOrderController extends Controller
      * Remove the specified resource from storage.
      *
      * @param  int  $id
-     * 
      * @return \Illuminate\Http\Response
      */
     public function destroy($id, $phone)
