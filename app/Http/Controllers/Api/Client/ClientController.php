@@ -84,7 +84,7 @@ class ClientController extends Controller
             ]);
 
             return response()->json([
-                'success' => 'success',
+                'status' => 'success',
                 'message' => 'register successfully',
             ], 200);
 

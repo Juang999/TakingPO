@@ -229,6 +229,7 @@ class ClothesController extends Controller
             return response()->json([
                 'status' => 'success',
                 'message' => 'success create data',
+                'clothes_id' => $clothes->id
             ], 200);
         } catch (\Throwable $th) {
             DB::rollBack();

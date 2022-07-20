@@ -29,7 +29,7 @@ Route::middleware('jwt.verify')->group(function () {
         'clothes' => 'Api\ClothesController',
         'distributor' => 'Api\DistributorController',
         'partner-group' => 'Api\PartnerGroupController',
-        // 'image' => 'Api\ImageController'
+        'image' => 'Api\Admin\PhotoController'
     ]);
 
     // route with exception
