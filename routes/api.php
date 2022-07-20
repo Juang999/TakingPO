@@ -55,21 +55,35 @@ Route::middleware('jwt.verify')->group(function () {
 });
 
 // group pre-order route
+// Route::apiResource('pre-order/{phone}', 'Api\Client\PreOrderController');
 Route::prefix('pre-order')->group( function () {
-    Route::get('/{phone}', 'Api\PreOrderController@getClothes');
-    Route::post('/{phone}', 'Api\PreOrderController@storeClothes');
-    Route::post('/store-all/{phone}', 'Api\PreOrderController@storeAllClothes');
-    Route::get('/{phone}/clothes/{id}', 'Api\PreOrderController@getDetailClothes');
+    // CRUD for Taking PO from client
+    Route::get('/{phone}', 'Api\Client\PreOrderController@index');
+    Route::post('/{phone}', 'Api\Client\PreOrderController@store');
+    Route::delete('/{phone}/clothes/{id}', 'Api\Client\PreOrderController@delete');
+    Route::get('/{phone}/clothes/{id}', 'Api\Client\PreOrderController@show');
+    Route::put('/{phone}/clothes/{id}', 'Api\Client\PreOrderController@update');
+
+    // cart
+    Route::get('cart/{phone}', 'Api\Client\Cart');
+
+    // Store all clothes
+    Route::post('/store-all/{phone}', 'Api\Client\StoreAll');
 });
 
 // group registration route
-Route::prefix('registration')->group( function () {
-    Route::get('login/{phone}', 'Api\LoginUser');
-    Route::post('/register-member', 'Api\SingleRegister');
-    Route::put('/update-phone/{phone}', 'Api\UpdatePhone');
-    Route::get('/get-list-group', 'Api\PartnerGroupController@index');
-    Route::get('/get-list-distributor', 'Api\ListController@listDistributor');
-    Route::post('/create-address/{phone}', 'Api\AddressController@createAddress');
+Route::prefix('client')->group( function () {
+    // Login & Register
+    Route::get('login/{phone}', 'Api\Client\ClientController@login');
+    Route::post('register', 'Api\Client\ClientController@register');
+    Route::put('update-phone/{phone}', 'Api\Client\ClientController@UpdatePhone');
+
+    // Get list group & distributor
+    Route::get('/get-list-group', 'Api\Client\ClientController@PartnerGroup');
+    Route::get('/get-list-distributor', 'Api\Client\ClientController@distributor');
+
+    // create address for agent
+    Route::post('/create-address/{phone}', 'Api\Client\PartnerAddressController@store');
 });
 
 // testing

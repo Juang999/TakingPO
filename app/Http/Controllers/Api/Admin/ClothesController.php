@@ -1,15 +1,16 @@
 <?php
 
-namespace App\Http\Controllers\Api;
+namespace App\Http\Controllers\Api\Admin;
 
-use App\BufferProduct;
-use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
-use App\Clothes;
-use App\Http\Requests\ClothesRequest;
 use App\Size;
 use App\Type;
+use App\Clothes;
+use App\BufferProduct;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use App\Http\Controllers\Controller;
+use App\Http\Requests\ClothesRequest;
+use App\Models\Queue;
 
 class ClothesController extends Controller
 {
@@ -78,6 +79,10 @@ class ClothesController extends Controller
                     'size_8' => $request->size_8,
                     'size_10' => $request->size_10,
                     'size_12' => $request->size_12,
+                ]);
+
+                Queue::create([
+                    'clothes_id' => $clothes->id
                 ]);
 
                 if ($clothes->size_s > 0) {
@@ -554,10 +559,10 @@ class ClothesController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(Clothes $clothes)
     {
         try {
-            Clothes::find($id)->delete();
+            $clothes->delete();
 
             return response()->json([
                 'status' => 'success',
