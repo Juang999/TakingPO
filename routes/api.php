@@ -60,7 +60,7 @@ Route::prefix('pre-order')->group( function () {
     // CRUD for Taking PO from client
     Route::get('/{phone}', 'Api\Client\PreOrderController@index');
     Route::post('/{phone}', 'Api\Client\PreOrderController@store');
-    Route::delete('/{phone}/clothes/{id}', 'Api\Client\PreOrderController@delete');
+    Route::delete('/{phone}/clothes/{id}', 'Api\Client\PreOrderController@destroy');
     Route::get('/{phone}/clothes/{id}', 'Api\Client\PreOrderController@show');
     Route::put('/{phone}/clothes/{id}', 'Api\Client\PreOrderController@update');
 

@@ -27,7 +27,7 @@ class Cart extends Controller
             ], 300);
         }
 
-        $cart = TemporaryStorage::where('distributor_id', $user->id)->get();
+        $cart = TemporaryStorage::where('distributor_id', $user->id)->with('Clothes')->get();
 
         return response()->json([
             'status' => 'success',
