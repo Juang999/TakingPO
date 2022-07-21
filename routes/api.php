@@ -51,6 +51,7 @@ Route::middleware('jwt.verify')->group(function () {
     Route::post('/photo/{id}', 'Api\UploadPhoto');
     Route::get('get-new-member', 'Api\AccRegistration');
     Route::put('/is-active/{clothes}', 'Api\ActivateClothes');
+    Route::post('single-agent', 'Api\Admin\CreateSingleAgent');
     Route::get('/detail-transaction/{id}', 'Api\DetailTransaction');
 });
 
@@ -62,7 +63,7 @@ Route::prefix('pre-order')->group( function () {
     Route::post('/{phone}', 'Api\Client\PreOrderController@store');
     Route::delete('/{phone}/clothes/{id}', 'Api\Client\PreOrderController@destroy');
     Route::get('/{phone}/clothes/{id}', 'Api\Client\PreOrderController@show');
-    Route::put('/{phone}/clothes/{id}', 'Api\Client\PreOrderController@update');
+    Route::put('/{phone}/cart/{id}', 'Api\Client\PreOrderController@update');
 
     // cart
     Route::get('cart/{phone}', 'Api\Client\Cart');

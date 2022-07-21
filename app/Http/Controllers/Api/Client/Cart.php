@@ -27,12 +27,27 @@ class Cart extends Controller
             ], 300);
         }
 
-        $cart = TemporaryStorage::where('distributor_id', $user->id)->with('Clothes')->get();
+        $carts = TemporaryStorage::where('distributor_id', $user->id)->with('Clothes.BufferProduct.Size')->get();
+
+        foreach ($carts as $cart) {
+            if ($cart->Clothes->combo != '-') {
+                $cart['Clothes']['combo'] = explode(",", $cart->Clothes->combo);
+            }
+
+            if ($cart->Clothes->size_2 != 0) {
+                $cart['Clothes']['size_2'] = explode(",", $cart->Clothes->size_2);
+                $cart['Clothes']['size_4'] = explode(",", $cart->Clothes->size_4);
+                $cart['Clothes']['size_6'] = explode(",", $cart->Clothes->size_6);
+                $cart['Clothes']['size_8'] = explode(",", $cart->Clothes->size_8);
+                $cart['Clothes']['size_10'] = explode(",", $cart->Clothes->size_10);
+                $cart['Clothes']['size_12'] = explode(",", $cart->Clothes->size_12);
+            }
+        }
 
         return response()->json([
             'status' => 'success',
             'message' => 'success to get data from cart',
-            'cart' => $cart
+            'cart' => $carts
         ], 200);
         } catch (\Throwable $th) {
             return response()->json([

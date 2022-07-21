@@ -96,7 +96,7 @@ class PreOrderController extends Controller
                         DB::rollback();
                         return response()->json([
                             'status' => 'failed',
-                            'message' => 'to many request'
+                            'message' => 'size s to many request'
                         ], 400);
                     }
                 }
@@ -121,7 +121,7 @@ class PreOrderController extends Controller
                     } else {
                         return response()->json([
                             'status' => 'failed',
-                            'message' => 'sold out'
+                            'message' => 'size m to many request'
                         ], 400);
                     }
                 }
@@ -147,7 +147,7 @@ class PreOrderController extends Controller
                         return response()->json([
                             'status' => 'failed',
                             'message' => 'failed to update data',
-                            'message' => 'sold out'
+                            'message' => 'size l sold out'
                         ], 400);
                     }
                 }
@@ -173,7 +173,7 @@ class PreOrderController extends Controller
                         return response()->json([
                             'status' => 'failed',
                             'message' => 'failed to update data',
-                            'message' => 'sold out'
+                            'message' => 'size xl sold out'
                         ], 400);
                     }
                 }
@@ -199,7 +199,7 @@ class PreOrderController extends Controller
                         return response()->json([
                             'status' => 'failed',
                             'message' => 'failed to update data',
-                            'message' => 'sold out'
+                            'message' => 'size xxl sold out'
                         ], 400);
                     }
                 }
@@ -225,7 +225,7 @@ class PreOrderController extends Controller
                         return response()->json([
                             'status' => 'failed',
                             'message' => 'failed to update data',
-                            'message' => 'sold out'
+                            'message' => 'size xxxl sold out'
                         ], 400);
                     }
                 }
@@ -251,7 +251,7 @@ class PreOrderController extends Controller
                         return response()->json([
                             'status' => 'failed',
                             'message' => 'failed to update data',
-                            'message' => 'sold out'
+                            'message' => 'size 2 sold out'
                         ], 400);
                     }
                 }
@@ -278,7 +278,7 @@ class PreOrderController extends Controller
                         return response()->json([
                             'status' => 'failed',
                             'message' => 'failed to update data',
-                            'message' => 'sold out'
+                            'message' => 'size 4 sold out'
                         ], 400);
                     }
                 }
@@ -304,7 +304,7 @@ class PreOrderController extends Controller
                         return response()->json([
                             'status' => 'failed',
                             'message' => 'failed to update data',
-                            'message' => 'sold out'
+                            'message' => 'size 6 sold out'
                         ], 400);
                     }
                 }
@@ -330,7 +330,7 @@ class PreOrderController extends Controller
                         return response()->json([
                             'status' => 'failed',
                             'message' => 'failed to update data',
-                            'message' => 'sold out'
+                            'message' => 'size 8 sold out'
                         ], 400);
                     }
                 }
@@ -356,7 +356,7 @@ class PreOrderController extends Controller
                         return response()->json([
                             'status' => 'failed',
                             'message' => 'failed to update data',
-                            'message' => 'sold out'
+                            'message' => 'size 10 sold out'
                         ], 400);
                     }
                 }
@@ -382,7 +382,7 @@ class PreOrderController extends Controller
                         return response()->json([
                             'status' => 'failed',
                             'message' => 'failed to update data',
-                            'message' => 'sold out'
+                            'message' => 'size 12 sold out'
                         ], 400);
                     }
                 }
@@ -478,7 +478,7 @@ class PreOrderController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(PreOrderRequest $request, $id, $phone)
+    public function update(Request $request, $phone, $id)
     {
         $user = Distributor::where('phone', $phone)->first();
 
@@ -491,6 +491,12 @@ class PreOrderController extends Controller
 
         try {
             $temporary_storage = TemporaryStorage::find($id);
+
+            // return response()->json($temporary_storage->size_8);
+
+            // if ($request->size_8 == 0) {
+            //     return response()->json('hello world', 200);
+            // }
 
             DB::beginTransaction();
 
@@ -513,21 +519,26 @@ class PreOrderController extends Controller
                             'qty_process' => $qty_process
                         ]);
 
-                    } elseif ($request->size_s && $request->size_s < $temporary_storage->size_s) {
-                        $decrement = $temporary_storage->size_s - $request->size_s;
-                        $qty_avaliable = $BufferStock_s->qty_avaliable + $decrement;
-                        $qty_process = $BufferStock_s->qty_process - $decrement;
+                    } elseif ($request->size_s < $temporary_storage->size_s) {
+                        if ($request->size_s == 0) {
+                            $qty_avaliable = $BufferStock_s->qty_avaliable + $temporary_storage->size_s;
+                            $qty_process = $BufferStock_s->qty_process - $temporary_storage->size_s;
 
-                        $BufferStock_s->update([
-                            'qty_avaliable' => $qty_avaliable,
-                            'qty_process' => $qty_process
-                        ]);
+                            $BufferStock_s->update([
+                                'qty_avaliable' => $qty_avaliable,
+                                'qty_process' => $qty_process
+                            ]);
+                        } else {
+                            $decrement = $temporary_storage->size_s - $request->size_s;
+                            $qty_avaliable = $BufferStock_s->qty_avaliable + $decrement;
+                            $qty_process = $BufferStock_s->qty_process - $decrement;
+
+                            $BufferStock_s->update([
+                                'qty_avaliable' => $qty_avaliable,
+                                'qty_process' => $qty_process
+                            ]);
+                        }
                     }
-                } else {
-                    return response()->json([
-                        'status' => 'failed',
-                        'message' => 'not ready'
-                    ], 400);
                 }
             }
 
@@ -548,20 +559,24 @@ class PreOrderController extends Controller
                             'qty_avaliable' => $qty_avaliable,
                             'qty_process' => $qty_process
                         ]);
-                    } elseif ($request->size_m && $request->size_m < $temporary_storage->size_m) {
-                        $decrement = $temporary_storage->size_m - $request->size_m;
-                        $qty_avaliable = $BufferStock_m->qty_avaliable + $decrement;
-                        $qty_process = $BufferStock_m->qty_process - $decrement;
-                        $BufferStock_m->update([
-                            'qty_avaliable' => $qty_avaliable,
-                            'qty_process' => $qty_process
-                        ]);
+                    } elseif ($request->size_m < $temporary_storage->size_m) {
+                        if ($request->size_m == 0) {
+                            $qty_avaliable = $BufferStock_m->qty_avaliable + $temporary_storage->size_m;
+                            $qty_process = $BufferStock_m->qty_process - $temporary_storage->size_m;
+                            $BufferStock_m->update([
+                                'qty_avaliable' => $qty_avaliable,
+                                'qty_process' => $qty_process
+                            ]);
+                        } else {
+                            $decrement = $temporary_storage->size_m - $request->size_m;
+                            $qty_avaliable = $BufferStock_m->qty_avaliable + $decrement;
+                            $qty_process = $BufferStock_m->qty_process - $decrement;
+                            $BufferStock_m->update([
+                                'qty_avaliable' => $qty_avaliable,
+                                'qty_process' => $qty_process
+                            ]);
+                        }
                     }
-                } else {
-                    return response()->json([
-                        'status' => 'failed',
-                        'message' => 'not ready '
-                    ], 400);
                 }
             }
 
@@ -582,22 +597,26 @@ class PreOrderController extends Controller
                             'qty_avaliable' => $qty_avaliable,
                             'qty_process' => $qty_process
                         ]);
-                    } elseif ($temporary_storage->size_l && $temporary_storage->size_l < $temporary_storage->size_l) {
-                        $decrement = $temporary_storage->size_l - $request->size_l;
-                        $qty_avaliable = $BufferStock_l->qty_avaliable + $decrement;
-                        $qty_process = $BufferStock_l->qty_process - $decrement;
+                    } elseif ($temporary_storage->size_l < $temporary_storage->size_l) {
+                        if ($request->size_l) {
+                            $qty_avaliable = $BufferStock_l->qty_avaliable + $temporary_storage->size_l;
+                            $qty_process = $BufferStock_l->qty_process - $temporary_storage->size_l;
 
-                        $BufferStock_l->update([
-                            'qty_avaliable' => $qty_avaliable,
-                            'qty_process' => $qty_process
-                        ]);
+                            $BufferStock_l->update([
+                                'qty_avaliable' => $qty_avaliable,
+                                'qty_process' => $qty_process
+                            ]);
+                        } else {
+                            $decrement = $temporary_storage->size_l - $request->size_l;
+                            $qty_avaliable = $BufferStock_l->qty_avaliable + $decrement;
+                            $qty_process = $BufferStock_l->qty_process - $decrement;
+
+                            $BufferStock_l->update([
+                                'qty_avaliable' => $qty_avaliable,
+                                'qty_process' => $qty_process
+                            ]);
+                        }
                     }
-                } else {
-                    return response()->json([
-                        'status' => 'failed',
-                        'message' => 'failed to update data',
-                        'message' => 'not ready'
-                    ], 400);
                 }
             }
 
@@ -618,22 +637,26 @@ class PreOrderController extends Controller
                             'qty_avaliable' => $qty_avaliable,
                             'qty_process' => $qty_process
                         ]);
-                    } elseif ($request->size_xl && $request->size_xl < $temporary_storage->size_xl) {
-                        $decrement = $temporary_storage->size_xl - $request->size_xl;
-                        $qty_avaliable = $BufferStock_xl->qty_avaliable + $decrement;
-                        $qty_process = $BufferStock_xl->qty_process - $decrement;
+                    } elseif ($request->size_xl < $temporary_storage->size_xl) {
+                        if ($request->size_xl == 0) {
+                            $qty_avaliable = $BufferStock_xl->qty_avaliable + $temporary_storage->size_xl;
+                            $qty_process = $BufferStock_xl->qty_process - $temporary_storage->size_xl;
 
-                        $BufferStock_xl->update([
-                            'qty_avaliable' => $qty_avaliable,
-                            'qty_process' => $qty_process
-                        ]);
+                            $BufferStock_xl->update([
+                                'qty_avaliable' => $qty_avaliable,
+                                'qty_process' => $qty_process
+                            ]);
+                        } else {
+                            $decrement = $temporary_storage->size_xl - $request->size_xl;
+                            $qty_avaliable = $BufferStock_xl->qty_avaliable + $decrement;
+                            $qty_process = $BufferStock_xl->qty_process - $decrement;
+
+                            $BufferStock_xl->update([
+                                'qty_avaliable' => $qty_avaliable,
+                                'qty_process' => $qty_process
+                            ]);
+                        }
                     }
-                } else {
-                    return response()->json([
-                        'status' => 'failed',
-                        'message' => 'failed to update data',
-                        'message' => 'not ready'
-                    ], 400);
                 }
             }
 
@@ -654,22 +677,26 @@ class PreOrderController extends Controller
                             'qty_avaliable' => $qty_avaliable,
                             'qty_process' => $qty_process
                         ]);
-                    } elseif ($request->size_xxl && $request->size_xxl < $temporary_storage->size_xxl) {
-                        $decrement = $temporary_storage->$size_xxl - $request->size_xxl;
-                        $qty_avaliable = $BufferStock_xxl->qty_avaliable + $decrement;
-                        $qty_process = $BufferStock_xxl->qty_process - $decrement;
+                    } elseif ($request->size_xxl < $temporary_storage->size_xxl) {
+                        if ($request->size_xxl == 0) {
+                            $qty_avaliable = $BufferStock_xxl->qty_avaliable + $temporary_storage->size_xxl;
+                            $qty_process = $BufferStock_xxl->qty_process - $temporary_storage->size_xxl;
 
-                        $BufferStock_xxl->update([
-                            'qty_avaliable' => $qty_avaliable,
-                            'qty_process' => $qty_process
-                        ]);
+                            $BufferStock_xxl->update([
+                                'qty_avaliable' => $qty_avaliable,
+                                'qty_process' => $qty_process
+                            ]);
+                        } else {
+                            $decrement = $temporary_storage->$size_xxl - $request->size_xxl;
+                            $qty_avaliable = $BufferStock_xxl->qty_avaliable + $decrement;
+                            $qty_process = $BufferStock_xxl->qty_process - $decrement;
+
+                            $BufferStock_xxl->update([
+                                'qty_avaliable' => $qty_avaliable,
+                                'qty_process' => $qty_process
+                            ]);
+                        }
                     }
-                } else {
-                    return response()->json([
-                        'status' => 'failed',
-                        'message' => 'failed to update data',
-                        'message' => 'not ready'
-                    ], 400);
                 }
             }
 
@@ -690,22 +717,26 @@ class PreOrderController extends Controller
                             'qty_avaliable' => $qty_avaliable,
                             'qty_process' => $qty_process
                         ]);
-                    } elseif ($request->size_xxxl && $request->size_xxxl < $temporary_storage->size_xxxl) {
-                        $decrement = $temporary_storage->size_xxxl - $request->size_xxxl;
-                        $qty_avaliable = $BufferStock_xxxl->qty_avaliable + $decrement;
-                        $qty_process = $BufferStock_xxxl->qty_process - $decrement;
+                    } elseif ($request->size_xxxl < $temporary_storage->size_xxxl) {
+                        if ($request->size_xxxl == 0) {
+                            $qty_avaliable = $BufferStock_xxxl->qty_avaliable + $temporary_storage->size_xxxl;
+                            $qty_process = $BufferStock_xxxl->qty_process - $temporary_storage->size_xxxl;
 
-                        $BufferStock_xxxl->update([
-                            'qty_avaliable' => $qty_avaliable,
-                            'qty_process' => $qty_process
-                        ]);
+                            $BufferStock_xxxl->update([
+                                'qty_avaliable' => $qty_avaliable,
+                                'qty_process' => $qty_process
+                            ]);
+                        } else {
+                            $decrement = $temporary_storage->size_xxxl - $request->size_xxxl;
+                            $qty_avaliable = $BufferStock_xxxl->qty_avaliable + $decrement;
+                            $qty_process = $BufferStock_xxxl->qty_process - $decrement;
+
+                            $BufferStock_xxxl->update([
+                                'qty_avaliable' => $qty_avaliable,
+                                'qty_process' => $qty_process
+                            ]);
+                        }
                     }
-                } else {
-                    return response()->json([
-                        'status' => 'failed',
-                        'message' => 'failed to update data',
-                        'message' => 'not ready'
-                    ], 400);
                 }
             }
 
@@ -726,22 +757,26 @@ class PreOrderController extends Controller
                             'qty_avaliable' => $qty_avaliable,
                             'qty_process' => $qty_process
                         ]);
-                    } elseif ($request->size_2 && $request->size_2 < $temporary_storage->size_2) {
-                        $decrement = $temporary_storage->size_2 - $request->size_2;
-                        $qty_avaliable = $BufferStock_2->qty_avaliable + $increment;
-                        $qty_process = $BufferStock_2->qty_process - $increment;
+                    } elseif ($request->size_2 < $temporary_storage->size_2) {
+                        if ($request->size_2) {
+                            $qty_avaliable = $BufferStock_2->qty_avaliable + $increment;
+                            $qty_process = $BufferStock_2->qty_process - $increment;
 
-                        $BufferStock_2->update([
-                            'qty_avaliable' => $qty_avaliable,
-                            'qty_process' => $qty_process
-                        ]);
+                            $BufferStock_2->update([
+                                'qty_avaliable' => $qty_avaliable,
+                                'qty_process' => $qty_process
+                            ]);
+                        } else {
+                            $decrement = $temporary_storage->size_2 - $request->size_2;
+                            $qty_avaliable = $BufferStock_2->qty_avaliable + $increment;
+                            $qty_process = $BufferStock_2->qty_process - $increment;
+
+                            $BufferStock_2->update([
+                                'qty_avaliable' => $qty_avaliable,
+                                'qty_process' => $qty_process
+                            ]);
+                        }
                     }
-                } else {
-                    return response()->json([
-                        'status' => 'failed',
-                        'message' => 'failed to update data',
-                        'message' => 'not ready'
-                    ], 400);
                 }
             }
 
@@ -762,22 +797,26 @@ class PreOrderController extends Controller
                             'qty_avaliable' => $qty_avaliable,
                             'qty_process' => $qty_process
                         ]);
-                    } elseif ($request->size_4 && $request->size_4 < $temporary_storage->size_4) {
-                        $decrement = $temporary_storage->size_4 - $request->size_4;
-                        $qty_avaliable = $BufferStock_4->qty_avaliable + $decrement;
-                        $qty_process = $BufferStock_4->qty_process - $decrement;
+                    } elseif ($request->size_4 < $temporary_storage->size_4) {
+                        if ($request->size_4 == 0) {
+                            $qty_avaliable = $BufferStock_4->qty_avaliable + $temporary_storage->size_4;
+                            $qty_process = $BufferStock_4->qty_process - $temporary_storage->size_4;
 
-                        $BufferStock_4->update([
-                            'qty_avaliable' => $qty_avaliable,
-                            'qty_process' => $qty_process
-                        ]);
+                            $BufferStock_4->update([
+                                'qty_avaliable' => $qty_avaliable,
+                                'qty_process' => $qty_process
+                            ]);
+                        } else {
+                            $decrement = $temporary_storage->size_4 - $request->size_4;
+                            $qty_avaliable = $BufferStock_4->qty_avaliable + $decrement;
+                            $qty_process = $BufferStock_4->qty_process - $decrement;
+
+                            $BufferStock_4->update([
+                                'qty_avaliable' => $qty_avaliable,
+                                'qty_process' => $qty_process
+                            ]);
+                        }
                     }
-                } else {
-                    return response()->json([
-                        'status' => 'failed',
-                        'message' => 'failed to update data',
-                        'message' => 'not ready'
-                    ], 400);
                 }
             }
 
@@ -798,22 +837,26 @@ class PreOrderController extends Controller
                             'qty_avaliable' => $qty_avaliable,
                             'qty_process' => $qty_process
                         ]);
-                    } elseif ($request->size_6 && $request->size_6 < $temporary_storage->size_6) {
-                        $decrement = $temporary_storage->size_6 - $request->size_6;
-                        $qty_avaliable = $BufferStock_6->qty_avaliable + $decrement;
-                        $qty_process = $BufferStock_6->qty_process - $decrement;
+                    } elseif ($request->size_6 < $temporary_storage->size_6) {
+                        if ($temporary_storage->size_6 == 0) {
+                            $qty_avaliable = $BufferStock_6->qty_avaliable + $temporary_storage->size_6;
+                            $qty_process = $BufferStock_6->qty_process - $temporary_storage->size_6;
 
-                        $BufferStock_6->update([
-                            'qty_avaliable' => $qty_avaliable,
-                            'qty_process' => $qty_process
-                        ]);
+                            $BufferStock_6->update([
+                                'qty_avaliable' => $qty_avaliable,
+                                'qty_process' => $qty_process
+                            ]);
+                        } else {
+                            $decrement = $temporary_storage->size_6 - $request->size_6;
+                            $qty_avaliable = $BufferStock_6->qty_avaliable + $decrement;
+                            $qty_process = $BufferStock_6->qty_process - $decrement;
+
+                            $BufferStock_6->update([
+                                'qty_avaliable' => $qty_avaliable,
+                                'qty_process' => $qty_process
+                            ]);
+                        }
                     }
-                } else {
-                    return response()->json([
-                        'status' => 'failed',
-                        'message' => 'failed to update data',
-                        'message' => 'not ready'
-                    ], 400);
                 }
             }
 
@@ -834,22 +877,27 @@ class PreOrderController extends Controller
                             'qty_avaliable' => $qty_avaliable,
                             'qty_process' => $qty_process
                         ]);
-                    } elseif ($request->size_8 && $request->size_8 < $temporary_storage->size_8) {
-                        $decrement = $temporary_storage->size_8 - $request->size_8;
-                        $qty_avaliable = $BufferStock_8->qty_avaliable + $decrement;
-                        $qty_process = $BufferStock_8->qty_process - $decrement;
+                    } elseif ($request->size_8 < $temporary_storage->size_8) {
+                        if ($request->size_8 == 0) {
+                            $qty_avaliable = $BufferStock_8->qty_avaliable + $temporary_storage->size_8;
+                            $qty_process = $BufferStock_8->qty_process - $temporary_storage->size_8;
 
-                        $BufferStock_8->update([
-                            'qty_avaliable' => $qty_avaliable,
-                            'qty_process' => $qty_process
-                        ]);
+                            $BufferStock_8->update([
+                                'qty_avaliable' => $qty_avaliable,
+                                'qty_process' => $qty_process
+                            ]);
+                        } else {
+                            return response()->json($request->size_8, 200);
+                            $decrement = $temporary_storage->size_8 - $request->size_8;
+                            $qty_avaliable = $BufferStock_8->qty_avaliable + $decrement;
+                            $qty_process = $BufferStock_8->qty_process - $decrement;
+
+                            $BufferStock_8->update([
+                                'qty_avaliable' => $qty_avaliable,
+                                'qty_process' => $qty_process
+                            ]);
+                        }
                     }
-                } else {
-                    return response()->json([
-                        'status' => 'failed',
-                        'message' => 'failed to update data',
-                        'message' => 'not ready'
-                    ], 400);
                 }
             }
 
@@ -870,22 +918,26 @@ class PreOrderController extends Controller
                             'qty_avaliable' => $qty_avaliable,
                             'qty_process' => $qty_process
                         ]);
-                    } elseif ($request->size_10 && $request->size_10 < $temporary_storage->size_10) {
-                        $decrement = $temporary_storage->size_10 - $request->size_10;
-                        $qty_avaliable = $BufferStock_10->qty_avaliable + $decrement;
-                        $qty_process = $BufferStock_10->qty_process - $decrement;
+                    } elseif ($request->size_10 < $temporary_storage->size_10) {
+                        if ($request->size_10 == 0) {
+                            $qty_avaliable = $BufferStock_10->qty_avaliable + $temporary_storage->size_10;
+                            $qty_process = $BufferStock_10->qty_process - $temporary_storage->size_10;
 
-                        $BufferStock_10->update([
-                            'qty_avaliable' => $qty_avaliable,
-                            'qty_process' => $qty_process
-                        ]);
+                            $BufferStock_10->update([
+                                'qty_avaliable' => $qty_avaliable,
+                                'qty_process' => $qty_process
+                            ]);
+                        } else {
+                            $decrement = $temporary_storage->size_10 - $request->size_10;
+                            $qty_avaliable = $BufferStock_10->qty_avaliable + $decrement;
+                            $qty_process = $BufferStock_10->qty_process - $decrement;
+
+                            $BufferStock_10->update([
+                                'qty_avaliable' => $qty_avaliable,
+                                'qty_process' => $qty_process
+                            ]);
+                        }
                     }
-                } else {
-                    return response()->json([
-                        'status' => 'failed',
-                        'message' => 'failed to update data',
-                        'message' => 'not ready'
-                    ], 400);
                 }
             }
 
@@ -906,22 +958,27 @@ class PreOrderController extends Controller
                             'qty_avaliable' => $qty_avaliable,
                             'qty_process' => $qty_process
                         ]);
-                    } elseif ($request->size_12 && $request->size_12 < $temporary_storage->size_12) {
-                        $decrement = $temporary_storage->size_12 - $request->size_12;
-                        $qty_avaliable = $BufferStock_12->qty_avaliable - $decrement;
-                        $qty_process = $BufferStock_12->qty_process + $decrement;
+                    } elseif ($request->size_12 < $temporary_storage->size_12) {
+                        if ($request->size_12 == 0) {
+                            $qty_avaliable = $BufferStock_12->qty_avaliable - $temporary_storage->size_12;
+                            $qty_process = $BufferStock_12->qty_process + $temporary_storage->size_12;
 
-                        $BufferStock_12->update([
-                            'qty_avaliable' => $qty_avaliable,
-                            'qty_process' => $qty_process
-                        ]);
+                            $BufferStock_12->update([
+                                'qty_avaliable' => $qty_avaliable,
+                                'qty_process' => $qty_process
+                            ]);
+                        } else {
+
+                            $decrement = $temporary_storage->size_12 - $request->size_12;
+                            $qty_avaliable = $BufferStock_12->qty_avaliable - $decrement;
+                            $qty_process = $BufferStock_12->qty_process + $decrement;
+
+                            $BufferStock_12->update([
+                                'qty_avaliable' => $qty_avaliable,
+                                'qty_process' => $qty_process
+                            ]);
+                        }
                     }
-                } else {
-                    return response()->json([
-                        'status' => 'failed',
-                        'message' => 'failed to update data',
-                        'message' => 'not ready'
-                    ], 400);
                 }
             }
 

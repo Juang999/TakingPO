@@ -68,12 +68,24 @@ class DistributorController extends Controller
                     'phone' => $request->phone
                 ]);
 
+                $address = PartnerAddress::create([
+                    'distributor_id' => $distributor->id,
+                    'prtnra_add_by' => $user_id,
+                    'address' => $request->address,
+                    'district' => $request->district,
+                    'regency' => $request->regency,
+                    'province' => $request->province,
+                    'addr_type' => $request->addr_type,
+                    'zip' => $request->zip,
+                ]);
+
             DB::commit();
 
             return response()->json([
                 'status' => 'success',
                 'message' => 'distributor registered',
-                'data' => $distributor
+                'data' => $distributor,
+                'address' => $address
             ]);
         } catch (\Throwable $th) {
             DB::rollBack();
@@ -94,7 +106,7 @@ class DistributorController extends Controller
      */
     public function show($distributor)
     {
-        $data = Distributor::where('id', $distributor)->first();
+        $data = Distributor::where('id', $distributor)->with('PartnerAddress')->first();
 
         $agents = Distributor::where('distributor_id', $data->id)->get(['id', 'name']);
 

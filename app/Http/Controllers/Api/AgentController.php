@@ -174,7 +174,7 @@ class AgentController extends Controller
     public function show($id)
     {
         try {
-            $agent = Distributor::where('id',$id)->with('PartnerGroup', 'MutifStoreMaster')->first();
+            $agent = Distributor::where('id',$id)->with('PartnerGroup', 'MutifStoreMaster.MutifStoreAddress')->first();
             $agent['distributor'] = Distributor::where('id', $agent->distributor_id)->first();
 
             // $agent['distributor'] = Distributor::where('id', $agent->distributor_id)->first();
