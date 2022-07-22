@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Api;
+namespace App\Http\Controllers\Api\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\PartnerGroupRequest;
@@ -17,12 +17,12 @@ class PartnerGroupController extends Controller
      */
     public function index()
     {
-        $group = PartnerGroup::get();
+        $partner_group = PartnerGroup::get();
 
         return response()->json([
             'status' => 'success',
-            'message' => 'success to get data',
-            'data' => $group
+            'message' => 'success to get role client',
+            'data' => $partner_group
         ], 200);
     }
 
@@ -87,9 +87,18 @@ class PartnerGroupController extends Controller
      * @param  \App\PartnerGroup  $partnerGroup
      * @return \Illuminate\Http\Response
      */
-    public function update(PartnerGroupRequest $request, PartnerGroup $partnerGroup)
+    public function update(Request $request, PartnerGroup $partnerGroup)
     {
-        // 
+        try {
+            $partnerGroup->update([
+                'prtnr_upd_by' => Auth::user()->id,
+                'prtnr_code' => ($request->partner_code) ? $request->partner_code : $partnerGroup->prtnr_code,
+                'prtnr_name' => ($request->partner_name) ? $request->partner_name : $partnerGroup->prtnr_name,
+                'prtnr_desc' => ($request->partner_desc) ? $request->partner_desc : $partnerGroup->prtnr_desc
+            ]);
+        } catch (\Throwable $th) {
+            //throw $th;
+        }
     }
 
     /**

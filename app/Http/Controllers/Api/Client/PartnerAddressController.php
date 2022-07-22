@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\Client;
 
 use App\Distributor;
+use App\District;
 use App\Http\Controllers\Controller;
 use App\PartnerAddress;
 use Illuminate\Http\Request;
@@ -43,6 +44,11 @@ class PartnerAddressController extends Controller
             'district' => $request->district,
             'regency' => $request->regency,
             'province' => $request->province,
+            'phone_1' => $phone,
+            'phone_2' => ($request->phone_2) ? $request->phone_2 : '-',
+            'fax_1' => ($request->fax_1) ? $request->fax_1 : '-',
+            'addr_type' => ($request->addr_type) ? $request->addr_type : 'Bill To',
+            'zip' => ($request->zip) ? $request->zip : '-',
         ]);
 
             return response()->json([
@@ -77,9 +83,42 @@ class PartnerAddressController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(Request $request, $phone)
     {
-        //
+        $user = Distributor::where('phone', $phone)->first();
+
+        if (!$user) {
+            return response()->json([
+                'status' => 'failed',
+                'message' => 'number '.$phone.' not registered'
+            ], 400);
+        }
+
+        try {
+            $address = PartnerAddress::where('distributor_id', $user->id)->update([
+                'distributor_id' => $user->id,
+                'address' => $request->address,
+                'district' => $request->district,
+                'regency' => $request->regency,
+                'province' => $request->province,
+                'phone_1' => $phone,
+                'phone_2' => $request->phone_2,
+                'fax_1' => $request->fax_1,
+                'addr_type' => $request->addr_type,
+                'zip' => $request->zip,
+            ]);
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'success to update address',
+            ], 200);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'status' => 'failed',
+                'message' => 'failed to update address',
+                'error' => $th->getMessage()
+            ]);
+        }
     }
 
     /**

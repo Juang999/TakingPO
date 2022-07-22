@@ -15,6 +15,7 @@
         "laravel/framework": "^7.29",
         "laravel/tinker": "^2.5",
         "malkusch/lock": "^2.2",
+        "spatie/laravel-permission": "^5.5",
         "tymon/jwt-auth": "dev-develop"
     },
     "require-dev": {

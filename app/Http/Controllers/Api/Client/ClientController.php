@@ -100,10 +100,6 @@ class ClientController extends Controller
 
     public function UpdatePhone(Request $request, $phone)
     {
-        return response()->json([
-            'message' => 'under development'
-        ], 400);
-
         $user = Distributor::where('phone', $phone)->first();
 
         if ($user->partner_group_id == 1) {
