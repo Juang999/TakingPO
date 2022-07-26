@@ -39,6 +39,23 @@ class PreOrderRequest extends FormRequest
             'size_8' => 'required|integer',
             'size_10' => 'required|integer',
             'size_12' => 'required|integer',
+            'size_27' => 'required|integer',
+            'size_28' => 'required|integer',
+            'size_29' => 'required|integer',
+            'size_30' => 'required|integer',
+            'size_31' => 'required|integer',
+            'size_32' => 'required|integer',
+            'size_33' => 'required|integer',
+            'size_34' => 'required|integer',
+            'size_35' => 'required|integer',
+            'size_36' => 'required|integer',
+            'size_37' => 'required|integer',
+            'size_38' => 'required|integer',
+            'size_39' => 'required|integer',
+            'size_40' => 'required|integer',
+            'size_41' => 'required|integer',
+            'size_42' => 'required|integer',
+            'other' => 'required|integer',
             'total' => 'required'
         ];
     }

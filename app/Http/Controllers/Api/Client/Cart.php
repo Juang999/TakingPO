@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers\Api\Client;
 
+use App\BufferProduct;
+use App\Clothes;
 use App\Distributor;
 use App\Http\Controllers\Controller;
 use App\TemporaryStorage;
@@ -29,20 +31,9 @@ class Cart extends Controller
 
         $carts = TemporaryStorage::where('distributor_id', $user->id)->with('Clothes.BufferProduct.Size')->get();
 
-        foreach ($carts as $cart) {
-            if ($cart->Clothes->combo != '-') {
-                $cart['Clothes']['combo'] = explode(",", $cart->Clothes->combo);
-            }
-
-            if ($cart->Clothes->size_2 != 0) {
-                $cart['Clothes']['size_2'] = explode(",", $cart->Clothes->size_2);
-                $cart['Clothes']['size_4'] = explode(",", $cart->Clothes->size_4);
-                $cart['Clothes']['size_6'] = explode(",", $cart->Clothes->size_6);
-                $cart['Clothes']['size_8'] = explode(",", $cart->Clothes->size_8);
-                $cart['Clothes']['size_10'] = explode(",", $cart->Clothes->size_10);
-                $cart['Clothes']['size_12'] = explode(",", $cart->Clothes->size_12);
-            }
-        }
+        // foreach ($carts as $cart) {
+        //     $cart['buffer_stock'] = BufferProduct::where('clothes_id', $cart->clothes_id)->with('Size')->get();
+        // }
 
         return response()->json([
             'status' => 'success',

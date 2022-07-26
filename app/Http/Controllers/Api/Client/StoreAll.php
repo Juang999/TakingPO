@@ -60,6 +60,23 @@ class StoreAll extends Controller
                     $table->integer('size_8')->default(0);
                     $table->integer('size_10')->default(0);
                     $table->integer('size_12')->default(0);
+                    $table->integer('size_27')->default(0);
+                    $table->integer('size_28')->default(0);
+                    $table->integer('size_29')->default(0);
+                    $table->integer('size_30')->default(0);
+                    $table->integer('size_31')->default(0);
+                    $table->integer('size_32')->default(0);
+                    $table->integer('size_33')->default(0);
+                    $table->integer('size_34')->default(0);
+                    $table->integer('size_35')->default(0);
+                    $table->integer('size_36')->default(0);
+                    $table->integer('size_37')->default(0);
+                    $table->integer('size_38')->default(0);
+                    $table->integer('size_39')->default(0);
+                    $table->integer('size_40')->default(0);
+                    $table->integer('size_41')->default(0);
+                    $table->integer('size_42')->default(0);
+                    $table->integer('other')->default(0);
                     $table->integer('total')->default(0);
                     $table->timestamps();
                 });
@@ -96,6 +113,23 @@ class StoreAll extends Controller
                         'size_8' => $data->size_8,
                         'size_10' => $data->size_10,
                         'size_12' => $data->size_12,
+                        'size_27' => $data->size_27,
+                        'size_28' => $data->size_28,
+                        'size_29' => $data->size_29,
+                        'size_30' => $data->size_30,
+                        'size_31' => $data->size_31,
+                        'size_32' => $data->size_32,
+                        'size_33' => $data->size_33,
+                        'size_34' => $data->size_34,
+                        'size_35' => $data->size_35,
+                        'size_36' => $data->size_36,
+                        'size_37' => $data->size_37,
+                        'size_38' => $data->size_38,
+                        'size_39' => $data->size_39,
+                        'size_40' => $data->size_40,
+                        'size_41' => $data->size_41,
+                        'size_42' => $data->size_42,
+                        'other' => $data->other,
                         'total' => $data->total,
                         'created_at' => now()
                     ]
@@ -120,6 +154,23 @@ class StoreAll extends Controller
                             'size_8' => $data->size_8,
                             'size_10' => $data->size_10,
                             'size_12' => $data->size_12,
+                            'size_27' => $data->size_27,
+                            'size_28' => $data->size_28,
+                            'size_29' => $data->size_29,
+                            'size_30' => $data->size_30,
+                            'size_31' => $data->size_31,
+                            'size_32' => $data->size_32,
+                            'size_33' => $data->size_33,
+                            'size_34' => $data->size_34,
+                            'size_35' => $data->size_35,
+                            'size_36' => $data->size_36,
+                            'size_37' => $data->size_37,
+                            'size_38' => $data->size_38,
+                            'size_39' => $data->size_39,
+                            'size_40' => $data->size_40,
+                            'size_41' => $data->size_41,
+                            'size_42' => $data->size_42,
+                            'other' => $data->other,
                             'total' => $data->total
                         ]
                     ]);

@@ -46,7 +46,8 @@ class ClientController extends Controller
             return response()->json([
                 'status' => 'successs',
                 'message' => 'hello '.$user->name,
-                'account' => $user
+                'user' => $user,
+                'final_data' => []
             ], 200);
         } elseif ($activate && $activate->name == 'DONE') {
             // when logging into the final session
