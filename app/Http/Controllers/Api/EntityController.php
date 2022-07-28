@@ -84,7 +84,7 @@ class EntityController extends Controller
 
             return response()->json([
                 'status' => 'success',
-                'message' => 'entity active'
+                'message' => 'status change'
             ]);
         }
 
@@ -94,7 +94,7 @@ class EntityController extends Controller
 
         return response()->json([
             'status' => 'success',
-            'message' => 'entity active'
+            'message' => 'status change'
         ]);
     }
 

@@ -31,7 +31,7 @@ class PreOrderController extends Controller
             ], 400);
         }
 
-        $clothess = Clothes::orderBy('entity_name')->with('Type', 'Image', 'BufferProduct.Size')->get();
+        $clothess = Clothes::orderBy('group_article')->with('Type', 'Image', 'BufferProduct.Size')->get();
 
         if ($clothess) {
             foreach ($clothess as $clothes) {
@@ -1077,7 +1077,7 @@ class PreOrderController extends Controller
         }
 
         try {
-            $clothes = Clothes::where('id', $id)->with('Type', 'Image', 'BufferProduct')->first();
+            $clothes = Clothes::where('id', $id)->with('Type', 'Image', 'BufferProduct.Size')->first();
 
             if ($clothes->combo != '-') {
                 $clothes['combo'] = explode(",", $clothes->combo);
@@ -1905,7 +1905,7 @@ class PreOrderController extends Controller
 
             if ($BufferStock_27) {
                 if ($BufferStock_27->qty_buffer != 0) {
-                    if ($request->size_27 && $BufferStock_27->qty_avaliable != 0 && $request->size_27 > $temporary_storage->size_27) {
+                    if ($BufferStock_27->qty_avaliable != 0 && $request->size_27 > $temporary_storage->size_27) {
                         $increment = $request->size_27 - $temporary_storage->size_27;
                         $qty_avaliable = $BufferStock_27->qty_avaliable - $increment;
                         $qty_process = $BufferStock_27->qty_process + $increment;
@@ -1916,18 +1916,17 @@ class PreOrderController extends Controller
                         ]);
                     } elseif ($request->size_27 < $temporary_storage->size_27) {
                         if ($request->size_27 == 0) {
-                            $qty_avaliable = $BufferStock_27->qty_avaliable - $temporary_storage->size_27;
-                            $qty_process = $BufferStock_27->qty_process + $temporary_storage->size_27;
+                            $qty_avaliable = $BufferStock_27->qty_avaliable + $temporary_storage->size_27;
+                            $qty_process = $BufferStock_27->qty_process - $temporary_storage->size_27;
 
                             $BufferStock_27->update([
                                 'qty_avaliable' => $qty_avaliable,
                                 'qty_process' => $qty_process
                             ]);
                         } else {
-
                             $decrement = $temporary_storage->size_27 - $request->size_27;
-                            $qty_avaliable = $BufferStock_27->qty_avaliable - $decrement;
-                            $qty_process = $BufferStock_27->qty_process + $decrement;
+                            $qty_avaliable = $BufferStock_27->qty_avaliable + $decrement;
+                            $qty_process = $BufferStock_27->qty_process - $decrement;
 
                             $BufferStock_27->update([
                                 'qty_avaliable' => $qty_avaliable,
@@ -1970,7 +1969,7 @@ class PreOrderController extends Controller
 
             if ($BufferStock_28) {
                 if ($BufferStock_28->qty_buffer != 0) {
-                    if ($request->size_28 && $BufferStock_28->qty_avaliable != 0 && $request->size_28 > $temporary_storage->size_28) {
+                    if ($BufferStock_28->qty_avaliable != 0 && $request->size_28 > $temporary_storage->size_28) {
                         $increment = $request->size_28 - $temporary_storage->size_28;
                         $qty_avaliable = $BufferStock_28->qty_avaliable - $increment;
                         $qty_process = $BufferStock_28->qty_process + $increment;
@@ -1981,8 +1980,8 @@ class PreOrderController extends Controller
                         ]);
                     } elseif ($request->size_28 < $temporary_storage->size_28) {
                         if ($request->size_28 == 0) {
-                            $qty_avaliable = $BufferStock_28->qty_avaliable - $temporary_storage->size_28;
-                            $qty_process = $BufferStock_28->qty_process + $temporary_storage->size_28;
+                            $qty_avaliable = $BufferStock_28->qty_avaliable + $temporary_storage->size_28;
+                            $qty_process = $BufferStock_28->qty_process - $temporary_storage->size_28;
 
                             $BufferStock_28->update([
                                 'qty_avaliable' => $qty_avaliable,
@@ -1991,8 +1990,8 @@ class PreOrderController extends Controller
                         } else {
 
                             $decrement = $temporary_storage->size_28 - $request->size_28;
-                            $qty_avaliable = $BufferStock_28->qty_avaliable - $decrement;
-                            $qty_process = $BufferStock_28->qty_process + $decrement;
+                            $qty_avaliable = $BufferStock_28->qty_avaliable + $decrement;
+                            $qty_process = $BufferStock_28->qty_process - $decrement;
 
                             $BufferStock_28->update([
                                 'qty_avaliable' => $qty_avaliable,
@@ -2111,8 +2110,8 @@ class PreOrderController extends Controller
                         ]);
                     } elseif ($request->size_30 < $temporary_storage->size_30) {
                         if ($request->size_30 == 0) {
-                            $qty_avaliable = $BufferStock_30->qty_avaliable - $temporary_storage->size_30;
-                            $qty_process = $BufferStock_30->qty_process + $temporary_storage->size_30;
+                            $qty_avaliable = $BufferStock_30->qty_avaliable + $temporary_storage->size_30;
+                            $qty_process = $BufferStock_30->qty_process - $temporary_storage->size_30;
 
                             $BufferStock_30->update([
                                 'qty_avaliable' => $qty_avaliable,
@@ -2121,8 +2120,8 @@ class PreOrderController extends Controller
                         } else {
 
                             $decrement = $temporary_storage->size_30 - $request->size_30;
-                            $qty_avaliable = $BufferStock_30->qty_avaliable - $decrement;
-                            $qty_process = $BufferStock_30->qty_process + $decrement;
+                            $qty_avaliable = $BufferStock_30->qty_avaliable + $decrement;
+                            $qty_process = $BufferStock_30->qty_process - $decrement;
 
                             $BufferStock_30->update([
                                 'qty_avaliable' => $qty_avaliable,
@@ -2176,8 +2175,8 @@ class PreOrderController extends Controller
                         ]);
                     } elseif ($request->size_31 < $temporary_storage->size_31) {
                         if ($request->size_31 == 0) {
-                            $qty_avaliable = $BufferStock_31->qty_avaliable - $temporary_storage->size_31;
-                            $qty_process = $BufferStock_31->qty_process + $temporary_storage->size_31;
+                            $qty_avaliable = $BufferStock_31->qty_avaliable + $temporary_storage->size_31;
+                            $qty_process = $BufferStock_31->qty_process - $temporary_storage->size_31;
 
                             $BufferStock_31->update([
                                 'qty_avaliable' => $qty_avaliable,
@@ -2186,8 +2185,8 @@ class PreOrderController extends Controller
                         } else {
 
                             $decrement = $temporary_storage->size_31 - $request->size_31;
-                            $qty_avaliable = $BufferStock_31->qty_avaliable - $decrement;
-                            $qty_process = $BufferStock_31->qty_process + $decrement;
+                            $qty_avaliable = $BufferStock_31->qty_avaliable + $decrement;
+                            $qty_process = $BufferStock_31->qty_process - $decrement;
 
                             $BufferStock_31->update([
                                 'qty_avaliable' => $qty_avaliable,
@@ -2241,8 +2240,8 @@ class PreOrderController extends Controller
                         ]);
                     } elseif ($request->size_32 < $temporary_storage->size_32) {
                         if ($request->size_32 == 0) {
-                            $qty_avaliable = $BufferStock_32->qty_avaliable - $temporary_storage->size_32;
-                            $qty_process = $BufferStock_32->qty_process + $temporary_storage->size_32;
+                            $qty_avaliable = $BufferStock_32->qty_avaliable + $temporary_storage->size_32;
+                            $qty_process = $BufferStock_32->qty_process - $temporary_storage->size_32;
 
                             $BufferStock_32->update([
                                 'qty_avaliable' => $qty_avaliable,
@@ -2251,8 +2250,8 @@ class PreOrderController extends Controller
                         } else {
 
                             $decrement = $temporary_storage->size_32 - $request->size_32;
-                            $qty_avaliable = $BufferStock_32->qty_avaliable - $decrement;
-                            $qty_process = $BufferStock_32->qty_process + $decrement;
+                            $qty_avaliable = $BufferStock_32->qty_avaliable + $decrement;
+                            $qty_process = $BufferStock_32->qty_process - $decrement;
 
                             $BufferStock_32->update([
                                 'qty_avaliable' => $qty_avaliable,
@@ -2306,8 +2305,8 @@ class PreOrderController extends Controller
                         ]);
                     } elseif ($request->size_33 < $temporary_storage->size_33) {
                         if ($request->size_33 == 0) {
-                            $qty_avaliable = $BufferStock_33->qty_avaliable - $temporary_storage->size_33;
-                            $qty_process = $BufferStock_33->qty_process + $temporary_storage->size_33;
+                            $qty_avaliable = $BufferStock_33->qty_avaliable + $temporary_storage->size_33;
+                            $qty_process = $BufferStock_33->qty_process - $temporary_storage->size_33;
 
                             $BufferStock_33->update([
                                 'qty_avaliable' => $qty_avaliable,
@@ -2316,8 +2315,8 @@ class PreOrderController extends Controller
                         } else {
 
                             $decrement = $temporary_storage->size_33 - $request->size_33;
-                            $qty_avaliable = $BufferStock_33->qty_avaliable - $decrement;
-                            $qty_process = $BufferStock_33->qty_process + $decrement;
+                            $qty_avaliable = $BufferStock_33->qty_avaliable + $decrement;
+                            $qty_process = $BufferStock_33->qty_process - $decrement;
 
                             $BufferStock_33->update([
                                 'qty_avaliable' => $qty_avaliable,
@@ -2371,8 +2370,8 @@ class PreOrderController extends Controller
                         ]);
                     } elseif ($request->size_34 < $temporary_storage->size_34) {
                         if ($request->size_34 == 0) {
-                            $qty_avaliable = $BufferStock_34->qty_avaliable - $temporary_storage->size_34;
-                            $qty_process = $BufferStock_34->qty_process + $temporary_storage->size_34;
+                            $qty_avaliable = $BufferStock_34->qty_avaliable + $temporary_storage->size_34;
+                            $qty_process = $BufferStock_34->qty_process - $temporary_storage->size_34;
 
                             $BufferStock_34->update([
                                 'qty_avaliable' => $qty_avaliable,
@@ -2381,8 +2380,8 @@ class PreOrderController extends Controller
                         } else {
 
                             $decrement = $temporary_storage->size_34 - $request->size_34;
-                            $qty_avaliable = $BufferStock_34->qty_avaliable - $decrement;
-                            $qty_process = $BufferStock_34->qty_process + $decrement;
+                            $qty_avaliable = $BufferStock_34->qty_avaliable + $decrement;
+                            $qty_process = $BufferStock_34->qty_process - $decrement;
 
                             $BufferStock_34->update([
                                 'qty_avaliable' => $qty_avaliable,
@@ -2436,8 +2435,8 @@ class PreOrderController extends Controller
                         ]);
                     } elseif ($request->size_35 < $temporary_storage->size_35) {
                         if ($request->size_35 == 0) {
-                            $qty_avaliable = $BufferStock_35->qty_avaliable - $temporary_storage->size_35;
-                            $qty_process = $BufferStock_35->qty_process + $temporary_storage->size_35;
+                            $qty_avaliable = $BufferStock_35->qty_avaliable + $temporary_storage->size_35;
+                            $qty_process = $BufferStock_35->qty_process - $temporary_storage->size_35;
 
                             $BufferStock_35->update([
                                 'qty_avaliable' => $qty_avaliable,
@@ -2446,8 +2445,8 @@ class PreOrderController extends Controller
                         } else {
 
                             $decrement = $temporary_storage->size_35 - $request->size_35;
-                            $qty_avaliable = $BufferStock_35->qty_avaliable - $decrement;
-                            $qty_process = $BufferStock_35->qty_process + $decrement;
+                            $qty_avaliable = $BufferStock_35->qty_avaliable + $decrement;
+                            $qty_process = $BufferStock_35->qty_process - $decrement;
 
                             $BufferStock_35->update([
                                 'qty_avaliable' => $qty_avaliable,
@@ -2501,8 +2500,8 @@ class PreOrderController extends Controller
                         ]);
                     } elseif ($request->size_36 < $temporary_storage->size_36) {
                         if ($request->size_36 == 0) {
-                            $qty_avaliable = $BufferStock_36->qty_avaliable - $temporary_storage->size_36;
-                            $qty_process = $BufferStock_36->qty_process + $temporary_storage->size_36;
+                            $qty_avaliable = $BufferStock_36->qty_avaliable + $temporary_storage->size_36;
+                            $qty_process = $BufferStock_36->qty_process - $temporary_storage->size_36;
 
                             $BufferStock_36->update([
                                 'qty_avaliable' => $qty_avaliable,
@@ -2511,8 +2510,8 @@ class PreOrderController extends Controller
                         } else {
 
                             $decrement = $temporary_storage->size_36 - $request->size_36;
-                            $qty_avaliable = $BufferStock_36->qty_avaliable - $decrement;
-                            $qty_process = $BufferStock_36->qty_process + $decrement;
+                            $qty_avaliable = $BufferStock_36->qty_avaliable + $decrement;
+                            $qty_process = $BufferStock_36->qty_process - $decrement;
 
                             $BufferStock_36->update([
                                 'qty_avaliable' => $qty_avaliable,
@@ -2566,8 +2565,8 @@ class PreOrderController extends Controller
                         ]);
                     } elseif ($request->size_37 < $temporary_storage->size_37) {
                         if ($request->size_37 == 0) {
-                            $qty_avaliable = $BufferStock_37->qty_avaliable - $temporary_storage->size_37;
-                            $qty_process = $BufferStock_37->qty_process + $temporary_storage->size_37;
+                            $qty_avaliable = $BufferStock_37->qty_avaliable + $temporary_storage->size_37;
+                            $qty_process = $BufferStock_37->qty_process - $temporary_storage->size_37;
 
                             $BufferStock_37->update([
                                 'qty_avaliable' => $qty_avaliable,
@@ -2631,8 +2630,8 @@ class PreOrderController extends Controller
                         ]);
                     } elseif ($request->size_38 < $temporary_storage->size_38) {
                         if ($request->size_38 == 0) {
-                            $qty_avaliable = $BufferStock_38->qty_avaliable - $temporary_storage->size_38;
-                            $qty_process = $BufferStock_38->qty_process + $temporary_storage->size_38;
+                            $qty_avaliable = $BufferStock_38->qty_avaliable + $temporary_storage->size_38;
+                            $qty_process = $BufferStock_38->qty_process - $temporary_storage->size_38;
 
                             $BufferStock_38->update([
                                 'qty_avaliable' => $qty_avaliable,
@@ -2641,8 +2640,8 @@ class PreOrderController extends Controller
                         } else {
 
                             $decrement = $temporary_storage->size_38 - $request->size_38;
-                            $qty_avaliable = $BufferStock_38->qty_avaliable - $decrement;
-                            $qty_process = $BufferStock_38->qty_process + $decrement;
+                            $qty_avaliable = $BufferStock_38->qty_avaliable + $decrement;
+                            $qty_process = $BufferStock_38->qty_process - $decrement;
 
                             $BufferStock_38->update([
                                 'qty_avaliable' => $qty_avaliable,
@@ -2696,8 +2695,8 @@ class PreOrderController extends Controller
                         ]);
                     } elseif ($request->size_39 < $temporary_storage->size_39) {
                         if ($request->size_39 == 0) {
-                            $qty_avaliable = $BufferStock_39->qty_avaliable - $temporary_storage->size_39;
-                            $qty_process = $BufferStock_39->qty_process + $temporary_storage->size_39;
+                            $qty_avaliable = $BufferStock_39->qty_avaliable + $temporary_storage->size_39;
+                            $qty_process = $BufferStock_39->qty_process - $temporary_storage->size_39;
 
                             $BufferStock_39->update([
                                 'qty_avaliable' => $qty_avaliable,
@@ -2706,8 +2705,8 @@ class PreOrderController extends Controller
                         } else {
 
                             $decrement = $temporary_storage->size_39 - $request->size_39;
-                            $qty_avaliable = $BufferStock_39->qty_avaliable - $decrement;
-                            $qty_process = $BufferStock_39->qty_process + $decrement;
+                            $qty_avaliable = $BufferStock_39->qty_avaliable + $decrement;
+                            $qty_process = $BufferStock_39->qty_process - $decrement;
 
                             $BufferStock_39->update([
                                 'qty_avaliable' => $qty_avaliable,
@@ -2761,18 +2760,17 @@ class PreOrderController extends Controller
                         ]);
                     } elseif ($request->size_40 < $temporary_storage->size_40) {
                         if ($request->size_40 == 0) {
-                            $qty_avaliable = $BufferStock_40->qty_avaliable - $temporary_storage->size_40;
-                            $qty_process = $BufferStock_40->qty_process + $temporary_storage->size_40;
+                            $qty_avaliable = $BufferStock_40->qty_avaliable + $temporary_storage->size_40;
+                            $qty_process = $BufferStock_40->qty_process - $temporary_storage->size_40;
 
                             $BufferStock_40->update([
                                 'qty_avaliable' => $qty_avaliable,
                                 'qty_process' => $qty_process
                             ]);
                         } else {
-
                             $decrement = $temporary_storage->size_40 - $request->size_40;
-                            $qty_avaliable = $BufferStock_40->qty_avaliable - $decrement;
-                            $qty_process = $BufferStock_40->qty_process + $decrement;
+                            $qty_avaliable = $BufferStock_40->qty_avaliable + $decrement;
+                            $qty_process = $BufferStock_40->qty_process - $decrement;
 
                             $BufferStock_40->update([
                                 'qty_avaliable' => $qty_avaliable,
@@ -2826,8 +2824,8 @@ class PreOrderController extends Controller
                         ]);
                     } elseif ($request->size_41 < $temporary_storage->size_41) {
                         if ($request->size_41 == 0) {
-                            $qty_avaliable = $BufferStock_41->qty_avaliable - $temporary_storage->size_41;
-                            $qty_process = $BufferStock_41->qty_process + $temporary_storage->size_41;
+                            $qty_avaliable = $BufferStock_41->qty_avaliable + $temporary_storage->size_41;
+                            $qty_process = $BufferStock_41->qty_process - $temporary_storage->size_41;
 
                             $BufferStock_41->update([
                                 'qty_avaliable' => $qty_avaliable,
@@ -2836,8 +2834,8 @@ class PreOrderController extends Controller
                         } else {
 
                             $decrement = $temporary_storage->size_41 - $request->size_41;
-                            $qty_avaliable = $BufferStock_41->qty_avaliable - $decrement;
-                            $qty_process = $BufferStock_41->qty_process + $decrement;
+                            $qty_avaliable = $BufferStock_41->qty_avaliable + $decrement;
+                            $qty_process = $BufferStock_41->qty_process - $decrement;
 
                             $BufferStock_41->update([
                                 'qty_avaliable' => $qty_avaliable,
@@ -2891,8 +2889,8 @@ class PreOrderController extends Controller
                         ]);
                     } elseif ($request->size_42 < $temporary_storage->size_42) {
                         if ($request->size_42 == 0) {
-                            $qty_avaliable = $BufferStock_42->qty_avaliable - $temporary_storage->size_42;
-                            $qty_process = $BufferStock_42->qty_process + $temporary_storage->size_42;
+                            $qty_avaliable = $BufferStock_42->qty_avaliable + $temporary_storage->size_42;
+                            $qty_process = $BufferStock_42->qty_process - $temporary_storage->size_42;
 
                             $BufferStock_42->update([
                                 'qty_avaliable' => $qty_avaliable,
@@ -2901,8 +2899,8 @@ class PreOrderController extends Controller
                         } else {
 
                             $decrement = $temporary_storage->size_42 - $request->size_42;
-                            $qty_avaliable = $BufferStock_42->qty_avaliable - $decrement;
-                            $qty_process = $BufferStock_42->qty_process + $decrement;
+                            $qty_avaliable = $BufferStock_42->qty_avaliable + $decrement;
+                            $qty_process = $BufferStock_42->qty_process - $decrement;
 
                             $BufferStock_42->update([
                                 'qty_avaliable' => $qty_avaliable,
@@ -2943,8 +2941,8 @@ class PreOrderController extends Controller
 
             if ($BufferStock_other) {
                 if ($BufferStock_other->qty_buffer != 0) {
-                    if ($request->size_other && $BufferStock_other->qty_avaliable != 0 && $request->size_other > $temporary_storage->size_other) {
-                        $increment = $request->size_other - $temporary_storage->size_other;
+                    if ($BufferStock_other->qty_avaliable != 0 && $request->other > $temporary_storage->other) {
+                        $increment = $request->other - $temporary_storage->other;
                         $qty_avaliable = $BufferStock_other->qty_avaliable - $increment;
                         $qty_process = $BufferStock_other->qty_process + $increment;
 
@@ -2952,10 +2950,10 @@ class PreOrderController extends Controller
                             'qty_avaliable' => $qty_avaliable,
                             'qty_process' => $qty_process
                         ]);
-                    } elseif ($request->size_other < $temporary_storage->size_other) {
-                        if ($request->size_other == 0) {
-                            $qty_avaliable = $BufferStock_other->qty_avaliable - $temporary_storage->size_other;
-                            $qty_process = $BufferStock_other->qty_process + $temporary_storage->size_other;
+                    } elseif ($request->other < $temporary_storage->other) {
+                        if ($request->other == 0) {
+                            $qty_avaliable = $BufferStock_other->qty_avaliable + $temporary_storage->other;
+                            $qty_process = $BufferStock_other->qty_process - $temporary_storage->other;
 
                             $BufferStock_other->update([
                                 'qty_avaliable' => $qty_avaliable,
@@ -2963,9 +2961,9 @@ class PreOrderController extends Controller
                             ]);
                         } else {
 
-                            $decrement = $temporary_storage->size_other - $request->size_other;
-                            $qty_avaliable = $BufferStock_other->qty_avaliable - $decrement;
-                            $qty_process = $BufferStock_other->qty_process + $decrement;
+                            $decrement = $temporary_storage->other - $request->other;
+                            $qty_avaliable = $BufferStock_other->qty_avaliable + $decrement;
+                            $qty_process = $BufferStock_other->qty_process - $decrement;
 
                             $BufferStock_other->update([
                                 'qty_avaliable' => $qty_avaliable,
@@ -2974,22 +2972,22 @@ class PreOrderController extends Controller
                         }
                     }
                 } elseif ($BufferStock_other->qty_buffer == 0) {
-                    if ($request->size_other > $temporary_storage->size_other) {
-                        $increment = $request->size_other - $temporary_storage->size_other;
+                    if ($request->other > $temporary_storage->other) {
+                        $increment = $request->other - $temporary_storage->other;
                         $qty_process = $BufferStock_other->qty_process + $increment;
 
                         $BufferStock_other->update([
                             'qty_process' => $qty_process
                         ]);
-                    } elseif ($request->size_other < $temporary_storage->size_other) {
-                        if ($request->size_other == 0) {
-                            $qty_process = $BufferStock_other->qty_process - $temporary_storage->size_other;
+                    } elseif ($request->other < $temporary_storage->other) {
+                        if ($request->other == 0) {
+                            $qty_process = $BufferStock_other->qty_process - $temporary_storage->other;
 
                             $BufferStock_other->update([
                                 'qty_process' => $qty_process
                             ]);
                         } else {
-                            $decrement = $temporary_storage->size_other - $request->size_other;
+                            $decrement = $temporary_storage->other - $request->other;
                             $qty_process = $BufferStock_other->qty_process - $decrement;
 
                             $BufferStock_other->update([
@@ -3781,15 +3779,15 @@ class PreOrderController extends Controller
 
             if ($BufferStock_other) {
                 if ($BufferStock_other->qty_buffer > 0) {    
-                    $qty_avaliable = $BufferStock_other->qty_avaliable + $detailCart->size_other;
-                    $qty_process = $BufferStock_other->qty_process - $detailCart->size_other;
+                    $qty_avaliable = $BufferStock_other->qty_avaliable + $detailCart->other;
+                    $qty_process = $BufferStock_other->qty_process - $detailCart->other;
 
                     $BufferStock_other->update([
                         'qty_avaliable' => $qty_avaliable,
                         'qty_proccess' => $qty_process
                     ]);
                 } elseif ($BufferStock_other->qty_buffer == 0) {
-                    $qty_process = $BufferStock_other->qty_process - $detailCart->size_other;
+                    $qty_process = $BufferStock_other->qty_process - $detailCart->other;
 
                     $BufferStock_other->update([
                         'qty_proccess' => $qty_process

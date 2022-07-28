@@ -27,9 +27,10 @@ Route::middleware('jwt.verify')->group(function () {
     Route::apiResources([
         'agent' => 'Api\AgentController',
         'clothes' => 'Api\ClothesController',
+        'image' => 'Api\Admin\PhotoController',
         'distributor' => 'Api\DistributorController',
         'partner-group' => 'Api\PartnerGroupController',
-        'image' => 'Api\Admin\PhotoController'
+        'mutif-store-admin' => 'Api\Admin\MutifStoreMasterController',
     ]);
 
     // route with exception
@@ -49,9 +50,11 @@ Route::middleware('jwt.verify')->group(function () {
 
     // single route
     Route::post('/photo/{id}', 'Api\UploadPhoto');
+    Route::get('/status', 'Api\Admin\SessionStatus');
     Route::get('get-new-member', 'Api\AccRegistration');
     Route::put('/is-active/{clothes}', 'Api\ActivateClothes');
     Route::post('single-agent', 'Api\Admin\CreateSingleAgent');
+    Route::get('unregistered-MS-agent', 'Api\Admin\SingleAgent');
     Route::get('/detail-transaction/{id}', 'Api\DetailTransaction');
 });
 
@@ -83,8 +86,15 @@ Route::prefix('client')->group( function () {
     Route::get('/get-list-group', 'Api\Client\ClientController@PartnerGroup');
     Route::get('/get-list-distributor', 'Api\Client\ClientController@distributor');
 
-    // create address for agent
+    // create address for agent & MS
     Route::post('/create-address/{phone}', 'Api\Client\PartnerAddressController@store');
+});
+
+Route::prefix('mutif-store')->group( function () {
+    Route::get('/{phone}', 'Api\Client\MutifStoreAddressController@index');
+    Route::post('/{phone}', 'Api\Client\MutifStoreAddressController@store');
+    Route::get('/{phone}/MS/{id}', 'Api\Client\MutifStoreAddressController@show');
+    Route::put('/{phone}/MS/{id}', 'Api\Client\MutifStoreAddressController@update');
 });
 
 // testing

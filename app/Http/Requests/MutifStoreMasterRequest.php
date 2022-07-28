@@ -26,7 +26,6 @@ class MutifStoreMasterRequest extends FormRequest
         return [
             'mutif_store_master' => 'required',
             'distributor_id' => 'required',
-            
         ];
     }
 }

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\Admin;
 use App\Http\Controllers\Controller;
 use App\MutifStoreMaster;
 use Illuminate\Http\Request;
+use App\Requests\MutifStoreRequest;
 
 class MutifStoreMasterController extends Controller
 {
@@ -40,7 +41,45 @@ class MutifStoreMasterController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $user = Distributor::find($request->distributor_id);
+
+        try {
+            $MutfStoreMaster = MutifStoreMaster::create([
+                'mutif_store_name' => $request->ms_ms_name,
+                'mutif_store_code' => $request->ms_code,
+                'group_code' => $user->group_code,
+                'distributor_id' => $user->id,
+                'partner_group_id' => $user->partner_group_id,
+                'open_date' => $request->open_date,
+                'status' => $request->status,
+                'msdp' => $request->msdp
+            ]);
+
+            $MutfStoreAddress = MutifStoreAddress::create([
+                'mutif_store_master_id' => $MutifStoreMaster->id,
+                'address' => $request->address,
+                'province' => $request->province,
+                'regency' => $request->regency,
+                'district' => $request->district,
+                'phone_1' => $phone,
+                'phone_2' => $request->phone,
+                'fax_1' => $request->fax,
+                'addr_type' => $request->addr_type,
+                'zip' => $request->zip,
+                'comment' => $request->comment
+            ]);
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'success to create MS',
+            ], 200);
+        } catch (Exception $e) {
+            return response()->json([
+                'status' => 'failed',
+                'message' => 'failed to create MS',
+                'error' => $e->getMessage()
+            ], 400);
+        }
     }
 
     /**
