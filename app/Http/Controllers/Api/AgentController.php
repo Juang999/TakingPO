@@ -29,9 +29,8 @@ class AgentController extends Controller
 
         foreach ($datas as $data) {
             $data['agent'] = Distributor::where('id', $data->distributor_id)->first();
-            $data['distributor'] = Distributor::where('id', $data->agent->distributor_id)->first();
-            $data['distributor']['total_agent'] = Distributor::where('distributor_id', $data->distributor->id)->count();
-
+            $data['distributor'] = Distributor::where('id', $data['agent']->distributor_id)->first();
+            $data['distributor']['total_agent'] = Distributor::where('distributor_id', $data['distributor']->id)->count();
             $data->makeHidden([
                 'ms_add_by',
                 'ms_upd_by',

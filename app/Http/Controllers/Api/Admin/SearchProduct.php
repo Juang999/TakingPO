@@ -16,20 +16,20 @@ class SearchProduct extends Controller
      */
     public function __invoke($search)
     {
-      try {
-        $product = Clothes::where('article_name', 'LIKE', '%'.$search.'%')->first();
+        try {
+            $product = Clothes::where('article_name', 'LIKE', '%'.$search.'%')->get();
 
-        return response()->json([
-          'status' => 'success',
-          'message' => 'success to get products',
-          'data' => $product
-        ], 200);
-      } catch (\Throwable $th) {
-        return response()->json([
-          'status' => 'failed',
-          'message' => 'failed to get data',
-          'error' => $th->getMessage()
-        ], 400);
-      }
+            return response()->json([
+                'status' => 'success',
+                'message' => 'success to get products',
+                'data' => $product
+            ], 200);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'status' => 'failed',
+                'message' => 'failed to get data',
+                'error' => $th->getMessage()
+            ], 400);
+        }
     }
 }
