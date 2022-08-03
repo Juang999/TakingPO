@@ -31,7 +31,9 @@ class PreOrderController extends Controller
             ], 400);
         }
 
-        $clothess = Clothes::orderBy('group_article')->with('Type', 'Image', 'BufferProduct.Size')->get();
+        $clothess = Clothes::orderBy('group_article')
+        ->with('Type', 'Image', 'BufferProduct.Size')
+        ->get();
 
         if ($clothess) {
             foreach ($clothess as $clothes) {
@@ -148,7 +150,7 @@ class PreOrderController extends Controller
 
             if ($BufferStock_l) {
                 if ($BufferStock_l->qty_buffer != 0) {
-                    dd($BufferStock_l->qty_buffer);
+                    //dd($BufferStock_l->qty_buffer);
                     if ($BufferStock_l->qty_avaliable >= $request->size_l) {
                         $qty_avaliable = $BufferStock_l->qty_avaliable - $request->size_l;
                         $qty_process = $BufferStock_l->qty_process + $request->size_l;
@@ -1393,7 +1395,7 @@ class PreOrderController extends Controller
                         $increment = $request->size_xxl - $temporary_storage->size_xxl;
 
                         $qty_avaliable = $BufferStock_xxl->qty_avaliable - $increment;
-                        dd($increment);
+                        //dd($increment);
                         $qty_process = $BufferStock_xxl->qty_process + $increment;
 
                         $BufferStock_xxl->update([
@@ -1529,9 +1531,9 @@ class PreOrderController extends Controller
                             'qty_process' => $qty_process
                         ]);
                     } elseif ($request->size_2 < $temporary_storage->size_2) {
-                        if ($request->size_2) {
-                            $qty_avaliable = $BufferStock_2->qty_avaliable + $increment;
-                            $qty_process = $BufferStock_2->qty_process - $increment;
+                        if ($request->size_2 == 0) {
+                            $qty_avaliable = $BufferStock_2->qty_avaliable + $temporary_storage->size_2;
+                            $qty_process = $BufferStock_2->qty_process - $temporary_storage->size_2;
 
                             $BufferStock_2->update([
                                 'qty_avaliable' => $qty_avaliable,
@@ -1539,8 +1541,8 @@ class PreOrderController extends Controller
                             ]);
                         } else {
                             $decrement = $temporary_storage->size_2 - $request->size_2;
-                            $qty_avaliable = $BufferStock_2->qty_avaliable + $increment;
-                            $qty_process = $BufferStock_2->qty_process - $increment;
+                            $qty_avaliable = $BufferStock_2->qty_avaliable + $decrement;
+                            $qty_process = $BufferStock_2->qty_process - $decrement;
 
                             $BufferStock_2->update([
                                 'qty_avaliable' => $qty_avaliable,
@@ -3204,7 +3206,7 @@ class PreOrderController extends Controller
 
             if ($BufferStock_xxxl) {
                 if ($BufferStock_xxxl->qty_buffer > 0) {
-                    
+
                     $qty_avaliable = $BufferStock_xxxl->qty_avaliable + $detailCart->size_xxxl;
                     $qty_process = $BufferStock_xxxl->qty_process - $detailCart->size_xxxl;
 
@@ -3348,7 +3350,7 @@ class PreOrderController extends Controller
             ])->first();
 
             if ($BufferStock_12) {
-                if ($BufferStock_12->qty_buffer > 0) {    
+                if ($BufferStock_12->qty_buffer > 0) {
                     $qty_avaliable = $BufferStock_12->qty_avaliable + $detailCart->size_12;
                     $qty_process = $BufferStock_12->qty_process - $detailCart->size_12;
 
@@ -3372,7 +3374,7 @@ class PreOrderController extends Controller
             ])->first();
 
             if ($BufferStock_27) {
-                if ($BufferStock_27->qty_buffer > 0) {    
+                if ($BufferStock_27->qty_buffer > 0) {
                     $qty_avaliable = $BufferStock_27->qty_avaliable + $detailCart->size_27;
                     $qty_process = $BufferStock_27->qty_process - $detailCart->size_27;
 
@@ -3396,7 +3398,7 @@ class PreOrderController extends Controller
             ])->first();
 
             if ($BufferStock_28) {
-                if ($BufferStock_28->qty_buffer > 0) {    
+                if ($BufferStock_28->qty_buffer > 0) {
                     $qty_avaliable = $BufferStock_28->qty_avaliable + $detailCart->size_28;
                     $qty_process = $BufferStock_28->qty_process - $detailCart->size_28;
 
@@ -3420,7 +3422,7 @@ class PreOrderController extends Controller
             ])->first();
 
             if ($BufferStock_29) {
-                if ($BufferStock_29->qty_buffer > 0) {    
+                if ($BufferStock_29->qty_buffer > 0) {
                     $qty_avaliable = $BufferStock_29->qty_avaliable + $detailCart->size_29;
                     $qty_process = $BufferStock_29->qty_process - $detailCart->size_29;
 
@@ -3444,7 +3446,7 @@ class PreOrderController extends Controller
             ])->first();
 
             if ($BufferStock_30) {
-                if ($BufferStock_30->qty_buffer > 0) {    
+                if ($BufferStock_30->qty_buffer > 0) {
                     $qty_avaliable = $BufferStock_30->qty_avaliable + $detailCart->size_30;
                     $qty_process = $BufferStock_30->qty_process - $detailCart->size_30;
 
@@ -3468,7 +3470,7 @@ class PreOrderController extends Controller
             ])->first();
 
             if ($BufferStock_30) {
-                if ($BufferStock_30->qty_buffer > 0) {    
+                if ($BufferStock_30->qty_buffer > 0) {
                     $qty_avaliable = $BufferStock_30->qty_avaliable + $detailCart->size_30;
                     $qty_process = $BufferStock_30->qty_process - $detailCart->size_30;
 
@@ -3492,7 +3494,7 @@ class PreOrderController extends Controller
             ])->first();
 
             if ($BufferStock_31) {
-                if ($BufferStock_31->qty_buffer > 0) {    
+                if ($BufferStock_31->qty_buffer > 0) {
                     $qty_avaliable = $BufferStock_31->qty_avaliable + $detailCart->size_31;
                     $qty_process = $BufferStock_31->qty_process - $detailCart->size_31;
 
@@ -3516,7 +3518,7 @@ class PreOrderController extends Controller
             ])->first();
 
             if ($BufferStock_32) {
-                if ($BufferStock_32->qty_buffer > 0) {    
+                if ($BufferStock_32->qty_buffer > 0) {
                     $qty_avaliable = $BufferStock_32->qty_avaliable + $detailCart->size_32;
                     $qty_process = $BufferStock_32->qty_process - $detailCart->size_32;
 
@@ -3540,7 +3542,7 @@ class PreOrderController extends Controller
             ])->first();
 
             if ($BufferStock_33) {
-                if ($BufferStock_33->qty_buffer > 0) {    
+                if ($BufferStock_33->qty_buffer > 0) {
                     $qty_avaliable = $BufferStock_33->qty_avaliable + $detailCart->size_33;
                     $qty_process = $BufferStock_33->qty_process - $detailCart->size_33;
 
@@ -3564,7 +3566,7 @@ class PreOrderController extends Controller
             ])->first();
 
             if ($BufferStock_34) {
-                if ($BufferStock_34->qty_buffer > 0) {    
+                if ($BufferStock_34->qty_buffer > 0) {
                     $qty_avaliable = $BufferStock_34->qty_avaliable + $detailCart->size_34;
                     $qty_process = $BufferStock_34->qty_process - $detailCart->size_34;
 
@@ -3588,7 +3590,7 @@ class PreOrderController extends Controller
             ])->first();
 
             if ($BufferStock_35) {
-                if ($BufferStock_35->qty_buffer > 0) {    
+                if ($BufferStock_35->qty_buffer > 0) {
                     $qty_avaliable = $BufferStock_35->qty_avaliable + $detailCart->size_35;
                     $qty_process = $BufferStock_35->qty_process - $detailCart->size_35;
 
@@ -3612,7 +3614,7 @@ class PreOrderController extends Controller
             ])->first();
 
             if ($BufferStock_36) {
-                if ($BufferStock_36->qty_buffer > 0) {    
+                if ($BufferStock_36->qty_buffer > 0) {
                     $qty_avaliable = $BufferStock_36->qty_avaliable + $detailCart->size_36;
                     $qty_process = $BufferStock_36->qty_process - $detailCart->size_36;
 
@@ -3636,7 +3638,7 @@ class PreOrderController extends Controller
             ])->first();
 
             if ($BufferStock_37) {
-                if ($BufferStock_37->qty_buffer > 0) {    
+                if ($BufferStock_37->qty_buffer > 0) {
                     $qty_avaliable = $BufferStock_37->qty_avaliable + $detailCart->size_37;
                     $qty_process = $BufferStock_37->qty_process - $detailCart->size_37;
 
@@ -3660,7 +3662,7 @@ class PreOrderController extends Controller
             ])->first();
 
             if ($BufferStock_38) {
-                if ($BufferStock_38->qty_buffer > 0) {    
+                if ($BufferStock_38->qty_buffer > 0) {
                     $qty_avaliable = $BufferStock_38->qty_avaliable + $detailCart->size_38;
                     $qty_process = $BufferStock_38->qty_process - $detailCart->size_38;
 
@@ -3684,7 +3686,7 @@ class PreOrderController extends Controller
             ])->first();
 
             if ($BufferStock_39) {
-                if ($BufferStock_39->qty_buffer > 0) {    
+                if ($BufferStock_39->qty_buffer > 0) {
                     $qty_avaliable = $BufferStock_39->qty_avaliable + $detailCart->size_39;
                     $qty_process = $BufferStock_39->qty_process - $detailCart->size_39;
 
@@ -3708,7 +3710,7 @@ class PreOrderController extends Controller
             ])->first();
 
             if ($BufferStock_40) {
-                if ($BufferStock_40->qty_buffer > 0) {    
+                if ($BufferStock_40->qty_buffer > 0) {
                     $qty_avaliable = $BufferStock_40->qty_avaliable + $detailCart->size_40;
                     $qty_process = $BufferStock_40->qty_process - $detailCart->size_40;
 
@@ -3732,7 +3734,7 @@ class PreOrderController extends Controller
             ])->first();
 
             if ($BufferStock_41) {
-                if ($BufferStock_41->qty_buffer > 0) {    
+                if ($BufferStock_41->qty_buffer > 0) {
                     $qty_avaliable = $BufferStock_41->qty_avaliable + $detailCart->size_41;
                     $qty_process = $BufferStock_41->qty_process - $detailCart->size_41;
 
@@ -3756,7 +3758,7 @@ class PreOrderController extends Controller
             ])->first();
 
             if ($BufferStock_42) {
-                if ($BufferStock_42->qty_buffer > 0) {    
+                if ($BufferStock_42->qty_buffer > 0) {
                     $qty_avaliable = $BufferStock_42->qty_avaliable + $detailCart->size_42;
                     $qty_process = $BufferStock_42->qty_process - $detailCart->size_42;
 
@@ -3778,7 +3780,7 @@ class PreOrderController extends Controller
             ])->first();
 
             if ($BufferStock_other) {
-                if ($BufferStock_other->qty_buffer > 0) {    
+                if ($BufferStock_other->qty_buffer > 0) {
                     $qty_avaliable = $BufferStock_other->qty_avaliable + $detailCart->other;
                     $qty_process = $BufferStock_other->qty_process - $detailCart->other;
 

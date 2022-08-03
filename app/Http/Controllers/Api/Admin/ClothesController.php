@@ -21,7 +21,7 @@ class ClothesController extends Controller
      */
     public function index()
     {
-        $clothess = Clothes::orderBy('type_id', 'DESC')->with('Type', 'Image', 'BufferProduct.Size')->get();
+        $clothess = Clothes::orderBy('group_article')->with('Type', 'Image', 'BufferProduct.Size')->get();
 
         foreach ($clothess as $clothes) {
             $clothes->combo = explode(',', $clothes->combo);

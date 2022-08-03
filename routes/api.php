@@ -56,6 +56,7 @@ Route::middleware('jwt.verify')->group(function () {
     Route::post('single-agent', 'Api\Admin\CreateSingleAgent');
     Route::get('unregistered-MS-agent', 'Api\Admin\SingleAgent');
     Route::get('/detail-transaction/{id}', 'Api\DetailTransaction');
+    Route::get('/search-products/{search}', 'Api\Admin\SearchProduct');
 });
 
 // group pre-order route
