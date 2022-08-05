@@ -59,6 +59,7 @@ Route::middleware('jwt.verify')->group(function () {
     Route::get('/detail-transaction/{id}', 'Api\DetailTransaction');
     Route::get('/search-products/{search}', 'Api\Admin\SearchProduct');
     Route::get('/search-distributor/{search}', 'Api\Admin\SearchDistributor');
+    Route::get('/highest-order', 'Api\Admin\HighestOrder');
 });
 
 // group pre-order route

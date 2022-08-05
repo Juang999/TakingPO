@@ -1272,7 +1272,7 @@ class PreOrderController extends Controller
                             'qty_avaliable' => $qty_avaliable,
                             'qty_process' => $qty_process
                         ]);
-                    } elseif ($temporary_storage->size_l < $temporary_storage->size_l) {
+                    } elseif ($request->size_l < $temporary_storage->size_l) {
                         if ($request->size_l == 0 ) {
                             $qty_avaliable = $BufferStock_l->qty_avaliable + $temporary_storage->size_l;
                             $qty_process = $BufferStock_l->qty_process - $temporary_storage->size_l;

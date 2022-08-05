@@ -16,7 +16,7 @@ class CreateDistributorsTable extends Migration
         Schema::create('distributors', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->string('phone')->nullable();
+            $table->string('phone')->unique()->nullable();
             $table->integer('distributor_id')->default(0);
             $table->string('group_code')->nullable();
             $table->integer('partner_group_id')->constrained('parter_groups')->nullable();

@@ -112,7 +112,7 @@ class ClientController extends Controller
                 return response()->json($validator->errors()->toJson(), 400);
             }
 
-            $user->update('phone', $request->new_phone_number);
+            $user->update(['phone' => $request->new_phone_number]);
 
             return response()->json([
                 'status' => 'success',
@@ -185,8 +185,6 @@ class ClientController extends Controller
             'district' => $request->district,
             'regency' => $request->regency,
             'province' => $request->province,
-            // 'phone_1' => $request->phone_1,
-            // 'comment' => $request->comment
         ]);
 
             return response()->json([
