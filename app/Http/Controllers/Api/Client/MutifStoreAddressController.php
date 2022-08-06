@@ -37,11 +37,11 @@ class MutifStoreAddressController extends Controller
                 'message' => 'success to get data',
                 'data' => $MutifStore
             ], 200);
-        } catch (Exception $e) {
+        } catch (\Throwable $th) {
             return response()->json([
                 'status' => 'failed',
                 'message' => 'failed to get data',
-                'error' => $e->getMessage()
+                'error' => $th->getMessage()
             ], 400);
         }
     }
@@ -93,11 +93,11 @@ class MutifStoreAddressController extends Controller
                 'status' => 'success',
                 'message' => 'success to create MS',
             ], 200);
-        } catch (Exception $e) {
+        } catch (\Throwable $th) {
             return response()->json([
                 'status' => 'failed',
                 'message' => 'failed to create MS',
-                'error' => $e->getMessage()
+                'error' => $th->getMessage()
             ], 400);
         }
     }
@@ -127,11 +127,11 @@ class MutifStoreAddressController extends Controller
                 'message' => 'success to get data',
                 'mutif-store' => $MutifStore
             ], 200);
-        } catch (Exception $e) {
+        } catch (\Throwable $th) {
             return response()->json([
                 'status' => 'failed',
                 'message' => 'failed to get data',
-                'error' => $e->getMessage()
+                'error' => $th->getMessage()
             ], 400);
         }
     }
@@ -183,13 +183,13 @@ class MutifStoreAddressController extends Controller
                 'status' => 'success',
                 'message' => 'success to update Mutif Store'
             ], 200);
-        } catch (Exception $e) {
+        } catch (\Throwable $th) {
             DB::rollback();
 
             return response()->json([
                 'status' => 'failed',
                 'message' => 'failed to update Mutif Store',
-                'error' => $e->getMessage()
+                'error' => $th->getMessage()
             ], 400);
         }
     }
