@@ -103,7 +103,14 @@ class ClientController extends Controller
     {
         $user = Distributor::where('phone', $phone)->first();
 
-        if ($user->partner_group_id == 1) {
+        if (!$user) {
+            return response()->json([
+                'status' => 'rejected',
+                'message' => 'user not found!'
+            ], 300);
+        }
+
+        if ($user->partner_group_id == 1 ) {
             $validator = Validator::make($request->all(), [
                 'new_phone_number' => 'required'
             ]);
@@ -128,14 +135,19 @@ class ClientController extends Controller
                 return response()->json($validator->errors()->toJson(), 400);
             }
 
-            $mutif_stores = MutifStoreMaster::where('distributor_id', $user->id)->get();
+            $mutif_store = MutifStoreMaster::where('mutif_store_code', $request->ms_code)->first();
 
-            foreach ($mutif_stores as $mutif_store) {
-                if ($mutif_store->mutif_store_code == $request->ms_code) {
-                    $user->update([
-                        'phone' => $request->new_phone_number
-                    ]);
-                }
+            if (!$mutif_store) {
+                return response()->json([
+                    'status' => 'rejected!',
+                    'message' => 'mutif store not found!'
+                ], 400);
+            }
+
+            if ($mutif_store->mutif_store_code == $request->ms_code) {
+                $user->update([
+                    'phone' => $request->new_phone_number
+                ]);
             }
 
             return response()->json([
