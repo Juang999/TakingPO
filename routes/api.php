@@ -56,7 +56,7 @@ Route::middleware('jwt.verify')->group(function () {
     Route::post('single-agent', 'Api\Admin\CreateSingleAgent');
     Route::get('unregistered-MS-agent', 'Api\Admin\SingleAgent');
     Route::get('/search-agent/{search}', 'Api\Admin\SearchAgent');
-    Route::get('/detail-transaction/{id}', 'Api\DetailTransaction');
+    Route::get('/detail-transaction1/{id}', 'Api\DetailTransaction');
     Route::get('/search-products/{search}', 'Api\Admin\SearchProduct');
     Route::get('/search-distributor/{search}', 'Api\Admin\SearchDistributor');
     Route::get('/highest-order', 'Api\Admin\HighestOrder');
@@ -103,3 +103,4 @@ Route::prefix('mutif-store')->group( function () {
 
 // testing
 Route::get('/index', 'WilayahController@index');
+Route::get('/testing', 'TestingController@index')->middleware('Logger');

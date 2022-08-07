@@ -44,7 +44,7 @@ class ClientController extends Controller
         } elseif ($activate && $activate->name == 'ACTIVE') {
             // when web is being closed
             return response()->json([
-                'status' => 'successs',
+                'status' => 'success',
                 'message' => 'hello '.$user->name,
                 'user' => $user,
                 'final_data' => []

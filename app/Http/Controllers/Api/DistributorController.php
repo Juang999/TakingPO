@@ -2,19 +2,19 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\TableName;
 use App\Distributor;
+use App\PartnerGroup;
+use App\PartnerAddress;
+use App\MutifStoreMaster;
+use App\MutifStoreAddress;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Schema;
 use App\Http\Requests\DistributorRequest;
 use App\Http\Requests\UpdateDistributorRequest;
-use App\MutifStoreAddress;
-use App\MutifStoreMaster;
-use App\PartnerAddress;
-use App\PartnerGroup;
-use App\TableName;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Schema;
 
 class DistributorController extends Controller
 {

@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use App\Clothes;
 use App\Distributor;
 use App\Http\Requests\PreOrderRequest;
+use App\IsActive;
 use App\Size;
 use App\TemporaryStorage;
 use Illuminate\Support\Facades\DB;
@@ -24,6 +25,15 @@ class PreOrderController extends Controller
     {
         $user  = Distributor::where('phone', $phone)->with('PartnerGroup')->first();
 
+
+        $activate = IsActive::find(1);
+        if ($activate->name == 'DONE') {
+            return response()->json([
+                'status' => 'closed',
+                'message' => 'final session'
+            ], 300);
+        }
+
         if (!$user) {
             return response()->json([
                 'status' => 'failed to get data',
@@ -31,8 +41,9 @@ class PreOrderController extends Controller
             ], 400);
         }
 
-        $clothess = Clothes::orderBy('group_article')
+        $clothess = Clothes::where('is_active', 1)
         ->with('Type', 'Image', 'BufferProduct.Size')
+        ->orderBy('group_article')
         ->get();
 
         if ($clothess) {
