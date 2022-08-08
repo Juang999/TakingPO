@@ -33,7 +33,7 @@ class DetailTransaction extends Controller
 
             $products = json_decode($product, true);
 
-            for ($i=0; $i < count($products); $i++) { 
+            for ($i=0; $i < count($products); $i++) {
                 // $products[$i]['clothes'] = Clothes::find($products[$i]['clothes_id']);
                 $clothes = Clothes::find($products[$i]['clothes_id']);
 
@@ -66,6 +66,7 @@ class DetailTransaction extends Controller
             }
 
             return response()->json([
+                'transaction_code' => $transaction_code,
                 'data' => $products
             ], 200);
         } catch (\Throwable $th) {

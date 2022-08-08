@@ -4,10 +4,12 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Spatie\Activitylog\Traits\LogsActivity;
+use Spatie\Activitylog\LogOptions;
 
 class Distributor extends Model
 {
-    use SoftDeletes;
+    use SoftDeletes, LogsActivity;
 
     protected $guarded = ['id'];
 
@@ -46,5 +48,10 @@ class Distributor extends Model
     public function MutifStoreMaster()
     {
         return $this->hasMany(MutifStoreMaster::class);
+    }
+
+    public function Phone()
+    {
+        return $this->hasMany(Phone::class);
     }
 }

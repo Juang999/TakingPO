@@ -3,9 +3,13 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
+use Spatie\Activitylog\Traits\LogsActivity;
+use Spatie\Activitylog\LogOptions;
 
 class PartnerGroup extends Model
 {
+    use LogsActivity;
+
     protected $guarded = ['id'];
 
     public function Distributor()

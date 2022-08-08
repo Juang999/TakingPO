@@ -12,6 +12,7 @@ use App\Http\Requests\AddressRequest;
 use App\Http\Requests\RegisterRequest;
 use App\MutifStoreMaster;
 use App\PartnerAddress;
+use App\Phone;
 use Illuminate\Support\Facades\Validator;
 
 class ClientController extends Controller
@@ -119,12 +120,46 @@ class ClientController extends Controller
                 return response()->json($validator->errors()->toJson(), 400);
             }
 
-            $user->update(['phone' => $request->new_phone_number]);
+            // $user->update(['phone' => $request->new_phone_number]);
 
-            return response()->json([
-                'status' => 'success',
-                'message' => 'phone updated!',
-            ], 200);
+            $phone = Phone::where('distributor_id', $user->id)->latest();
+
+            if (!$phone) {
+                Phone::create([
+                    'distributor_id' => $user->id,
+                    'phone_number' => $user->phone,
+                    'is_active' => 1,
+                    'approved' => 1
+                ]);
+
+                Phone::create([
+                    'distributor_id' => $user->id,
+                    'phone' => $request->new_phone_number,
+                    'is_active' => 0,
+                    'approved' => 0
+                ]);
+
+                activity()->log('[client] '. $user->name .' with id '. $user->id . ' waiting for approval change phone number');
+
+                return response()->json([
+                    'status' => 'success',
+                    'message' => 'wait for approval from admin',
+                ], 200);
+            } else {
+                Phone::create([
+                    'distributor_id' => $user->id,
+                    'phone' => $request->new_phone_number,
+                    'is_active' => 0,
+                    'approved' => 0
+                ]);
+
+                activity()->log('[client] '. $user->name .' with id '. $user->id . ' waiting for approval change phone number');
+
+                return response()->json([
+                    'status' => 'success',
+                    'message' => 'wait for approval from admin',
+                ], 200);
+            }
         } else if ($user->partner_group_id == 2 || $user->partner_group_id == 3) {
             $validator = Validator::make($request->all(), [
                 'ms_code' => 'required',
@@ -145,14 +180,49 @@ class ClientController extends Controller
             }
 
             if ($mutif_store->mutif_store_code == $request->ms_code) {
-                $user->update([
-                    'phone' => $request->new_phone_number
-                ]);
+                $phone = Phone::where('distributor_id', $user->id)->latest();
+
+                if (!$phone) {
+                    Phone::create([
+                        'distributor_id' => $user->id,
+                        'phone_number' => $user->phone,
+                        'is_active' => 1,
+                        'approved' => 1
+                    ]);
+
+                    Phone::create([
+                        'distributor_id' => $user->id,
+                        'phone' => $request->new_phone_number,
+                        'is_active' => 0,
+                        'approved' => 0
+                    ]);
+
+                    activity()->log('[client] '. $user->name .' with id '. $user->id . ' waiting for approval change phone number');
+
+                    return response()->json([
+                        'status' => 'success',
+                        'message' => 'wait for approval from admin',
+                    ], 200);
+                } else {
+                    Phone::create([
+                        'distributor_id' => $user->id,
+                        'phone' => $request->new_phone_number,
+                        'is_active' => 0,
+                        'approved' => 0
+                    ]);
+
+                    activity()->log('[client] '. $user->name .' with id '. $user->id . ' waiting for approval change phone number');
+
+                    return response()->json([
+                        'status' => 'success',
+                        'message' => 'wait for approval from admin',
+                    ], 200);
+                }
             }
 
             return response()->json([
                 'status' => 'success',
-                'message' => 'success to update phone number',
+                'message' => 'wait for approval from admin',
             ], 200);
         }
     }

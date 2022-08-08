@@ -15,7 +15,7 @@ class Logger
      */
     public function handle($request, Closure $next)
     {
-        dd($request);
+        dd($request->url());
         return $next($request);
     }
 }

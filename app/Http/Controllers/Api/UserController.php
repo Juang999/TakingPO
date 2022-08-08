@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Validator;
 use JWTAuth;
 use Tymon\JWTAuth\Exceptions\JWTException;
 use App\User;
+use Illuminate\Support\Facades\Auth;
 
 class UserController extends Controller
 {
@@ -23,6 +24,12 @@ class UserController extends Controller
         } catch (JWTException $e) {
             return response()->json(['error' => 'could_not_create_token'], 500);
         }
+
+        $user = User::where([
+            ['email', '=', $request->email]
+        ])->first();
+
+        activity()->log($user->name . ' has logged in');
 
         return response()->json(compact('token'));
     }
@@ -73,5 +80,26 @@ class UserController extends Controller
         }
 
         return response()->json(compact('user'));
+    }
+
+    public function logout()
+    {
+        try {
+
+            activity()->log(Auth::user()->jame . ' logged out');
+
+            JWTAuth::parseToken()->invalidate(true);
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'logged out!'
+            ], 200);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'status' => 'failed',
+                'message' => 'failed to logout',
+                'error' => $th->getMessage()
+            ], 400);
+        }
     }
 }
