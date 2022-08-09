@@ -13,6 +13,10 @@ class Distributor extends Model
 
     protected $guarded = ['id'];
 
+    protected static $logName = 'system';
+
+    protected static $logAttributes = ['phone'];
+
     // protected $hidden = ['created_at', 'updated_at'];
 
     public function TableName()
