@@ -31,11 +31,11 @@ class SingleAgent extends Controller
                 'message' => 'success to get unregistered user',
                 'user' => $distributor_hasNot_MS
             ], 200);
-        } catch (Exception $e) {
+        } catch (\Throwable $th) {
             return response()->json([
                 'status' => 'failed',
                 'message' => 'failed to get unregistered user',
-                'error' => $e->getMessage()
+                'error' => $th->getMessage()
             ], 400);
         }
     }

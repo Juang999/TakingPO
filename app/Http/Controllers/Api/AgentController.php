@@ -28,9 +28,10 @@ class AgentController extends Controller
         $datas = MutifStoreMaster::get();
 
         foreach ($datas as $data) {
-            $data['agent'] = Distributor::where('id', $data->distributor_id)->first();
-            $data['distributor'] = Distributor::where('id', $data['agent']->distributor_id)->first();
-            $data['distributor']['total_agent'] = Distributor::where('distributor_id', $data['distributor']->id)->count();
+            $data->agent = Distributor::where('id', $data->distributor_id)->first();
+            $data->distributor = Distributor::where('id', $data->agent->distributor_id)->first();
+            // $data->distributor['total_agent'] = Distributor::where('distributor_id', $data->distributor)->count();
+
             $data->makeHidden([
                 'ms_add_by',
                 'ms_upd_by',
@@ -56,18 +57,18 @@ class AgentController extends Controller
                 'deleted_at'
             ]);
 
-            $data->distributor->makeHidden([
-                'distributor_id',
-                'group_code',
-                'group_code',
-                'partner_group_id',
-                'level',
-                'training_level',
-                'prtnr_add_by',
-                'prtnr_upd_by',
-                'deleted_at',
-                'phone'
-            ]);
+            // $data->distributor->makeHidden([
+            //     'distributor_id',
+            //     'group_code',
+            //     'group_code',
+            //     'partner_group_id',
+            //     'level',
+            //     'training_level',
+            //     'prtnr_add_by',
+            //     'prtnr_upd_by',
+            //     'deleted_at',
+            //     'phone'
+            // ]);
         }
 
         return response()->json([

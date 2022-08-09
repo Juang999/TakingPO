@@ -76,13 +76,20 @@ class ClientController extends Controller
         try {
             $partner_group = PartnerGroup::where('id', $request->partner_group_id)->first();
 
-            Distributor::create([
+            $distributor = Distributor::create([
                 'name' => $request->name,
                 'phone' => $request->phone,
                 'distributor_id' => $request->distributor_id,
                 'group_code' => $partner_group->prtnr_code,
                 'partner_group_id' => $partner_group->id,
                 'level' => 'bronze'
+            ]);
+
+            $phone = Phone::create([
+                'distributor_id' => $distributor->id,
+                'phone_number' => $distributor->phone,
+                'is_active' => 1,
+                'approved' => 1
             ]);
 
             return response()->json([
@@ -120,46 +127,20 @@ class ClientController extends Controller
                 return response()->json($validator->errors()->toJson(), 400);
             }
 
-            // $user->update(['phone' => $request->new_phone_number]);
-
             $phone = Phone::where('distributor_id', $user->id)->latest();
 
-            if (!$phone) {
                 Phone::create([
                     'distributor_id' => $user->id,
-                    'phone_number' => $user->phone,
-                    'is_active' => 1,
-                    'approved' => 1
-                ]);
-
-                Phone::create([
-                    'distributor_id' => $user->id,
-                    'phone' => $request->new_phone_number,
+                    'phone_number' => $request->new_phone_number,
                     'is_active' => 0,
                     'approved' => 0
                 ]);
-
-                activity()->log('[client] '. $user->name .' with id '. $user->id . ' waiting for approval change phone number');
 
                 return response()->json([
                     'status' => 'success',
                     'message' => 'wait for approval from admin',
                 ], 200);
-            } else {
-                Phone::create([
-                    'distributor_id' => $user->id,
-                    'phone' => $request->new_phone_number,
-                    'is_active' => 0,
-                    'approved' => 0
-                ]);
 
-                activity()->log('[client] '. $user->name .' with id '. $user->id . ' waiting for approval change phone number');
-
-                return response()->json([
-                    'status' => 'success',
-                    'message' => 'wait for approval from admin',
-                ], 200);
-            }
         } else if ($user->partner_group_id == 2 || $user->partner_group_id == 3) {
             $validator = Validator::make($request->all(), [
                 'ms_code' => 'required',
@@ -170,6 +151,7 @@ class ClientController extends Controller
                 return response()->json($validator->errors()->toJson(), 400);
             }
 
+            // checking MS/PM
             $mutif_store = MutifStoreMaster::where('mutif_store_code', $request->ms_code)->first();
 
             if (!$mutif_store) {
@@ -179,20 +161,11 @@ class ClientController extends Controller
                 ], 400);
             }
 
+            // Update Phone
             if ($mutif_store->mutif_store_code == $request->ms_code) {
-                $phone = Phone::where('distributor_id', $user->id)->latest();
-
-                if (!$phone) {
                     Phone::create([
                         'distributor_id' => $user->id,
-                        'phone_number' => $user->phone,
-                        'is_active' => 1,
-                        'approved' => 1
-                    ]);
-
-                    Phone::create([
-                        'distributor_id' => $user->id,
-                        'phone' => $request->new_phone_number,
+                        'phone_number' => $request->new_phone_number,
                         'is_active' => 0,
                         'approved' => 0
                     ]);
@@ -203,21 +176,6 @@ class ClientController extends Controller
                         'status' => 'success',
                         'message' => 'wait for approval from admin',
                     ], 200);
-                } else {
-                    Phone::create([
-                        'distributor_id' => $user->id,
-                        'phone' => $request->new_phone_number,
-                        'is_active' => 0,
-                        'approved' => 0
-                    ]);
-
-                    activity()->log('[client] '. $user->name .' with id '. $user->id . ' waiting for approval change phone number');
-
-                    return response()->json([
-                        'status' => 'success',
-                        'message' => 'wait for approval from admin',
-                    ], 200);
-                }
             }
 
             return response()->json([

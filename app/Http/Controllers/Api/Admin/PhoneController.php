@@ -2,9 +2,12 @@
 
 namespace App\Http\Controllers\Api\Admin;
 
+use App\Distributor;
 use App\Http\Controllers\Controller;
 use App\Phone;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class PhoneController extends Controller
 {
@@ -16,11 +19,11 @@ class PhoneController extends Controller
     public function index()
     {
         try {
-            $phone = Phone::where('approved', 0)->with('Distributor')->get();
+            $phone = Phone::where('approved', 0)->with('Distributor')->orderBy('created_at', 'DESC')->get();
 
             return response()->json([
                 'status' => 'success',
-                'message' => 'success to get not approved phone',
+                'message' => 'success to get not-approved phone',
                 'phone' => $phone
             ], 200);
         } catch (\Throwable $th) {
@@ -64,12 +67,47 @@ class PhoneController extends Controller
     public function update(Request $request, Phone $phone)
     {
         try {
+        DB::beginTransaction();
+            $latestPhoneNumber = Phone::where([
+                ['distributor_id', '=', $phone->distributor_id,],
+                ['is_active', '=', 1],
+                ['approved', '=', 1]
+                ])->latest();
+
+            $distributor = Distributor::where('id', $phone->distributor_id)->first();
+
+            $latestPhone = $distributor->phone;
+
+            $latestPhoneNumber->update([
+                'is_active' => 0
+            ]);
+
             $phone->update([
                 'is_active' => 1,
                 'approved' => 1
             ]);
+
+            $new_phone = $distributor->update([
+                'phone' => $phone->phone_number
+            ]);
+
+            activity()->withProperties([$phone->phone_number => $latestPhone])
+            ->log(Auth::user()->name.' has approved '.$phone->phone_number);
+
+            DB::commit();
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'phone approved'
+            ], 200);
         } catch (\Throwable $th) {
-            //throw $th;
+
+            DB::rollBack();
+            return response()->json([
+                'status' => 'failed',
+                'message' => 'failed to approve',
+                'error' => $th->getMessage()
+            ], 400);
         }
     }
 
@@ -81,6 +119,19 @@ class PhoneController extends Controller
      */
     public function destroy(Phone $phone)
     {
-        //
+        try {
+            $phone->delete();
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'success to reject phone number'
+            ], 200);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'status' => 'failed',
+                'message' => 'failed to reject phone number',
+                'error' => $th->getMessage()
+            ], 400);
+        }
     }
 }

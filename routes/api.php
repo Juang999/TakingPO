@@ -48,6 +48,9 @@ Route::middleware('jwt.verify')->group(function () {
     Route::apiResource('total-pre-order', 'Api\TotalPreOrderController')
     ->only('index', 'show');
 
+    Route::apiResource('phone', 'Api\Admin\PhoneController')
+    ->except('store');
+
     // single route
     Route::post('/photo/{id}', 'Api\UploadPhoto');
     Route::get('/status', 'Api\Admin\SessionStatus');
