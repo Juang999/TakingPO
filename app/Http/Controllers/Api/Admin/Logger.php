@@ -16,7 +16,7 @@ class Logger extends Controller
      */
     public function __invoke()
     {
-        $logs = Activity::all();
+        $logs = Activity::orderBy('created_at', 'DESC')->get();
 
         return response()->json([
             'status' => 'success',
