@@ -94,6 +94,8 @@ class PartnerAddressController extends Controller
             ], 400);
         }
 
+        // dd($request->all());
+
         try {
             $address = PartnerAddress::where('distributor_id', $user->id)->update([
                 'distributor_id' => $user->id,

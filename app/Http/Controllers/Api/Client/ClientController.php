@@ -13,6 +13,7 @@ use App\Http\Requests\RegisterRequest;
 use App\MutifStoreMaster;
 use App\PartnerAddress;
 use App\Phone;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
 class ClientController extends Controller
@@ -33,6 +34,15 @@ class ClientController extends Controller
                 'message' => 'user '.$phone.' not registered'
             ], 400);
         }
+
+        $phone = DB::table('phones')->where('distributor_id', '=', $user->id)->latest()->first();
+        if ($phone->is_active != true) {
+            return response()->json([
+                'status' => 'waiting',
+                'message' => 'waiting for approval admin'
+            ], 200);
+        }
+
 
         $activate = IsActive::find(1);
 

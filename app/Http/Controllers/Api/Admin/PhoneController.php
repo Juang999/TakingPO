@@ -91,9 +91,6 @@ class PhoneController extends Controller
                 'phone' => $phone->phone_number
             ]);
 
-            activity()->withProperties([$phone->phone_number => $latestPhone])
-            ->log(Auth::user()->name.' has approved '.$phone->phone_number);
-
             DB::commit();
 
             return response()->json([

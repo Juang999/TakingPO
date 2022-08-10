@@ -18,7 +18,9 @@ class CreateMutifStoreMastersTable extends Migration
             $table->string('mutif_store_name')->nullable();
             $table->string('mutif_store_code')->nullable();
             $table->integer('ms_add_by')->constrained('users')->nullable();
+            $table->date('ms_add_date')->nullable();
             $table->integer('ms_upd_by')->constrained('users')->nullable();
+            $table->date('ms_upd_date')->nullable();
             $table->string('group_code');
             $table->integer('distributor_id')->constrained('distributors');
             $table->integer('partner_group_id')->constrained('partner_groups');

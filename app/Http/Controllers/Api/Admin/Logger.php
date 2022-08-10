@@ -16,7 +16,23 @@ class Logger extends Controller
      */
     public function __invoke()
     {
-        $logs = Activity::orderBy('created_at', 'DESC')->get();
+        if (request()->start_date && request()->end_date) {
+            $logs = Activity::whereBetween('created_at', [request()->start_date, request()->end_date])
+            ->with('causer', 'subject')
+            ->orderBy('created_at', 'DESC')
+            ->get()->toArray();
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'success to get logs',
+                'logs' => $logs
+            ], 200);
+        }
+
+        $logs = Activity::whereBetween('created_at', [\Carbon\Carbon::now()->subDays(7), \Carbon\Carbon::now()])
+        ->with('causer', 'subject')
+        ->orderBy('created_at', 'DESC')
+        ->get()->toArray();
 
         return response()->json([
             'status' => 'success',

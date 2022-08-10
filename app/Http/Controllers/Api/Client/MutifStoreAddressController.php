@@ -143,11 +143,19 @@ class MutifStoreAddressController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(Request $request, $phone, $id)
     {
+        $user = Distributor::where('phone', $phone)->first();
+
+        if (!$user) {
+            return response()->json([
+                'status' => 'rejected',
+                'message' => $phone.' not registered'
+            ], 300);
+        }
+
         $MutifStoreMaster = MutifStoreMaster::find($id);
         $MutifStoreAddress = MutifStoreAddress::where('mutif_store_master_id', $MutifStoreMaster->id)->first();
-        $user_id = Auth::user()->id;
 
         try {
             DB::beginTransaction();
@@ -155,7 +163,6 @@ class MutifStoreAddressController extends Controller
             $MutifStoreMaster->update([
                 'mutif_store_name' => ($request->ms_ms_name) ? $request->ms_ms_name : $MutifStoreMaster->mutif_store_name,
                 'mutif_store_code' => ($request->ms_code) ? $request->ms_code : $MutifStoreMaster->mutif_store_code,
-                'ms_upd_by' => $user_id,
                 'group_code' => $MutifStoreMaster->group_code,
                 'distributor_id' => $MutifStoreMaster->distributor_id,
                 'partner_group_id' => $MutifStoreMaster->partner_group_id,
@@ -164,17 +171,17 @@ class MutifStoreAddressController extends Controller
                 'msdp' => ($request->msdp) ? $request->msdp : $MutifStoreMaster->msdp,
             ]);
 
-            $MutifStoreAddress->update([
-                'prtnr_upd_by' => $user_id,
-                'address' => ($request->address) ? $request->address : $MutifStoreAddress->address,
-                'province' => ($request->province) ? $request->province : $MutifStoreAddress->province,
-                'regency' => ($request->regency) ? $request->regency : $MutifStoreAddress->regency,
-                'district' => ($request->district) ? $request->district : $MutifStoreAddress->district,
-                'phone_2' => ($request->ms_phone) ? $request->ms_phone : $MutifStoreAddress->phone_2,
-                'fax_1' => ($request->ms_fax) ? $request->ms_fax : $MutifStoreAddress->fax_1,
-                'addr_type' => ($request->addr_type) ? $request->addr_type : $MutifStoreAddress->addr_type,
-                'zip' => ($request->zip) ? $request->zip : $MutifStoreAddress->zip,
-                'comment' => ($request->comment) ? $request->comment : $MutifStoreAddress->comment
+            $MutifStoreAddress->create([
+                'mutif_store_master_id' => $MutifStoreMaster->id,
+                'address' => $request->address,
+                'province' => $request->province,
+                'regency' => $request->regency,
+                'district' => $request->district,
+                'phone_2' => $request->ms_phone,
+                'fax_1' => $request->ms_fax,
+                'addr_type' => $request->addr_type,
+                'zip' => $request->zip,
+                'comment' => $request->comment
             ]);
 
             DB::commit();
@@ -200,8 +207,30 @@ class MutifStoreAddressController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy($phone, $id)
     {
-        //
+        $user = Distributor::where('phone', $phone)->first();
+
+        if (!$user) {
+            return response()->json([
+                'status' => 'rejected',
+                'message' => $phone.' not registered'
+            ], 300);
+        }
+
+        try {
+            MutifStoreMaster::find($id)->delete();
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'success to delete store'
+            ], 200);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'status' => 'failed',
+                'message' => 'failed to delete store',
+                'error' => $th->getMessage()
+            ], 400);
+        }
     }
 }
