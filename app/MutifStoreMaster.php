@@ -2,10 +2,19 @@
 
 namespace App;
 
+use Spatie\Activitylog\LogOptions;
 use Illuminate\Database\Eloquent\Model;
+use Spatie\Activitylog\Traits\LogsActivity;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class MutifStoreMaster extends Model
 {
+    use LogsActivity, SoftDeletes;
+
+    protected static $logName = 'system';
+
+    protected static $logAttributes = ['*'];
+
     protected $guarded = ['id'];
 
     public function Distributor()

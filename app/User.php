@@ -2,15 +2,24 @@
 
 namespace App;
 
+use Spatie\Activitylog\LogOptions;
+use Tymon\JWTAuth\Contracts\JWTSubject;
+use Illuminate\Notifications\Notifiable;
+use Spatie\Activitylog\Traits\LogsActivity;
+use Spatie\Activitylog\Traits\CausesActivity;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Foundation\Auth\User as Authenticatable;
-use Illuminate\Notifications\Notifiable;
-use Tymon\JWTAuth\Contracts\JWTSubject;
-use Spatie\Activitylog\Traits\LogsActivity;
 
 class User extends Authenticatable implements JWTSubject
 {
-    use Notifiable, LogsActivity;
+    use Notifiable, LogsActivity, CausesActivity;
+
+    public $appends = ['name'];
+
+    public function getNameAttribute()
+    {
+        return $this->causer->name ?? null;
+    }
 
     /**
      * The attributes that are mass assignable.

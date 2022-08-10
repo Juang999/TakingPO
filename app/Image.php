@@ -11,6 +11,10 @@ class Image extends Model
 {
     use SoftDeletes, LogsActivity;
 
+    protected static $logName = 'system';
+
+    protected static $logAttributes = ['photo'];
+
     protected $guarded = ['id'];
 
     public function Clothes()

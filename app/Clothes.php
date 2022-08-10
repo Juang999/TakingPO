@@ -13,6 +13,10 @@ class Clothes extends Model
 
     protected $guarded = ['id'];
 
+    protected static $logName = 'system';
+
+    protected static $logAttributes = ['entity_name', 'article_name'];
+
     public function Type()
     {
         return $this->belongsTo(Type::class);

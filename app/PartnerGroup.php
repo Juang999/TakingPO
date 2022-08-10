@@ -10,6 +10,10 @@ class PartnerGroup extends Model
 {
     use LogsActivity;
 
+    protected static $logName = 'system';
+
+    protected static $logAttributes = ['prtnr_name', 'prtnr_code', 'prtnr_desc', 'discount'];
+
     protected $guarded = ['id'];
 
     public function Distributor()

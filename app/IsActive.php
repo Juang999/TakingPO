@@ -10,5 +10,9 @@ class IsActive extends Model
 {
     use LogsActivity;
 
+    protected static $logName = 'system';
+
+    protected static $logAttributes = ['name'];
+
     protected $fillable = ['name'];
 }
