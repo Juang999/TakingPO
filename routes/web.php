@@ -1,5 +1,7 @@
 <?php
 
+use App\Events\MessageCreated;
+use App\Events\NotificationCreated;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -14,5 +16,8 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', function () {
+    MessageCreated::dispatch('hello world');
+
+    // event( new NotificationCreated );
     return view('welcome');
 });

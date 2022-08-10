@@ -1,5 +1,6 @@
 <?php
 
+use App\Events\NotificationCreated;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -95,17 +96,27 @@ Route::prefix('client')->group( function () {
     Route::get('/get-list-group', 'Api\Client\ClientController@PartnerGroup');
     Route::get('/get-list-distributor', 'Api\Client\ClientController@distributor');
 
-    // create address for agent & MS
+    // route for address agent
     Route::post('/create-address/{phone}', 'Api\Client\PartnerAddressController@store');
+    Route::put('/update-address/{phone}', 'Api\Client\PartnerAddressController@update');
 });
 
 Route::prefix('mutif-store')->group( function () {
     Route::get('/{phone}', 'Api\Client\MutifStoreAddressController@index');
     Route::post('/{phone}', 'Api\Client\MutifStoreAddressController@store');
-    Route::get('/{phone}/MS/{id}', 'Api\Client\MutifStoreAddressController@show');
-    Route::put('/{phone}/MS/{id}', 'Api\Client\MutifStoreAddressController@update');
+    Route::get('/{phone}/store/{id}', 'Api\Client\MutifStoreAddressController@show');
+    Route::put('/{phone}/store/{id}', 'Api\Client\MutifStoreAddressController@update');
+    Route::delete('/{phone}/store/{id}', 'Api\Client\MutifStoreAddressController@destroy');
 });
 
 // testing
 Route::get('/index', 'WilayahController@index');
 Route::post('/testing', 'TestingController@index')->middleware('Logger');
+
+Route::get('/testing', function () {
+    NotificationCreated::dispatch('hello world');
+
+    return response()->json([
+        'status' => 'success'
+    ]);
+});
