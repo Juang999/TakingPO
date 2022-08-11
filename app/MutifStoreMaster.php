@@ -13,7 +13,7 @@ class MutifStoreMaster extends Model
 
     protected static $logName = 'system';
 
-    protected static $logAttributes = ['*'];
+    protected static $logAttributes = ['entity_name', 'article_name'];
 
     protected $guarded = ['id'];
 
