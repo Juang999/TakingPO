@@ -26,7 +26,18 @@ class ClientController extends Controller
             ], 400);
         }
 
-        $user = Distributor::where('phone', $phone)->with('PartnerAddress', 'MutifStoreMaster.MutifStoreAddress')->first();
+        $phone_number = Phone::where('phone_number', '=', $phone)->first();
+
+        $user = Distributor::where('id', $phone_number->distributor_id)->with('PartnerAddress', 'MutifStoreMaster.MutifStoreAddress')->first();
+
+        $new_phone_number = Phone::where('distributor_id', '=', $user->id)->latest()->first();
+
+        if ($phone == $new_phone_number->phone_number && $new_phone_number->is_active == 0) {
+            return response()->json([
+                'status' => 'waiting',
+                'message' => 'waiting for approval admin'
+            ], 200);
+        }
 
         if (!$user) {
             return response()->json([
@@ -34,15 +45,6 @@ class ClientController extends Controller
                 'message' => 'user '.$phone.' not registered'
             ], 400);
         }
-
-        $phone = DB::table('phones')->where('distributor_id', '=', $user->id)->latest()->first();
-        if ($phone->is_active != true) {
-            return response()->json([
-                'status' => 'waiting',
-                'message' => 'waiting for approval admin'
-            ], 200);
-        }
-
 
         $activate = IsActive::find(1);
 
