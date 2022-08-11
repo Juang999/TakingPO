@@ -12,7 +12,7 @@ class Phone extends Model
 
     protected $guarded = ['id'];
 
-    protected static $logAttributes = ['*'];
+    protected static $logAttributes = ['phone_number'];
 
     public function getActivitylogOptions()
     {
