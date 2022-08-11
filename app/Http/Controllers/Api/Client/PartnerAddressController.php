@@ -51,6 +51,15 @@ class PartnerAddressController extends Controller
             'zip' => ($request->zip) ? $request->zip : '-',
         ]);
 
+        activity()->causedBy($distributor)
+                            ->performedOn($address)
+                            ->withProperties([
+                                'attributes' => [
+                                    'address' => $address->address,
+                                    'zip' => $address->zip
+                                ]
+                            ])->log('created!');
+
             return response()->json([
                 'status' => 'success',
                 'message' => 'success to register address',
@@ -95,6 +104,7 @@ class PartnerAddressController extends Controller
         }
 
         // dd($request->all());
+        $oldAddress = PartnerAddress::where('distributor_id', $user->id)->first();
 
         try {
             $address = PartnerAddress::where('distributor_id', $user->id)->update([
@@ -109,6 +119,19 @@ class PartnerAddressController extends Controller
                 'addr_type' => $request->addr_type,
                 'zip' => $request->zip,
             ]);
+
+            activity()->causedBy($user)
+            ->performedOn($address)
+            ->withProperties([
+                'old' => [
+                    'address' => $oldAddress->address,
+                    'zip' => $oldAddress->zip
+                ],
+                'attributes' => [
+                    'address' => $address->address,
+                    'zip' => $address->zip
+                ]
+            ])->log('updated');
 
             return response()->json([
                 'status' => 'success',

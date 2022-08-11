@@ -30,12 +30,19 @@ class MutifStoreAddressController extends Controller
         }
 
         try {
-            $MutifStore = MutifStoreMaster::where('distributor_id', $user->id)->with('MutifStoreAddress')->get();
+            $stores = MutifStoreMaster::where('distributor_id', $user->id)->with('Distributor')->get();
+
+            foreach ($stores as $store) {
+                $store['mutif_store_address'] = MutifStoreAddress::where([
+                    ['mutif_store_master_id', '=', $store->id],
+                    ['active', '=', 1]
+                ])->first();
+            }
 
             return response()->json([
                 'status' => 'success',
                 'message' => 'success to get data',
-                'data' => $MutifStore
+                'data' => $stores
             ], 200);
         } catch (\Throwable $th) {
             return response()->json([
@@ -64,6 +71,8 @@ class MutifStoreAddressController extends Controller
         }
 
         try {
+            DB::beginTransaction();
+
             $MutifStoreMaster = MutifStoreMaster::create([
                 'mutif_store_name' => $request->ms_ms_name,
                 'mutif_store_code' => $request->ms_code,
@@ -89,11 +98,23 @@ class MutifStoreAddressController extends Controller
                 'comment' => $request->comment
             ]);
 
+            activity()->causedBy($user)
+                            ->performedOn($MutifStoreMaster)
+                            ->withProperties([
+                                'attributes' => [
+                                    'mutif_store_name' => $MutifStoreMaster->mutif_store_name,
+                                    'mutif_store_code' => $MutifStoreMaster->mutif_store_code
+                                ]
+                            ])->log('created');
+
+            DB::commit();
+
             return response()->json([
                 'status' => 'success',
                 'message' => 'success to create MS',
             ], 200);
         } catch (\Throwable $th) {
+            DB::rollBack();
             return response()->json([
                 'status' => 'failed',
                 'message' => 'failed to create MS',
@@ -155,7 +176,9 @@ class MutifStoreAddressController extends Controller
         }
 
         $MutifStoreMaster = MutifStoreMaster::find($id);
-        $MutifStoreAddress = MutifStoreAddress::where('mutif_store_master_id', $MutifStoreMaster->id)->first();
+        $MutifStoreAddress = MutifStoreAddress::where('mutif_store_master_id', $MutifStoreMaster->id)
+                            ->latest()
+                            ->first();
 
         try {
             DB::beginTransaction();
@@ -171,18 +194,40 @@ class MutifStoreAddressController extends Controller
                 'msdp' => ($request->msdp) ? $request->msdp : $MutifStoreMaster->msdp,
             ]);
 
-            $MutifStoreAddress->create([
-                'mutif_store_master_id' => $MutifStoreMaster->id,
-                'address' => $request->address,
-                'province' => $request->province,
-                'regency' => $request->regency,
-                'district' => $request->district,
-                'phone_2' => $request->ms_phone,
-                'fax_1' => $request->ms_fax,
-                'addr_type' => $request->addr_type,
-                'zip' => $request->zip,
-                'comment' => $request->comment
-            ]);
+            if ($request->address) {
+                $MutifStoreAddress->update([
+                    'acitve' => 0
+                ]);
+
+                MutifStoreAddress::create([
+                    'mutif_store_master_id' => $MutifStoreMaster->id,
+                    'address' => $request->address,
+                    'province' => $request->province,
+                    'regency' => $request->regency,
+                    'district' => $request->district,
+                    'phone_2' => $request->ms_phone,
+                    'fax_1' => $request->ms_fax,
+                    'addr_type' => $request->addr_type,
+                    'zip' => $request->zip,
+                    'comment' => $request->comment,
+                    'active' => 1
+                ]);
+            }
+
+            $newMutifStore = MutifStoreMaster::find($id);
+
+            activity()->causedBy($user)
+                            ->performedOn($MutifStoreMaster)
+                            ->withProperties([
+                                'old' => [
+                                    'mutif_store_name' => $MutifStoreMaster->mutif_store_name,
+                                    'mutif_store_code' => $MutifStoreMaster->mutif_store_code
+                                ],
+                                'attributes' => [
+                                    'mutif_store_name' => $newMutifStore->mutif_store_name,
+                                    'mutif_store_code' => $newMutifStore->mutif_store_code
+                                ]
+                            ])->log('updated');
 
             DB::commit();
 
@@ -219,7 +264,18 @@ class MutifStoreAddressController extends Controller
         }
 
         try {
-            MutifStoreMaster::find($id)->delete();
+            $MutifStoreMaster = MutifStoreMaster::find($id);
+
+            activity()->causedBy($user)
+                            ->performedOn($MutifStoreMaster)
+                            ->withProperties([
+                                'attributes' => [
+                                    'mutif_store_name' => $MutifStoreMaster->mutif_store_name,
+                                    'mutif_store_code' => $MutifStoreMaster->mutif_store_code
+                                ]
+                            ])->log('deleted');
+
+            $MutifStoreMaster->delete();
 
             return response()->json([
                 'status' => 'success',

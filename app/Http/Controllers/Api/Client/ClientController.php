@@ -123,6 +123,8 @@ class ClientController extends Controller
     {
         $user = Distributor::where('phone', $phone)->first();
 
+        $log_phone = new Phone;
+
         if (!$user) {
             return response()->json([
                 'status' => 'rejected',
@@ -147,6 +149,14 @@ class ClientController extends Controller
                     'is_active' => 0,
                     'approved' => 0
                 ]);
+
+                activity()->causedBy($user)
+                            ->performedOn($phone)
+                            ->withProperties([
+                                'attributes' => [
+                                    'phone_number' => $phone->phone_number
+                                ]
+                            ])->log('upated!');
 
                 return response()->json([
                     'status' => 'success',
@@ -175,12 +185,20 @@ class ClientController extends Controller
 
             // Update Phone
             if ($mutif_store->mutif_store_code == $request->ms_code) {
-                    Phone::create([
+                    $phone = Phone::create([
                         'distributor_id' => $user->id,
                         'phone_number' => $request->new_phone_number,
                         'is_active' => 0,
                         'approved' => 0
                     ]);
+
+                    activity()->causedBy($user)
+                            ->performedOn($phone)
+                            ->withProperties([
+                                'attributes' => [
+                                    'phone_number' => $phone->phone_number
+                                ]
+                            ])->log('updated');
 
                     return response()->json([
                         'status' => 'success',

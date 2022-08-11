@@ -6,17 +6,22 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Activitylog\LogOptions;
-use Spatie\Activitylog\Traits\CausesActivity;
 
 class Distributor extends Model
 {
-    use SoftDeletes, LogsActivity, CausesActivity;
+    use SoftDeletes, LogsActivity;
 
     protected $guarded = ['id'];
 
     protected static $logName = 'system';
 
-    protected static $logAttributes = ['phone'];
+    protected static $logAttributes = ['name', 'phone'];
+
+    public function getActivitylogOptions()
+    {
+        return LogOptions::defaults()
+        ->setDescriptionForEvent(fn(string $eventName) => "user has been {$eventName}");
+    }
 
     // protected $hidden = ['created_at', 'updated_at'];
 

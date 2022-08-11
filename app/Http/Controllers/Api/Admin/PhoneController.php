@@ -76,20 +76,37 @@ class PhoneController extends Controller
 
             $distributor = Distributor::where('id', $phone->distributor_id)->first();
 
-            $latestPhone = $distributor->phone;
-
             $latestPhoneNumber->update([
                 'is_active' => 0
             ]);
+
+            $notApprovePhone = Phone::find($phone->id);
 
             $phone->update([
                 'is_active' => 1,
                 'approved' => 1
             ]);
 
-            $new_phone = $distributor->update([
+            $distributor->update([
                 'phone' => $phone->phone_number
             ]);
+
+            $approvedPhone = Phone::find($phone->id);
+
+            activity()->causedBy(Auth::user())
+                        ->performedOn($phone)
+                        ->withProperties([
+                                    'old' => [
+                                        'phone_number' => $notApprovePhone->phone_number,
+                                        'is_active' => $notApprovePhone->is_active,
+                                        'approved' => $notApprovePhone->approved
+                                    ],
+                                    'attributes' => [
+                                        'phone_number' => $approvedPhone->phone_number,
+                                        'is_active' => $approvedPhone->is_active,
+                                        'approved' => $approvedPhone->approved
+                                    ]
+                        ])->log('updated');
 
             DB::commit();
 

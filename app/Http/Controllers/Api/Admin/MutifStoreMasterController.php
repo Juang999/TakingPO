@@ -8,6 +8,7 @@ use App\MutifStoreAddress;
 use App\MutifStoreMaster;
 use Illuminate\Http\Request;
 use App\Requests\MutifStoreRequest;
+use Illuminate\Support\Facades\Auth;
 
 class MutifStoreMasterController extends Controller
 {
@@ -70,6 +71,15 @@ class MutifStoreMasterController extends Controller
                 'zip' => $request->zip,
                 'comment' => $request->comment
             ]);
+
+            activity()->causedBy(Auth::user())
+            ->performedOn($MutifStoreMaster)
+            ->withProperties([
+                'attributes' => [
+                    'mutif_store_name' => $MutifStoreMaster->mutif_store_name,
+                    'mutif_store_code' => $MutifStoreMaster->mutif_store_code
+                ]
+            ])->log('created');
 
             return response()->json([
                 'status' => 'success',

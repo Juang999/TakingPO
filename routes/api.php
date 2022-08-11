@@ -53,9 +53,12 @@ Route::middleware('jwt.verify')->group(function () {
     ->except('store');
 
     // single route
+    Route::get('/logs', 'Api\Admin\Logger');
     Route::post('/photo/{id}', 'Api\UploadPhoto');
     Route::get('/status', 'Api\Admin\SessionStatus');
+    Route::post('logout', 'Api\UserController@logout');
     Route::get('get-new-member', 'Api\AccRegistration');
+    Route::get('/highest-order', 'Api\Admin\HighestOrder');
     Route::put('/is-active/{clothes}', 'Api\ActivateClothes');
     Route::post('single-agent', 'Api\Admin\CreateSingleAgent');
     Route::get('unregistered-MS-agent', 'Api\Admin\SingleAgent');
@@ -63,9 +66,7 @@ Route::middleware('jwt.verify')->group(function () {
     Route::get('/detail-transaction/{id}', 'Api\DetailTransaction');
     Route::get('/search-products/{search}', 'Api\Admin\SearchProduct');
     Route::get('/search-distributor/{search}', 'Api\Admin\SearchDistributor');
-    Route::get('/highest-order', 'Api\Admin\HighestOrder');
-    Route::get('/logs', 'Api\Admin\Logger');
-    Route::post('logout', 'Api\UserController@logout');
+
 });
 
 // group pre-order route
@@ -75,8 +76,8 @@ Route::prefix('pre-order')->group( function () {
     Route::get('/{phone}', 'Api\Client\PreOrderController@index');
     Route::post('/{phone}', 'Api\Client\PreOrderController@store');
     Route::delete('/{phone}/clothes/{id}', 'Api\Client\PreOrderController@destroy');
-    Route::get('/{phone}/clothes/{id}', 'Api\Client\PreOrderController@show');
     Route::put('/{phone}/cart/{id}', 'Api\Client\PreOrderController@update');
+    Route::get('/{phone}/clothes/{id}', 'Api\Client\PreOrderController@show');
 
     // cart
     Route::get('cart/{phone}', 'Api\Client\Cart');
