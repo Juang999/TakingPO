@@ -182,8 +182,6 @@ class ClientController extends Controller
                         'approved' => 0
                     ]);
 
-                    activity()->log('[client] '. $user->name .' with id '. $user->id . ' waiting for approval change phone number');
-
                     return response()->json([
                         'status' => 'success',
                         'message' => 'wait for approval from admin',
