@@ -7,6 +7,7 @@ use App\District;
 use App\Http\Controllers\Controller;
 use App\PartnerAddress;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class PartnerAddressController extends Controller
 {
@@ -38,6 +39,8 @@ class PartnerAddressController extends Controller
         }
         try {
 
+        DB::beginTransaction();
+
         $address = PartnerAddress::create([
             'distributor_id' => $distributor->id,
             'address' => $request->address,
@@ -60,12 +63,15 @@ class PartnerAddressController extends Controller
                                 ]
                             ])->log('created!');
 
+        DB::commit();
+
             return response()->json([
                 'status' => 'success',
                 'message' => 'success to register address',
                 'data' => $address,
             ], 200);
         } catch (\Throwable $th) {
+        DB::rollBack();
             return response()->json([
                 'status' => 'failed',
                 'message' => 'failed to register address',
@@ -107,7 +113,9 @@ class PartnerAddressController extends Controller
         $oldAddress = PartnerAddress::where('distributor_id', $user->id)->first();
 
         try {
-            $address = PartnerAddress::where('distributor_id', $user->id)->update([
+
+            DB::beginTransaction();
+            PartnerAddress::where('distributor_id', $user->id)->update([
                 'distributor_id' => $user->id,
                 'address' => $request->address,
                 'district' => $request->district,
@@ -120,6 +128,8 @@ class PartnerAddressController extends Controller
                 'zip' => $request->zip,
             ]);
 
+            $address = PartnerAddress::where('distributor_id', $user->id)->first();
+
             activity()->causedBy($user)
             ->performedOn($address)
             ->withProperties([
@@ -131,13 +141,16 @@ class PartnerAddressController extends Controller
                     'address' => $address->address,
                     'zip' => $address->zip
                 ]
-            ])->log('updated');
+            ])->log('created!');
+
+            DB::commit();
 
             return response()->json([
                 'status' => 'success',
                 'message' => 'success to update address',
             ], 200);
         } catch (\Throwable $th) {
+            DB::rollBack();
             return response()->json([
                 'status' => 'failed',
                 'message' => 'failed to update address',

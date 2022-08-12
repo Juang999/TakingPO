@@ -28,17 +28,24 @@ class ClientController extends Controller
 
         $phone_number = Phone::where('phone_number', '=', $phone)->first();
 
-        $user = Distributor::where('id', $phone_number->distributor_id)->with('PartnerAddress', 'MutifStoreMaster.MutifStoreAddress')->first();
+        $user = Distributor::where('id', $phone_number->distributor_id)
+                            ->with('PartnerAddress', 'MutifStoreMaster.MutifStoreAddress')
+                            ->first();
 
-        $new_phone_number = Phone::where('distributor_id', '=', $user->id)->latest()->first();
+        $new_phone_number = Phone::where([
+            ['distributor_id', '=', $user->id],
+            ['is_active', '=', 0],
+            ['approved', '=', 0]
+            ])->latest()->first();
 
-        if ($phone == $new_phone_number->phone_number && $new_phone_number->is_active == 0) {
+            
+            if ($new_phone_number && $phone == $new_phone_number->phone_number && $new_phone_number->is_active == 0) {
             return response()->json([
                 'status' => 'waiting',
                 'message' => 'waiting for approval admin'
             ], 200);
         }
-
+        
         if (!$user) {
             return response()->json([
                 'status' => 'failed',
@@ -55,7 +62,7 @@ class ClientController extends Controller
                 'message' => 'the web is being closed'
             ], 400);
         } elseif ($activate && $activate->name == 'ACTIVE') {
-            // when web is being closed
+            // when web is being closed            
             return response()->json([
                 'status' => 'success',
                 'message' => 'hello '.$user->name,
@@ -156,7 +163,7 @@ class ClientController extends Controller
                                 'attributes' => [
                                     'phone_number' => $phone->phone_number
                                 ]
-                            ])->log('upated!');
+                            ])->log('created');
 
                 return response()->json([
                     'status' => 'success',
@@ -198,7 +205,7 @@ class ClientController extends Controller
                                 'attributes' => [
                                     'phone_number' => $phone->phone_number
                                 ]
-                            ])->log('updated');
+                            ])->log('created');
 
                     return response()->json([
                         'status' => 'success',

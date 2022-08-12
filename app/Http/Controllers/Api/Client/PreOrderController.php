@@ -30,7 +30,8 @@ class PreOrderController extends Controller
         if ($activate->name == 'DONE') {
             return response()->json([
                 'status' => 'closed',
-                'message' => 'final session'
+                'message' => 'ISMAIL BURIQUE',
+                'data' => []
             ], 300);
         }
 
@@ -1864,8 +1865,8 @@ class PreOrderController extends Controller
                         ]);
                     } elseif ($request->size_12 < $temporary_storage->size_12) {
                         if ($request->size_12 == 0) {
-                            $qty_avaliable = $BufferStock_12->qty_avaliable - $temporary_storage->size_12;
-                            $qty_process = $BufferStock_12->qty_process + $temporary_storage->size_12;
+                            $qty_avaliable = $BufferStock_12->qty_avaliable + $temporary_storage->size_12;
+                            $qty_process = $BufferStock_12->qty_process - $temporary_storage->size_12;
 
                             $BufferStock_12->update([
                                 'qty_avaliable' => $qty_avaliable,
@@ -1874,8 +1875,8 @@ class PreOrderController extends Controller
                         } else {
 
                             $decrement = $temporary_storage->size_12 - $request->size_12;
-                            $qty_avaliable = $BufferStock_12->qty_avaliable - $decrement;
-                            $qty_process = $BufferStock_12->qty_process + $decrement;
+                            $qty_avaliable = $BufferStock_12->qty_avaliable + $decrement;
+                            $qty_process = $BufferStock_12->qty_process - $decrement;
 
                             $BufferStock_12->update([
                                 'qty_avaliable' => $qty_avaliable,
@@ -2955,6 +2956,7 @@ class PreOrderController extends Controller
             if ($BufferStock_other) {
                 if ($BufferStock_other->qty_buffer != 0) {
                     if ($BufferStock_other->qty_avaliable != 0 && $request->other > $temporary_storage->other) {
+                        dd('hello world');
                         $increment = $request->other - $temporary_storage->other;
                         $qty_avaliable = $BufferStock_other->qty_avaliable - $increment;
                         $qty_process = $BufferStock_other->qty_process + $increment;
