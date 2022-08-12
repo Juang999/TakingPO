@@ -31,7 +31,7 @@ class CreateTemporaryStoragesTable extends Migration
             $table->integer('size_8')->default(0);
             $table->integer('size_10')->default(0);
             $table->integer('size_12')->default(0);
-            $table->integer('total')->default(0);
+            $table->bigIncrements('total')->default(0);
             $table->timestamps();
         });
     }
