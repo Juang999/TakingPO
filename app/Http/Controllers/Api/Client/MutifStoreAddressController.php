@@ -59,7 +59,7 @@ class MutifStoreAddressController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(MutifStoreRequest $request, $phone)
+    public function store(Request $request, $phone)
     {
         $user = Distributor::where('phone', $phone)->first();
 

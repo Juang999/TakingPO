@@ -91,7 +91,8 @@ class PreOrderController extends Controller
 
         DB::beginTransaction();
 
-        $size_s = Size::where('size', 's')->first();
+        $size_s = Size::where('size', 'S')->first();
+        if ($size_s) {
             $BufferStock_s = BufferProduct::where([
                 'clothes_id' => $request->clothes_id,
                 'size_id' => $size_s->id
@@ -122,869 +123,923 @@ class PreOrderController extends Controller
                     ]);
                 }
             }
+        }
 
-            $size_m = Size::where('size', 'm')->first();
-            $BufferStock_m = BufferProduct::where([
-                'clothes_id' => $request->clothes_id,
-                'size_id' => $size_m->id
-            ])->first();
-
-            if ($BufferStock_m) {
-                if ($BufferStock_m->qty_buffer != 0) {
-                    if ($BufferStock_m->qty_avaliable >= $request->size_m) {
-                        $qty_avaliable = $BufferStock_m->qty_avaliable - $request->size_m;
+            $size_m = Size::where('size', 'M')->first();
+            if ($size_m) {
+                $BufferStock_m = BufferProduct::where([
+                    'clothes_id' => $request->clothes_id,
+                    'size_id' => $size_m->id
+                ])->first();
+    
+                if ($BufferStock_m) {
+                    if ($BufferStock_m->qty_buffer != 0) {
+                        if ($BufferStock_m->qty_avaliable >= $request->size_m) {
+                            $qty_avaliable = $BufferStock_m->qty_avaliable - $request->size_m;
+                            $qty_process = $BufferStock_m->qty_process + $request->size_m;
+    
+                            $BufferStock_m->update([
+                                'qty_avaliable' => $qty_avaliable,
+                                'qty_process' => $qty_process
+                            ]);
+                        } else {
+                            return response()->json([
+                                'status' => 'failed',
+                                'message' => 'size m to many request'
+                            ], 400);
+                        }
+                    } elseif ($BufferStock_m->qty_buffer == 0) {
                         $qty_process = $BufferStock_m->qty_process + $request->size_m;
-
+    
                         $BufferStock_m->update([
-                            'qty_avaliable' => $qty_avaliable,
                             'qty_process' => $qty_process
                         ]);
-                    } else {
-                        return response()->json([
-                            'status' => 'failed',
-                            'message' => 'size m to many request'
-                        ], 400);
                     }
-                } elseif ($BufferStock_m->qty_buffer == 0) {
-                    $qty_process = $BufferStock_m->qty_process + $request->size_m;
-
-                    $BufferStock_m->update([
-                        'qty_process' => $qty_process
-                    ]);
                 }
             }
 
-            $size_l = Size::where('size', 'l')->first();
-            $BufferStock_l = BufferProduct::where([
-                'clothes_id' => $request->clothes_id,
-                'size_id' => $size_l->id
-            ])->first();
-
-            if ($BufferStock_l) {
-                if ($BufferStock_l->qty_buffer != 0) {
-                    //dd($BufferStock_l->qty_buffer);
-                    if ($BufferStock_l->qty_avaliable >= $request->size_l) {
-                        $qty_avaliable = $BufferStock_l->qty_avaliable - $request->size_l;
+            $size_l = Size::where('size', 'L')->first();
+            if ($size_l) {
+                $BufferStock_l = BufferProduct::where([
+                    'clothes_id' => $request->clothes_id,
+                    'size_id' => $size_l->id
+                ])->first();
+    
+                if ($BufferStock_l) {
+                    if ($BufferStock_l->qty_buffer != 0) {
+                        if ($BufferStock_l->qty_avaliable >= $request->size_l) {
+                            $qty_avaliable = $BufferStock_l->qty_avaliable - $request->size_l;
+                            $qty_process = $BufferStock_l->qty_process + $request->size_l;
+    
+                            $BufferStock_l->update([
+                                'qty_avaliable' => $qty_avaliable,
+                                'qty_process' => $qty_process
+                            ]);
+                        } else {
+                            return response()->json([
+                                'status' => 'failed',
+                                'message' => 'failed to update data',
+                                'message' => 'size l sold out'
+                            ], 400);
+                        }
+                    } elseif ($BufferStock_l->qty_buffer == 0) {
                         $qty_process = $BufferStock_l->qty_process + $request->size_l;
-
+    
                         $BufferStock_l->update([
-                            'qty_avaliable' => $qty_avaliable,
                             'qty_process' => $qty_process
                         ]);
-                    } else {
-                        return response()->json([
-                            'status' => 'failed',
-                            'message' => 'failed to update data',
-                            'message' => 'size l sold out'
-                        ], 400);
                     }
-                } elseif ($BufferStock_l->qty_buffer == 0) {
-                    $qty_process = $BufferStock_l->qty_process + $request->size_l;
-
-                    $BufferStock_l->update([
-                        'qty_process' => $qty_process
-                    ]);
                 }
             }
 
-            $size_xl = Size::where('size', 'xl')->first();
-            $BufferStock_xl = BufferProduct::where([
-                'clothes_id' => $request->clothes_id,
-                'size_id' => $size_xl->id
-            ])->first();
-
-            if ($BufferStock_xl) {
-                if ($BufferStock_xl->qty_buffer != 0) {
-                    if ($BufferStock_xl->qty_avaliable >= $request->size_xl) {
-                        $qty_avaliable = $BufferStock_xl->qty_avaliable - $request->size_xl;
+            $size_xl = Size::where('size', 'XL')->first();
+            if ($size_xl) {
+                $BufferStock_xl = BufferProduct::where([
+                    'clothes_id' => $request->clothes_id,
+                    'size_id' => $size_xl->id
+                ])->first();
+    
+                if ($BufferStock_xl) {
+                    if ($BufferStock_xl->qty_buffer != 0) {
+                        if ($BufferStock_xl->qty_avaliable >= $request->size_xl) {
+                            $qty_avaliable = $BufferStock_xl->qty_avaliable - $request->size_xl;
+                            $qty_process = $BufferStock_xl->qty_process + $request->size_xl;
+    
+                            $BufferStock_xl->update([
+                                'qty_avaliable' => $qty_avaliable,
+                                'qty_process' => $qty_process
+                            ]);
+                        } else {
+                            return response()->json([
+                                'status' => 'failed',
+                                'message' => 'failed to update data',
+                                'message' => 'size xl sold out'
+                            ], 400);
+                        }
+                    } elseif ($BufferStock_xl->qty_buffer == 0) {
                         $qty_process = $BufferStock_xl->qty_process + $request->size_xl;
-
+    
                         $BufferStock_xl->update([
-                            'qty_avaliable' => $qty_avaliable,
                             'qty_process' => $qty_process
                         ]);
-                    } else {
-                        return response()->json([
-                            'status' => 'failed',
-                            'message' => 'failed to update data',
-                            'message' => 'size xl sold out'
-                        ], 400);
                     }
-                } elseif ($BufferStock_xl->qty_buffer == 0) {
-                    $qty_process = $BufferStock_xl->qty_process + $request->size_xl;
-
-                    $BufferStock_xl->update([
-                        'qty_process' => $qty_process
-                    ]);
                 }
             }
 
-            $size_xxl = Size::where('size', 'xxl')->first();
-            $BufferStock_xxl = BufferProduct::where([
-                'clothes_id' => $request->clothes_id,
-                'size_id' => $size_xxl->id
-            ])->first();
-
-            if ($BufferStock_xxl) {
-                if ($BufferStock_xxl->qty_buffer != 0) {
-                    if ($BufferStock_xxl->qty_avaliable >= $request->size_xxl) {
-                        $qty_avaliable = $BufferStock_xxl->qty_avaliable - $request->size_xxl;
+            $size_xxl = Size::where('size', 'XXL')->first();
+            if ($size_xxl) {
+                $BufferStock_xxl = BufferProduct::where([
+                    'clothes_id' => $request->clothes_id,
+                    'size_id' => $size_xxl->id
+                ])->first();
+    
+                if ($BufferStock_xxl) {
+                    if ($BufferStock_xxl->qty_buffer != 0) {
+                        if ($BufferStock_xxl->qty_avaliable >= $request->size_xxl) {
+                            $qty_avaliable = $BufferStock_xxl->qty_avaliable - $request->size_xxl;
+                            $qty_process = $BufferStock_xxl->qty_process + $request->size_xxl;
+    
+                            $BufferStock_xxl->update([
+                                'qty_avaliable' => $qty_avaliable,
+                                'qty_process' => $qty_process
+                            ]);
+                        } else {
+                            return response()->json([
+                                'status' => 'failed',
+                                'message' => 'failed to update data',
+                                'message' => 'size xxl sold out'
+                            ], 400);
+                        }
+                    } elseif ($BufferStock_xxl->qty_buffer == 0) {
                         $qty_process = $BufferStock_xxl->qty_process + $request->size_xxl;
-
+    
                         $BufferStock_xxl->update([
-                            'qty_avaliable' => $qty_avaliable,
                             'qty_process' => $qty_process
                         ]);
-                    } else {
-                        return response()->json([
-                            'status' => 'failed',
-                            'message' => 'failed to update data',
-                            'message' => 'size xxl sold out'
-                        ], 400);
                     }
-                } elseif ($BufferStock_xxl->qty_buffer == 0) {
-                    $qty_process = $BufferStock_xxl->qty_process + $request->size_xxl;
-
-                    $BufferStock_xxl->update([
-                        'qty_process' => $qty_process
-                    ]);
                 }
             }
 
             $size_xxxl = Size::where('size', 'xxxl')->first();
-            $BufferStock_xxxl = BufferProduct::where([
-                'clothes_id' => $request->clothes_id,
-                'size_id' => $size_xxxl->id
-            ])->first();
-
-            if ($BufferStock_xxxl) {
-                if ($BufferStock_xxxl->qty_buffer != 0) {
-                    if ($BufferStock_xxxl->qty_avaliable >= $request->size_xxxl) {
-                        $qty_avaliable = $BufferStock_xxxl->qty_avaliable - $request->size_xxxl;
+            if ($size_xxxl) {
+                $BufferStock_xxxl = BufferProduct::where([
+                    'clothes_id' => $request->clothes_id,
+                    'size_id' => $size_xxxl->id
+                ])->first();
+    
+                if ($BufferStock_xxxl) {
+                    if ($BufferStock_xxxl->qty_buffer != 0) {
+                        if ($BufferStock_xxxl->qty_avaliable >= $request->size_xxxl) {
+                            $qty_avaliable = $BufferStock_xxxl->qty_avaliable - $request->size_xxxl;
+                            $qty_process = $BufferStock_xxxl->qty_process + $request->size_xxxl;
+    
+                            $BufferStock_xxxl->update([
+                                'qty_avaliable' => $qty_avaliable,
+                                'qty_process' => $qty_process
+                            ]);
+                        } else {
+                            return response()->json([
+                                'status' => 'failed',
+                                'message' => 'failed to update data',
+                                'message' => 'size xxxl sold out'
+                            ], 400);
+                        }
+                    } elseif ($BufferStock_xxxl->qty_buffer == 0) {
                         $qty_process = $BufferStock_xxxl->qty_process + $request->size_xxxl;
-
+    
                         $BufferStock_xxxl->update([
-                            'qty_avaliable' => $qty_avaliable,
                             'qty_process' => $qty_process
                         ]);
-                    } else {
-                        return response()->json([
-                            'status' => 'failed',
-                            'message' => 'failed to update data',
-                            'message' => 'size xxxl sold out'
-                        ], 400);
                     }
-                } elseif ($BufferStock_xxxl->qty_buffer == 0) {
-                    $qty_process = $BufferStock_xxxl->qty_process + $request->size_xxxl;
-
-                    $BufferStock_xxxl->update([
-                        'qty_process' => $qty_process
-                    ]);
                 }
             }
 
             $size_2 = Size::where('size', '2')->first();
-            $BufferStock_2 = BufferProduct::where([
-                'clothes_id' => $request->clothes_id,
-                'size_id' => $size_2->id
-            ])->first();
+            if ($size_2) {
+                $BufferStock_2 = BufferProduct::where([
+                    'clothes_id' => $request->clothes_id,
+                    'size_id' => $size_2->id
+                ])->first();
 
-            if ($BufferStock_2) {
-                if ($BufferStock_2->qty_buffer != 0) {
-                    if ($BufferStock_2->qty_avaliable >= $request->size_2) {
-                        $qty_avaliable = $BufferStock_2->qty_avaliable - $request->size_2;
+                if ($BufferStock_2) {
+                    if ($BufferStock_2->qty_buffer != 0) {
+                        if ($BufferStock_2->qty_avaliable >= $request->size_2) {
+                            $qty_avaliable = $BufferStock_2->qty_avaliable - $request->size_2;
+                            $qty_process = $BufferStock_2->qty_process + $request->size_2;
+
+                            $BufferStock_2->update([
+                                'qty_avaliable' => $qty_avaliable,
+                                'qty_process' => $qty_process
+                            ]);
+                        } else {
+                            return response()->json([
+                                'status' => 'failed',
+                                'message' => 'failed to update data',
+                                'message' => 'size 2 sold out'
+                            ], 400);
+                        }
+                    } elseif ($BufferStock_2->qty_buffer == 0) {
                         $qty_process = $BufferStock_2->qty_process + $request->size_2;
 
                         $BufferStock_2->update([
-                            'qty_avaliable' => $qty_avaliable,
                             'qty_process' => $qty_process
                         ]);
-                    } else {
-                        return response()->json([
-                            'status' => 'failed',
-                            'message' => 'failed to update data',
-                            'message' => 'size 2 sold out'
-                        ], 400);
                     }
-                } elseif ($BufferStock_2->qty_buffer == 0) {
-                    $qty_process = $BufferStock_2->qty_process + $request->size_2;
-
-                    $BufferStock_2->update([
-                        'qty_process' => $qty_process
-                    ]);
                 }
             }
 
 
             $size_4 = Size::where('size', '4')->first();
-            $BufferStock_4 = BufferProduct::where([
-                'clothes_id' => $request->clothes_id,
-                'size_id' => $size_4->id
-            ])->first();
+            if ($size_4) {
+                $BufferStock_4 = BufferProduct::where([
+                    'clothes_id' => $request->clothes_id,
+                    'size_id' => $size_4->id
+                ])->first();
 
-            if ($BufferStock_4) {
-                if ($BufferStock_4->qty_buffer != 0) {
-                    if ($BufferStock_4->qty_avaliable >= $request->size_4) {
-                        $qty_avaliable = $BufferStock_4->qty_avaliable - $request->size_4;
+                if ($BufferStock_4) {
+                    if ($BufferStock_4->qty_buffer != 0) {
+                        if ($BufferStock_4->qty_avaliable >= $request->size_4) {
+                            $qty_avaliable = $BufferStock_4->qty_avaliable - $request->size_4;
+                            $qty_process = $BufferStock_4->qty_process + $request->size_4;
+
+                            $BufferStock_4->update([
+                                'qty_avaliable' => $qty_avaliable,
+                                'qty_process' => $qty_process
+                            ]);
+                        } else {
+                            return response()->json([
+                                'status' => 'failed',
+                                'message' => 'failed to update data',
+                                'message' => 'size 4 sold out'
+                            ], 400);
+                        }
+                    } elseif ($BufferStock_4->qty_buffer == 0) {
                         $qty_process = $BufferStock_4->qty_process + $request->size_4;
 
                         $BufferStock_4->update([
-                            'qty_avaliable' => $qty_avaliable,
                             'qty_process' => $qty_process
                         ]);
-                    } else {
-                        return response()->json([
-                            'status' => 'failed',
-                            'message' => 'failed to update data',
-                            'message' => 'size 4 sold out'
-                        ], 400);
                     }
-                } elseif ($BufferStock_4->qty_buffer == 0) {
-                    $qty_process = $BufferStock_4->qty_process + $request->size_4;
-
-                    $BufferStock_4->update([
-                        'qty_process' => $qty_process
-                    ]);
                 }
             }
 
             $size_6 = Size::where('size', '6')->first();
-            $BufferStock_6 = BufferProduct::where([
-                'clothes_id' => $request->clothes_id,
-                'size_id' => $size_6->id
-            ])->first();
+            if ($size_6) {
+                $BufferStock_6 = BufferProduct::where([
+                    'clothes_id' => $request->clothes_id,
+                    'size_id' => $size_6->id
+                ])->first();
 
-            if ($BufferStock_6) {
-                if ($BufferStock_6->qty_buffer != 0) {
-                    if ($BufferStock_6->qty_avaliable >= $request->size_6) {
-                        $qty_avaliable = $BufferStock_6->qty_avaliable - $request->size_6;
+                if ($BufferStock_6) {
+                    if ($BufferStock_6->qty_buffer != 0) {
+                        if ($BufferStock_6->qty_avaliable >= $request->size_6) {
+                            $qty_avaliable = $BufferStock_6->qty_avaliable - $request->size_6;
+                            $qty_process = $BufferStock_6->qty_process + $request->size_6;
+
+                            $BufferStock_6->update([
+                                'qty_avaliable' => $qty_avaliable,
+                                'qty_process' => $qty_process
+                            ]);
+                        } else {
+                            return response()->json([
+                                'status' => 'failed',
+                                'message' => 'failed to update data',
+                                'message' => 'size 6 sold out'
+                            ], 400);
+                        }
+                    } elseif ($BufferStock_6->qty_buffer == 0) {
                         $qty_process = $BufferStock_6->qty_process + $request->size_6;
 
                         $BufferStock_6->update([
-                            'qty_avaliable' => $qty_avaliable,
                             'qty_process' => $qty_process
                         ]);
-                    } else {
-                        return response()->json([
-                            'status' => 'failed',
-                            'message' => 'failed to update data',
-                            'message' => 'size 6 sold out'
-                        ], 400);
                     }
-                } elseif ($BufferStock_6->qty_buffer == 0) {
-                    $qty_process = $BufferStock_6->qty_process + $request->size_6;
-
-                    $BufferStock_6->update([
-                        'qty_process' => $qty_process
-                    ]);
                 }
             }
 
             $size_8 = Size::where('size', '8')->first();
-            $BufferStock_8 = BufferProduct::where([
-                'clothes_id' => $request->clothes_id,
-                'size_id' => $size_8->id
-            ])->first();
+            if ($size_8) {
+                $BufferStock_8 = BufferProduct::where([
+                    'clothes_id' => $request->clothes_id,
+                    'size_id' => $size_8->id
+                ])->first();
 
-            if ($BufferStock_8) {
-                if ($BufferStock_8->qty_buffer != 0) {
-                    if ($BufferStock_8->qty_avaliable >= $request->size_8) {
-                        $qty_avaliable = $BufferStock_8->qty_avaliable - $request->size_8;
+                if ($BufferStock_8) {
+                    if ($BufferStock_8->qty_buffer != 0) {
+                        if ($BufferStock_8->qty_avaliable >= $request->size_8) {
+                            $qty_avaliable = $BufferStock_8->qty_avaliable - $request->size_8;
+                            $qty_process = $BufferStock_8->qty_process + $request->size_8;
+
+                            $BufferStock_8->update([
+                                'qty_avaliable' => $qty_avaliable,
+                                'qty_process' => $qty_process
+                            ]);
+                        } else {
+                            return response()->json([
+                                'status' => 'failed',
+                                'message' => 'failed to update data',
+                                'message' => 'size 8 sold out'
+                            ], 400);
+                        }
+                    } elseif ($BufferStock_8->qty_buffer == 0) {
                         $qty_process = $BufferStock_8->qty_process + $request->size_8;
 
                         $BufferStock_8->update([
-                            'qty_avaliable' => $qty_avaliable,
                             'qty_process' => $qty_process
                         ]);
-                    } else {
-                        return response()->json([
-                            'status' => 'failed',
-                            'message' => 'failed to update data',
-                            'message' => 'size 8 sold out'
-                        ], 400);
                     }
-                } elseif ($BufferStock_8->qty_buffer == 0) {
-                    $qty_process = $BufferStock_8->qty_process + $request->size_8;
-
-                    $BufferStock_8->update([
-                        'qty_process' => $qty_process
-                    ]);
                 }
             }
 
             $size_10 = Size::where('size', '10')->first();
-            $BufferStock_10 = BufferProduct::where([
-                'clothes_id' => $request->clothes_id,
-                'size_id' => $size_10->id
-            ])->first();
+            if ($size_10) {
+                $BufferStock_10 = BufferProduct::where([
+                    'clothes_id' => $request->clothes_id,
+                    'size_id' => $size_10->id
+                ])->first();
 
-            if ($BufferStock_10) {
-                if ($BufferStock_10->qty_buffer != 0) {
-                    if ($BufferStock_10->qty_avaliable >= $request->size_10) {
-                        $qty_avaliable = $BufferStock_10->qty_avaliable - $request->size_10;
+                if ($BufferStock_10) {
+                    if ($BufferStock_10->qty_buffer != 0) {
+                        if ($BufferStock_10->qty_avaliable >= $request->size_10) {
+                            $qty_avaliable = $BufferStock_10->qty_avaliable - $request->size_10;
+                            $qty_process = $BufferStock_10->qty_process + $request->size_10;
+
+                            $BufferStock_10->update([
+                                'qty_avaliable' => $qty_avaliable,
+                                'qty_process' => $qty_process
+                            ]);
+                        } else {
+                            return response()->json([
+                                'status' => 'failed',
+                                'message' => 'failed to update data',
+                                'message' => 'size 10 sold out'
+                            ], 400);
+                        }
+                    } elseif ($BufferStock_10->qty_buffer == 0) {
                         $qty_process = $BufferStock_10->qty_process + $request->size_10;
 
                         $BufferStock_10->update([
-                            'qty_avaliable' => $qty_avaliable,
                             'qty_process' => $qty_process
                         ]);
-                    } else {
-                        return response()->json([
-                            'status' => 'failed',
-                            'message' => 'failed to update data',
-                            'message' => 'size 10 sold out'
-                        ], 400);
                     }
-                } elseif ($BufferStock_10->qty_buffer == 0) {
-                    $qty_process = $BufferStock_10->qty_process + $request->size_10;
-
-                    $BufferStock_10->update([
-                        'qty_process' => $qty_process
-                    ]);
                 }
             }
 
             $size_12 = Size::where('size', '12')->first();
-            $BufferStock_12 = BufferProduct::where([
-                'clothes_id' => $request->clothes_id,
-                'size_id' => $size_12->id
-            ])->first();
+            if ($size_12) {
+                $BufferStock_12 = BufferProduct::where([
+                    'clothes_id' => $request->clothes_id,
+                    'size_id' => $size_12->id
+                ])->first();
 
-            if ($BufferStock_12) {
-                if ($BufferStock_12->qty_buffer != 0) {
-                    if ($BufferStock_12->qty_avaliable >= $request->size_12) {
-                        $qty_avaliable = $BufferStock_12->qty_avaliable - $request->size_12;
+                if ($BufferStock_12) {
+                    if ($BufferStock_12->qty_buffer != 0) {
+                        if ($BufferStock_12->qty_avaliable >= $request->size_12) {
+                            $qty_avaliable = $BufferStock_12->qty_avaliable - $request->size_12;
+                            $qty_process = $BufferStock_12->qty_process + $request->size_12;
+
+                            $BufferStock_12->update([
+                                'qty_avaliable' => $qty_avaliable,
+                                'qty_process' => $qty_process
+                            ]);
+                        } else {
+                            return response()->json([
+                                'status' => 'failed',
+                                'message' => 'failed to update data',
+                                'message' => 'size 12 sold out'
+                            ], 400);
+                        }
+                    } elseif ($BufferStock_12->qty_buffer == 0) {
                         $qty_process = $BufferStock_12->qty_process + $request->size_12;
 
                         $BufferStock_12->update([
-                            'qty_avaliable' => $qty_avaliable,
                             'qty_process' => $qty_process
                         ]);
-                    } else {
-                        return response()->json([
-                            'status' => 'failed',
-                            'message' => 'failed to update data',
-                            'message' => 'size 12 sold out'
-                        ], 400);
                     }
-                } elseif ($BufferStock_12->qty_buffer == 0) {
-                    $qty_process = $BufferStock_12->qty_process + $request->size_12;
-
-                    $BufferStock_12->update([
-                        'qty_process' => $qty_process
-                    ]);
                 }
             }
 
             $size_27 = Size::where('size', '27')->first();
-            $BufferStock_27 = BufferProduct::where([
-                'clothes_id' => $request->clothes_id,
-                'size_id' => $size_27->id
-            ])->first();
+            if ($size_27) {
+                $BufferStock_27 = BufferProduct::where([
+                    'clothes_id' => $request->clothes_id,
+                    'size_id' => $size_27->id
+                ])->first();
 
-            if ($BufferStock_27) {
-                if ($BufferStock_27->qty_buffer != 0) {
-                    if ($BufferStock_27->qty_avaliable >= $request->size_27) {
-                        $qty_avaliable = $BufferStock_27->qty_avaliable - $request->size_27;
+                if ($BufferStock_27) {
+                    if ($BufferStock_27->qty_buffer != 0) {
+                        if ($BufferStock_27->qty_avaliable >= $request->size_27) {
+                            $qty_avaliable = $BufferStock_27->qty_avaliable - $request->size_27;
+                            $qty_process = $BufferStock_27->qty_process + $request->size_27;
+
+                            $BufferStock_27->update([
+                                'qty_avaliable' => $qty_avaliable,
+                                'qty_process' => $qty_process
+                            ]);
+                        } else {
+                            return response()->json([
+                                'status' => 'failed',
+                                'message' => 'failed to update data',
+                                'message' => 'size 12 sold out'
+                            ], 400);
+                        }
+                    } elseif ($BufferStock_27->qty_buffer == 0) {
                         $qty_process = $BufferStock_27->qty_process + $request->size_27;
 
                         $BufferStock_27->update([
-                            'qty_avaliable' => $qty_avaliable,
                             'qty_process' => $qty_process
                         ]);
-                    } else {
-                        return response()->json([
-                            'status' => 'failed',
-                            'message' => 'failed to update data',
-                            'message' => 'size 12 sold out'
-                        ], 400);
                     }
-                } elseif ($BufferStock_27->qty_buffer == 0) {
-                    $qty_process = $BufferStock_27->qty_process + $request->size_27;
-
-                    $BufferStock_27->update([
-                        'qty_process' => $qty_process
-                    ]);
                 }
             }
 
             $size_28 = Size::where('size', '28')->first();
-            $BufferStock_28 = BufferProduct::where([
-                'clothes_id' => $request->clothes_id,
-                'size_id' => $size_28->id
-            ])->first();
+            if ($size_28) {
+                $BufferStock_28 = BufferProduct::where([
+                    'clothes_id' => $request->clothes_id,
+                    'size_id' => $size_28->id
+                ])->first();
 
-            if ($BufferStock_28) {
-                if ($BufferStock_28->qty_buffer != 0) {
-                    if ($BufferStock_28->qty_avaliable >= $request->size_28) {
-                        $qty_avaliable = $BufferStock_28->qty_avaliable - $request->size_28;
+                if ($BufferStock_28) {
+                    if ($BufferStock_28->qty_buffer != 0) {
+                        if ($BufferStock_28->qty_avaliable >= $request->size_28) {
+                            $qty_avaliable = $BufferStock_28->qty_avaliable - $request->size_28;
+                            $qty_process = $BufferStock_28->qty_process + $request->size_28;
+
+                            $BufferStock_28->update([
+                                'qty_avaliable' => $qty_avaliable,
+                                'qty_process' => $qty_process
+                            ]);
+                        } else {
+                            return response()->json([
+                                'status' => 'failed',
+                                'message' => 'failed to update data',
+                                'message' => 'size 12 sold out'
+                            ], 400);
+                        }
+                    } elseif ($BufferStock_28->qty_buffer == 0) {
                         $qty_process = $BufferStock_28->qty_process + $request->size_28;
 
                         $BufferStock_28->update([
-                            'qty_avaliable' => $qty_avaliable,
                             'qty_process' => $qty_process
                         ]);
-                    } else {
-                        return response()->json([
-                            'status' => 'failed',
-                            'message' => 'failed to update data',
-                            'message' => 'size 12 sold out'
-                        ], 400);
                     }
-                } elseif ($BufferStock_28->qty_buffer == 0) {
-                    $qty_process = $BufferStock_28->qty_process + $request->size_28;
-
-                    $BufferStock_28->update([
-                        'qty_process' => $qty_process
-                    ]);
                 }
             }
 
             $size_29 = Size::where('size', '29')->first();
-            $BufferStock_29 = BufferProduct::where([
-                'clothes_id' => $request->clothes_id,
-                'size_id' => $size_29->id
-            ])->first();
+            if ($size_29) {
+                $BufferStock_29 = BufferProduct::where([
+                    'clothes_id' => $request->clothes_id,
+                    'size_id' => $size_29->id
+                ])->first();
 
-            if ($BufferStock_29) {
-                if ($BufferStock_29->qty_buffer != 0) {
-                    if ($BufferStock_29->qty_avaliable >= $request->size_29) {
-                        $qty_avaliable = $BufferStock_29->qty_avaliable - $request->size_29;
+                if ($BufferStock_29) {
+                    if ($BufferStock_29->qty_buffer != 0) {
+                        if ($BufferStock_29->qty_avaliable >= $request->size_29) {
+                            $qty_avaliable = $BufferStock_29->qty_avaliable - $request->size_29;
+                            $qty_process = $BufferStock_29->qty_process + $request->size_29;
+
+                            $BufferStock_29->update([
+                                'qty_avaliable' => $qty_avaliable,
+                                'qty_process' => $qty_process
+                            ]);
+                        } else {
+                            return response()->json([
+                                'status' => 'failed',
+                                'message' => 'failed to update data',
+                                'message' => 'size 12 sold out'
+                            ], 400);
+                        }
+                    } elseif ($BufferStock_29->qty_buffer == 0) {
                         $qty_process = $BufferStock_29->qty_process + $request->size_29;
 
                         $BufferStock_29->update([
-                            'qty_avaliable' => $qty_avaliable,
                             'qty_process' => $qty_process
                         ]);
-                    } else {
-                        return response()->json([
-                            'status' => 'failed',
-                            'message' => 'failed to update data',
-                            'message' => 'size 12 sold out'
-                        ], 400);
                     }
-                } elseif ($BufferStock_29->qty_buffer == 0) {
-                    $qty_process = $BufferStock_29->qty_process + $request->size_29;
-
-                    $BufferStock_29->update([
-                        'qty_process' => $qty_process
-                    ]);
                 }
             }
 
             $size_30 = Size::where('size', '30')->first();
-            $BufferStock_30 = BufferProduct::where([
-                'clothes_id' => $request->clothes_id,
-                'size_id' => $size_30->id
-            ])->first();
+            if ($size_30) {
+                $BufferStock_30 = BufferProduct::where([
+                    'clothes_id' => $request->clothes_id,
+                    'size_id' => $size_30->id
+                ])->first();
 
-            if ($BufferStock_30) {
-                if ($BufferStock_30->qty_buffer != 0) {
-                    if ($BufferStock_30->qty_avaliable >= $request->size_30) {
-                        $qty_avaliable = $BufferStock_30->qty_avaliable - $request->size_30;
+                if ($BufferStock_30) {
+                    if ($BufferStock_30->qty_buffer != 0) {
+                        if ($BufferStock_30->qty_avaliable >= $request->size_30) {
+                            $qty_avaliable = $BufferStock_30->qty_avaliable - $request->size_30;
+                            $qty_process = $BufferStock_30->qty_process + $request->size_30;
+
+                            $BufferStock_30->update([
+                                'qty_avaliable' => $qty_avaliable,
+                                'qty_process' => $qty_process
+                            ]);
+                        } else {
+                            return response()->json([
+                                'status' => 'failed',
+                                'message' => 'failed to update data',
+                                'message' => 'size 12 sold out'
+                            ], 400);
+                        }
+                    } elseif ($BufferStock_30->qty_buffer == 0) {
                         $qty_process = $BufferStock_30->qty_process + $request->size_30;
 
                         $BufferStock_30->update([
-                            'qty_avaliable' => $qty_avaliable,
                             'qty_process' => $qty_process
                         ]);
-                    } else {
-                        return response()->json([
-                            'status' => 'failed',
-                            'message' => 'failed to update data',
-                            'message' => 'size 12 sold out'
-                        ], 400);
                     }
-                } elseif ($BufferStock_30->qty_buffer == 0) {
-                    $qty_process = $BufferStock_30->qty_process + $request->size_30;
-
-                    $BufferStock_30->update([
-                        'qty_process' => $qty_process
-                    ]);
                 }
             }
 
             $size_31 = Size::where('size', '31')->first();
-            $BufferStock_31 = BufferProduct::where([
-                'clothes_id' => $request->clothes_id,
-                'size_id' => $size_31->id
-            ])->first();
+            if ($size_31) {
+                $BufferStock_31 = BufferProduct::where([
+                    'clothes_id' => $request->clothes_id,
+                    'size_id' => $size_31->id
+                ])->first();
 
-            if ($BufferStock_31) {
-                if ($BufferStock_31->qty_buffer != 0) {
-                    if ($BufferStock_31->qty_avaliable >= $request->size_31) {
-                        $qty_avaliable = $BufferStock_31->qty_avaliable - $request->size_31;
+                if ($BufferStock_31) {
+                    if ($BufferStock_31->qty_buffer != 0) {
+                        if ($BufferStock_31->qty_avaliable >= $request->size_31) {
+                            $qty_avaliable = $BufferStock_31->qty_avaliable - $request->size_31;
+                            $qty_process = $BufferStock_31->qty_process + $request->size_31;
+
+                            $BufferStock_31->update([
+                                'qty_avaliable' => $qty_avaliable,
+                                'qty_process' => $qty_process
+                            ]);
+                        } else {
+                            return response()->json([
+                                'status' => 'failed',
+                                'message' => 'failed to update data',
+                                'message' => 'size 12 sold out'
+                            ], 400);
+                        }
+                    } elseif ($BufferStock_31->qty_buffer == 0) {
                         $qty_process = $BufferStock_31->qty_process + $request->size_31;
 
                         $BufferStock_31->update([
-                            'qty_avaliable' => $qty_avaliable,
                             'qty_process' => $qty_process
                         ]);
-                    } else {
-                        return response()->json([
-                            'status' => 'failed',
-                            'message' => 'failed to update data',
-                            'message' => 'size 12 sold out'
-                        ], 400);
                     }
-                } elseif ($BufferStock_31->qty_buffer == 0) {
-                    $qty_process = $BufferStock_31->qty_process + $request->size_31;
-
-                    $BufferStock_31->update([
-                        'qty_process' => $qty_process
-                    ]);
                 }
             }
 
             $size_32 = Size::where('size', '32')->first();
-            $BufferStock_32 = BufferProduct::where([
-                'clothes_id' => $request->clothes_id,
-                'size_id' => $size_32->id
-            ])->first();
+            if ($size_32) {
+                $BufferStock_32 = BufferProduct::where([
+                    'clothes_id' => $request->clothes_id,
+                    'size_id' => $size_32->id
+                ])->first();
 
-            if ($BufferStock_32) {
-                if ($BufferStock_32->qty_buffer != 0) {
-                    if ($BufferStock_32->qty_avaliable >= $request->size_32) {
-                        $qty_avaliable = $BufferStock_32->qty_avaliable - $request->size_32;
+                if ($BufferStock_32) {
+                    if ($BufferStock_32->qty_buffer != 0) {
+                        if ($BufferStock_32->qty_avaliable >= $request->size_32) {
+                            $qty_avaliable = $BufferStock_32->qty_avaliable - $request->size_32;
+                            $qty_process = $BufferStock_32->qty_process + $request->size_32;
+
+                            $BufferStock_32->update([
+                                'qty_avaliable' => $qty_avaliable,
+                                'qty_process' => $qty_process
+                            ]);
+                        } else {
+                            return response()->json([
+                                'status' => 'failed',
+                                'message' => 'failed to update data',
+                                'message' => 'size 12 sold out'
+                            ], 400);
+                        }
+                    } elseif ($BufferStock_32->qty_buffer == 0) {
                         $qty_process = $BufferStock_32->qty_process + $request->size_32;
 
                         $BufferStock_32->update([
-                            'qty_avaliable' => $qty_avaliable,
                             'qty_process' => $qty_process
                         ]);
-                    } else {
-                        return response()->json([
-                            'status' => 'failed',
-                            'message' => 'failed to update data',
-                            'message' => 'size 12 sold out'
-                        ], 400);
                     }
-                } elseif ($BufferStock_32->qty_buffer == 0) {
-                    $qty_process = $BufferStock_32->qty_process + $request->size_32;
-
-                    $BufferStock_32->update([
-                        'qty_process' => $qty_process
-                    ]);
                 }
             }
 
             $size_33 = Size::where('size', '33')->first();
-            $BufferStock_33 = BufferProduct::where([
-                'clothes_id' => $request->clothes_id,
-                'size_id' => $size_33->id
-            ])->first();
+            if ($size_33) {
+                $BufferStock_33 = BufferProduct::where([
+                    'clothes_id' => $request->clothes_id,
+                    'size_id' => $size_33->id
+                ])->first();
 
-            if ($BufferStock_33) {
-                if ($BufferStock_33->qty_buffer != 0) {
-                    if ($BufferStock_33->qty_avaliable >= $request->size_33) {
-                        $qty_avaliable = $BufferStock_33->qty_avaliable - $request->size_33;
+                if ($BufferStock_33) {
+                    if ($BufferStock_33->qty_buffer != 0) {
+                        if ($BufferStock_33->qty_avaliable >= $request->size_33) {
+                            $qty_avaliable = $BufferStock_33->qty_avaliable - $request->size_33;
+                            $qty_process = $BufferStock_33->qty_process + $request->size_33;
+
+                            $BufferStock_33->update([
+                                'qty_avaliable' => $qty_avaliable,
+                                'qty_process' => $qty_process
+                            ]);
+                        } else {
+                            return response()->json([
+                                'status' => 'failed',
+                                'message' => 'failed to update data',
+                                'message' => 'size 12 sold out'
+                            ], 400);
+                        }
+                    } elseif ($BufferStock_33->qty_buffer == 0) {
                         $qty_process = $BufferStock_33->qty_process + $request->size_33;
 
                         $BufferStock_33->update([
-                            'qty_avaliable' => $qty_avaliable,
                             'qty_process' => $qty_process
                         ]);
-                    } else {
-                        return response()->json([
-                            'status' => 'failed',
-                            'message' => 'failed to update data',
-                            'message' => 'size 12 sold out'
-                        ], 400);
                     }
-                } elseif ($BufferStock_33->qty_buffer == 0) {
-                    $qty_process = $BufferStock_33->qty_process + $request->size_33;
-
-                    $BufferStock_33->update([
-                        'qty_process' => $qty_process
-                    ]);
                 }
             }
 
             $size_34 = Size::where('size', '34')->first();
-            $BufferStock_34 = BufferProduct::where([
-                'clothes_id' => $request->clothes_id,
-                'size_id' => $size_34->id
-            ])->first();
+            if ($size_34) {
+                $BufferStock_34 = BufferProduct::where([
+                    'clothes_id' => $request->clothes_id,
+                    'size_id' => $size_34->id
+                ])->first();
 
-            if ($BufferStock_34) {
-                if ($BufferStock_34->qty_buffer != 0) {
-                    if ($BufferStock_34->qty_avaliable >= $request->size_34) {
-                        $qty_avaliable = $BufferStock_34->qty_avaliable - $request->size_34;
+                if ($BufferStock_34) {
+                    if ($BufferStock_34->qty_buffer != 0) {
+                        if ($BufferStock_34->qty_avaliable >= $request->size_34) {
+                            $qty_avaliable = $BufferStock_34->qty_avaliable - $request->size_34;
+                            $qty_process = $BufferStock_34->qty_process + $request->size_34;
+
+                            $BufferStock_34->update([
+                                'qty_avaliable' => $qty_avaliable,
+                                'qty_process' => $qty_process
+                            ]);
+                        } else {
+                            return response()->json([
+                                'status' => 'failed',
+                                'message' => 'failed to update data',
+                                'message' => 'size 12 sold out'
+                            ], 400);
+                        }
+                    } elseif ($BufferStock_34->qty_buffer == 0) {
                         $qty_process = $BufferStock_34->qty_process + $request->size_34;
 
                         $BufferStock_34->update([
-                            'qty_avaliable' => $qty_avaliable,
                             'qty_process' => $qty_process
                         ]);
-                    } else {
-                        return response()->json([
-                            'status' => 'failed',
-                            'message' => 'failed to update data',
-                            'message' => 'size 12 sold out'
-                        ], 400);
                     }
-                } elseif ($BufferStock_34->qty_buffer == 0) {
-                    $qty_process = $BufferStock_34->qty_process + $request->size_34;
-
-                    $BufferStock_34->update([
-                        'qty_process' => $qty_process
-                    ]);
                 }
             }
 
             $size_35 = Size::where('size', '35')->first();
-            $BufferStock_35 = BufferProduct::where([
-                'clothes_id' => $request->clothes_id,
-                'size_id' => $size_35->id
-            ])->first();
+            if ($size_35) {
+                $BufferStock_35 = BufferProduct::where([
+                    'clothes_id' => $request->clothes_id,
+                    'size_id' => $size_35->id
+                ])->first();
 
-            if ($BufferStock_35) {
-                if ($BufferStock_35->qty_buffer != 0) {
-                    if ($BufferStock_35->qty_avaliable >= $request->size_35) {
-                        $qty_avaliable = $BufferStock_35->qty_avaliable - $request->size_35;
+                if ($BufferStock_35) {
+                    if ($BufferStock_35->qty_buffer != 0) {
+                        if ($BufferStock_35->qty_avaliable >= $request->size_35) {
+                            $qty_avaliable = $BufferStock_35->qty_avaliable - $request->size_35;
+                            $qty_process = $BufferStock_35->qty_process + $request->size_35;
+
+                            $BufferStock_35->update([
+                                'qty_avaliable' => $qty_avaliable,
+                                'qty_process' => $qty_process
+                            ]);
+                        } else {
+                            return response()->json([
+                                'status' => 'failed',
+                                'message' => 'failed to update data',
+                                'message' => 'size 12 sold out'
+                            ], 400);
+                        }
+                    } elseif ($BufferStock_35->qty_buffer == 0) {
                         $qty_process = $BufferStock_35->qty_process + $request->size_35;
 
                         $BufferStock_35->update([
-                            'qty_avaliable' => $qty_avaliable,
                             'qty_process' => $qty_process
                         ]);
-                    } else {
-                        return response()->json([
-                            'status' => 'failed',
-                            'message' => 'failed to update data',
-                            'message' => 'size 12 sold out'
-                        ], 400);
                     }
-                } elseif ($BufferStock_35->qty_buffer == 0) {
-                    $qty_process = $BufferStock_35->qty_process + $request->size_35;
-
-                    $BufferStock_35->update([
-                        'qty_process' => $qty_process
-                    ]);
                 }
             }
 
             $size_36 = Size::where('size', '36')->first();
-            $BufferStock_36 = BufferProduct::where([
-                'clothes_id' => $request->clothes_id,
-                'size_id' => $size_36->id
-            ])->first();
+            if ($size_36) {
+                $BufferStock_36 = BufferProduct::where([
+                    'clothes_id' => $request->clothes_id,
+                    'size_id' => $size_36->id
+                ])->first();
 
-            if ($BufferStock_36) {
-                if ($BufferStock_36->qty_buffer != 0) {
-                    if ($BufferStock_36->qty_avaliable >= $request->size_36) {
-                        $qty_avaliable = $BufferStock_36->qty_avaliable - $request->size_36;
+                if ($BufferStock_36) {
+                    if ($BufferStock_36->qty_buffer != 0) {
+                        if ($BufferStock_36->qty_avaliable >= $request->size_36) {
+                            $qty_avaliable = $BufferStock_36->qty_avaliable - $request->size_36;
+                            $qty_process = $BufferStock_36->qty_process + $request->size_36;
+
+                            $BufferStock_36->update([
+                                'qty_avaliable' => $qty_avaliable,
+                                'qty_process' => $qty_process
+                            ]);
+                        } else {
+                            return response()->json([
+                                'status' => 'failed',
+                                'message' => 'failed to update data',
+                                'message' => 'size 12 sold out'
+                            ], 400);
+                        }
+                    } elseif ($BufferStock_36->qty_buffer == 0) {
                         $qty_process = $BufferStock_36->qty_process + $request->size_36;
 
                         $BufferStock_36->update([
-                            'qty_avaliable' => $qty_avaliable,
                             'qty_process' => $qty_process
                         ]);
-                    } else {
-                        return response()->json([
-                            'status' => 'failed',
-                            'message' => 'failed to update data',
-                            'message' => 'size 12 sold out'
-                        ], 400);
                     }
-                } elseif ($BufferStock_36->qty_buffer == 0) {
-                    $qty_process = $BufferStock_36->qty_process + $request->size_36;
-
-                    $BufferStock_36->update([
-                        'qty_process' => $qty_process
-                    ]);
                 }
             }
 
             $size_37 = Size::where('size', '37')->first();
-            $BufferStock_37 = BufferProduct::where([
-                'clothes_id' => $request->clothes_id,
-                'size_id' => $size_37->id
-            ])->first();
+            if ($size_37) {
+                $BufferStock_37 = BufferProduct::where([
+                    'clothes_id' => $request->clothes_id,
+                    'size_id' => $size_37->id
+                ])->first();
 
-            if ($BufferStock_37) {
-                if ($BufferStock_37->qty_buffer != 0) {
-                    if ($BufferStock_37->qty_avaliable >= $request->size_37) {
-                        $qty_avaliable = $BufferStock_37->qty_avaliable - $request->size_37;
+                if ($BufferStock_37) {
+                    if ($BufferStock_37->qty_buffer != 0) {
+                        if ($BufferStock_37->qty_avaliable >= $request->size_37) {
+                            $qty_avaliable = $BufferStock_37->qty_avaliable - $request->size_37;
+                            $qty_process = $BufferStock_37->qty_process + $request->size_37;
+
+                            $BufferStock_37->update([
+                                'qty_avaliable' => $qty_avaliable,
+                                'qty_process' => $qty_process
+                            ]);
+                        } else {
+                            return response()->json([
+                                'status' => 'failed',
+                                'message' => 'failed to update data',
+                                'message' => 'size 12 sold out'
+                            ], 400);
+                        }
+                    } elseif ($BufferStock_37->qty_buffer == 0) {
                         $qty_process = $BufferStock_37->qty_process + $request->size_37;
 
                         $BufferStock_37->update([
-                            'qty_avaliable' => $qty_avaliable,
                             'qty_process' => $qty_process
                         ]);
-                    } else {
-                        return response()->json([
-                            'status' => 'failed',
-                            'message' => 'failed to update data',
-                            'message' => 'size 12 sold out'
-                        ], 400);
                     }
-                } elseif ($BufferStock_37->qty_buffer == 0) {
-                    $qty_process = $BufferStock_37->qty_process + $request->size_37;
-
-                    $BufferStock_37->update([
-                        'qty_process' => $qty_process
-                    ]);
                 }
             }
 
             $size_38 = Size::where('size', '38')->first();
-            $BufferStock_38 = BufferProduct::where([
-                'clothes_id' => $request->clothes_id,
-                'size_id' => $size_38->id
-            ])->first();
+            if ($size_38) {
+                $BufferStock_38 = BufferProduct::where([
+                    'clothes_id' => $request->clothes_id,
+                    'size_id' => $size_38->id
+                ])->first();
 
-            if ($BufferStock_38) {
-                if ($BufferStock_38->qty_buffer != 0) {
-                    if ($BufferStock_38->qty_avaliable >= $request->size_38) {
-                        $qty_avaliable = $BufferStock_38->qty_avaliable - $request->size_38;
+                if ($BufferStock_38) {
+                    if ($BufferStock_38->qty_buffer != 0) {
+                        if ($BufferStock_38->qty_avaliable >= $request->size_38) {
+                            $qty_avaliable = $BufferStock_38->qty_avaliable - $request->size_38;
+                            $qty_process = $BufferStock_38->qty_process + $request->size_38;
+
+                            $BufferStock_38->update([
+                                'qty_avaliable' => $qty_avaliable,
+                                'qty_process' => $qty_process
+                            ]);
+                        } else {
+                            return response()->json([
+                                'status' => 'failed',
+                                'message' => 'failed to update data',
+                                'message' => 'size 12 sold out'
+                            ], 400);
+                        }
+                    } elseif ($BufferStock_38->qty_buffer == 0) {
                         $qty_process = $BufferStock_38->qty_process + $request->size_38;
 
                         $BufferStock_38->update([
-                            'qty_avaliable' => $qty_avaliable,
                             'qty_process' => $qty_process
                         ]);
-                    } else {
-                        return response()->json([
-                            'status' => 'failed',
-                            'message' => 'failed to update data',
-                            'message' => 'size 12 sold out'
-                        ], 400);
                     }
-                } elseif ($BufferStock_38->qty_buffer == 0) {
-                    $qty_process = $BufferStock_38->qty_process + $request->size_38;
-
-                    $BufferStock_38->update([
-                        'qty_process' => $qty_process
-                    ]);
                 }
             }
 
             $size_39 = Size::where('size', '39')->first();
-            $BufferStock_39 = BufferProduct::where([
-                'clothes_id' => $request->clothes_id,
-                'size_id' => $size_39->id
-            ])->first();
+            if ($size_39) {
+                $BufferStock_39 = BufferProduct::where([
+                    'clothes_id' => $request->clothes_id,
+                    'size_id' => $size_39->id
+                ])->first();
 
-            if ($BufferStock_39) {
-                if ($BufferStock_39->qty_buffer != 0) {
-                    if ($BufferStock_39->qty_avaliable >= $request->size_39) {
-                        $qty_avaliable = $BufferStock_39->qty_avaliable - $request->size_39;
+                if ($BufferStock_39) {
+                    if ($BufferStock_39->qty_buffer != 0) {
+                        if ($BufferStock_39->qty_avaliable >= $request->size_39) {
+                            $qty_avaliable = $BufferStock_39->qty_avaliable - $request->size_39;
+                            $qty_process = $BufferStock_39->qty_process + $request->size_39;
+
+                            $BufferStock_39->update([
+                                'qty_avaliable' => $qty_avaliable,
+                                'qty_process' => $qty_process
+                            ]);
+                        } else {
+                            return response()->json([
+                                'status' => 'failed',
+                                'message' => 'failed to update data',
+                                'message' => 'size 12 sold out'
+                            ], 400);
+                        }
+                    } elseif ($BufferStock_39->qty_buffer == 0) {
                         $qty_process = $BufferStock_39->qty_process + $request->size_39;
 
                         $BufferStock_39->update([
-                            'qty_avaliable' => $qty_avaliable,
                             'qty_process' => $qty_process
                         ]);
-                    } else {
-                        return response()->json([
-                            'status' => 'failed',
-                            'message' => 'failed to update data',
-                            'message' => 'size 12 sold out'
-                        ], 400);
                     }
-                } elseif ($BufferStock_39->qty_buffer == 0) {
-                    $qty_process = $BufferStock_39->qty_process + $request->size_39;
-
-                    $BufferStock_39->update([
-                        'qty_process' => $qty_process
-                    ]);
                 }
             }
 
             $size_40 = Size::where('size', '40')->first();
-            $BufferStock_40 = BufferProduct::where([
-                'clothes_id' => $request->clothes_id,
-                'size_id' => $size_40->id
-            ])->first();
+            if ($size_40) {
+                $BufferStock_40 = BufferProduct::where([
+                    'clothes_id' => $request->clothes_id,
+                    'size_id' => $size_40->id
+                ])->first();
 
-            if ($BufferStock_40) {
-                if ($BufferStock_40->qty_buffer != 0) {
-                    if ($BufferStock_40->qty_avaliable >= $request->size_40) {
-                        $qty_avaliable = $BufferStock_40->qty_avaliable - $request->size_40;
+                if ($BufferStock_40) {
+                    if ($BufferStock_40->qty_buffer != 0) {
+                        if ($BufferStock_40->qty_avaliable >= $request->size_40) {
+                            $qty_avaliable = $BufferStock_40->qty_avaliable - $request->size_40;
+                            $qty_process = $BufferStock_40->qty_process + $request->size_40;
+
+                            $BufferStock_40->update([
+                                'qty_avaliable' => $qty_avaliable,
+                                'qty_process' => $qty_process
+                            ]);
+                        } else {
+                            return response()->json([
+                                'status' => 'failed',
+                                'message' => 'failed to update data',
+                                'message' => 'size 12 sold out'
+                            ], 400);
+                        }
+                    } elseif ($BufferStock_40->qty_buffer == 0) {
                         $qty_process = $BufferStock_40->qty_process + $request->size_40;
 
                         $BufferStock_40->update([
-                            'qty_avaliable' => $qty_avaliable,
                             'qty_process' => $qty_process
                         ]);
-                    } else {
-                        return response()->json([
-                            'status' => 'failed',
-                            'message' => 'failed to update data',
-                            'message' => 'size 12 sold out'
-                        ], 400);
                     }
-                } elseif ($BufferStock_40->qty_buffer == 0) {
-                    $qty_process = $BufferStock_40->qty_process + $request->size_40;
-
-                    $BufferStock_40->update([
-                        'qty_process' => $qty_process
-                    ]);
                 }
             }
 
             $size_41 = Size::where('size', '41')->first();
-            $BufferStock_41 = BufferProduct::where([
-                'clothes_id' => $request->clothes_id,
-                'size_id' => $size_41->id
-            ])->first();
+            if ($size_41) {   
+                $BufferStock_41 = BufferProduct::where([
+                    'clothes_id' => $request->clothes_id,
+                    'size_id' => $size_41->id
+                ])->first();
 
-            if ($BufferStock_41) {
-                if ($BufferStock_41->qty_buffer != 0) {
-                    if ($BufferStock_41->qty_avaliable >= $request->size_41) {
-                        $qty_avaliable = $BufferStock_41->qty_avaliable - $request->size_41;
+                if ($BufferStock_41) {
+                    if ($BufferStock_41->qty_buffer != 0) {
+                        if ($BufferStock_41->qty_avaliable >= $request->size_41) {
+                            $qty_avaliable = $BufferStock_41->qty_avaliable - $request->size_41;
+                            $qty_process = $BufferStock_41->qty_process + $request->size_41;
+
+                            $BufferStock_41->update([
+                                'qty_avaliable' => $qty_avaliable,
+                                'qty_process' => $qty_process
+                            ]);
+                        } else {
+                            return response()->json([
+                                'status' => 'failed',
+                                'message' => 'failed to update data',
+                                'message' => 'size 12 sold out'
+                            ], 400);
+                        }
+                    } elseif ($BufferStock_41->qty_buffer == 0) {
                         $qty_process = $BufferStock_41->qty_process + $request->size_41;
 
                         $BufferStock_41->update([
-                            'qty_avaliable' => $qty_avaliable,
                             'qty_process' => $qty_process
                         ]);
-                    } else {
-                        return response()->json([
-                            'status' => 'failed',
-                            'message' => 'failed to update data',
-                            'message' => 'size 12 sold out'
-                        ], 400);
                     }
-                } elseif ($BufferStock_41->qty_buffer == 0) {
-                    $qty_process = $BufferStock_41->qty_process + $request->size_41;
-
-                    $BufferStock_41->update([
-                        'qty_process' => $qty_process
-                    ]);
                 }
             }
 
             $size_42 = Size::where('size', '42')->first();
-            $BufferStock_42 = BufferProduct::where([
-                'clothes_id' => $request->clothes_id,
-                'size_id' => $size_42->id
-            ])->first();
+            if ($size_42) {
+                $BufferStock_42 = BufferProduct::where([
+                    'clothes_id' => $request->clothes_id,
+                    'size_id' => $size_42->id
+                ])->first();
 
-            if ($BufferStock_42) {
-                if ($BufferStock_42->qty_buffer != 0) {
-                    if ($BufferStock_42->qty_avaliable >= $request->size_42) {
-                        $qty_avaliable = $BufferStock_42->qty_avaliable - $request->size_42;
+                if ($BufferStock_42) {
+                    if ($BufferStock_42->qty_buffer != 0) {
+                        if ($BufferStock_42->qty_avaliable >= $request->size_42) {
+                            $qty_avaliable = $BufferStock_42->qty_avaliable - $request->size_42;
+                            $qty_process = $BufferStock_42->qty_process + $request->size_42;
+
+                            $BufferStock_42->update([
+                                'qty_avaliable' => $qty_avaliable,
+                                'qty_process' => $qty_process
+                            ]);
+                        } else {
+                            return response()->json([
+                                'status' => 'failed',
+                                'message' => 'failed to update data',
+                                'message' => 'size 12 sold out'
+                            ], 400);
+                        }
+                    } elseif ($BufferStock_42->qty_buffer == 0) {
                         $qty_process = $BufferStock_42->qty_process + $request->size_42;
 
                         $BufferStock_42->update([
-                            'qty_avaliable' => $qty_avaliable,
                             'qty_process' => $qty_process
                         ]);
-                    } else {
-                        return response()->json([
-                            'status' => 'failed',
-                            'message' => 'failed to update data',
-                            'message' => 'size 12 sold out'
-                        ], 400);
                     }
-                } elseif ($BufferStock_42->qty_buffer == 0) {
-                    $qty_process = $BufferStock_42->qty_process + $request->size_42;
-
-                    $BufferStock_42->update([
-                        'qty_process' => $qty_process
-                    ]);
                 }
             }
 
@@ -1140,7 +1195,9 @@ class PreOrderController extends Controller
 
             DB::beginTransaction();
 
-            $size_s = Size::where('size', 'S')->first();
+            $size_s = Size::firstOrCreate([
+                'size' => 'S'
+            ]);
             $BufferStock_s = BufferProduct::where([
                 'clothes_id' => $temporary_storage->clothes_id,
                 'size_id' => $size_s->id
@@ -1205,7 +1262,9 @@ class PreOrderController extends Controller
                 }
             }
 
-            $size_m = Size::where('size', 'M')->first();
+            $size_m = Size::firstOrCreate([
+                'size' => 'M'
+            ]);
             $BufferStock_m = BufferProduct::where([
                 'clothes_id' => $request->clothes_id,
                 'size_id' => $size_m->id
@@ -1267,7 +1326,9 @@ class PreOrderController extends Controller
                 }
             }
 
-            $size_l = Size::where('size', 'l')->first();
+            $size_l = Size::firstOrCreate([
+                'size' => 'L'
+            ]);
             $BufferStock_l = BufferProduct::where([
                 'clothes_id' => $request->clothes_id,
                 'size_id' => $size_l->id
@@ -1331,7 +1392,9 @@ class PreOrderController extends Controller
                 }
             }
 
-            $size_xl = Size::where('size', 'xl')->first();
+            $size_xl = Size::firstOrCreate([
+                'size' => 'XL'
+            ]);
             $BufferStock_xl = BufferProduct::where([
                 'clothes_id' => $request->clothes_id,
                 'size_id' => $size_xl->id
@@ -1395,7 +1458,9 @@ class PreOrderController extends Controller
                 }
             }
 
-            $size_xxl = Size::where('size', 'xxl')->first();
+            $size_xxl = Size::firstOrCreate([
+                'size' => 'XXL'
+            ]);
             $BufferStock_xxl = BufferProduct::where([
                 'clothes_id' => $request->clothes_id,
                 'size_id' => $size_xxl->id
@@ -1461,7 +1526,9 @@ class PreOrderController extends Controller
                 }
             }
 
-            $size_xxxl = Size::where('size', 'xxxl')->first();
+            $size_xxxl = Size::firstOrCreate([
+                'size' => 'XXXL'
+            ]);
             $BufferStock_xxxl = BufferProduct::where([
                 'clothes_id' => $request->clothes_id,
                 'size_id' => $size_xxxl->id
@@ -1525,7 +1592,9 @@ class PreOrderController extends Controller
                 }
             }
 
-            $size_2 = Size::where('size', '2')->first();
+            $size_2 = Size::firstOrCreate([
+                'size' => '2'
+            ]);
             $BufferStock_2 = BufferProduct::where([
                 'clothes_id' => $request->clothes_id,
                 'size_id' => $size_2->id
@@ -1589,7 +1658,9 @@ class PreOrderController extends Controller
                 }
             }
 
-            $size_4 = Size::where('size', '4')->first();
+            $size_4 = Size::firstOrCreate([
+                'size' => '4'
+            ]);
             $BufferStock_4 = BufferProduct::where([
                 'clothes_id' => $request->clothes_id,
                 'size_id' => $size_4->id
@@ -1653,7 +1724,9 @@ class PreOrderController extends Controller
                 }
             }
 
-            $size_6 = Size::where('size', '6')->first();
+            $size_6 = Size::firstOrCreate([
+                'size' => '6'
+            ]);
             $BufferStock_6 = BufferProduct::where([
                 'clothes_id' => $request->clothes_id,
                 'size_id' => $size_6->id
@@ -1717,7 +1790,9 @@ class PreOrderController extends Controller
                 }
             }
 
-            $size_8 = Size::where('size', '8')->first();
+            $size_8 = Size::firstOrCreate([
+                'size' => '8'
+            ]);
             $BufferStock_8 = BufferProduct::where([
                 'clothes_id' => $request->clothes_id,
                 'size_id' => $size_8->id
@@ -1782,7 +1857,9 @@ class PreOrderController extends Controller
                 }
             }
 
-            $size_10 = Size::where('size', '10')->first();
+            $size_10 = Size::firstOrCreate([
+                'size' => '10'
+            ]);
             $BufferStock_10 = BufferProduct::where([
                 'clothes_id' => $request->clothes_id,
                 'size_id' => $size_10->id
@@ -1846,7 +1923,9 @@ class PreOrderController extends Controller
                 }
             }
 
-            $size_12 = Size::where('size', '12')->first();
+            $size_12 = Size::firstOrCreate([
+                'size' => '12'
+            ]);
             $BufferStock_12 = BufferProduct::where([
                 'clothes_id' => $request->clothes_id,
                 'size_id' => $size_12->id
@@ -1911,7 +1990,9 @@ class PreOrderController extends Controller
                 }
             }
 
-            $size_27 = Size::where('size', '27')->first();
+            $size_27 = Size::firstOrCreate([
+                'size' => '27'
+            ]);
             $BufferStock_27 = BufferProduct::where([
                 'clothes_id' => $request->clothes_id,
                 'size_id' => $size_27->id
@@ -1975,7 +2056,9 @@ class PreOrderController extends Controller
                 }
             }
 
-            $size_28 = Size::where('size', '28')->first();
+            $size_28 = Size::firstOrCreate([
+                'size' => '28'
+            ]);
             $BufferStock_28 = BufferProduct::where([
                 'clothes_id' => $request->clothes_id,
                 'size_id' => $size_28->id
@@ -2040,7 +2123,9 @@ class PreOrderController extends Controller
                 }
             }
 
-            $size_29 = Size::where('size', '29')->first();
+            $size_29 = Size::firstOrCreate([
+                'size' => '29'
+            ]);
             $BufferStock_29 = BufferProduct::where([
                 'clothes_id' => $request->clothes_id,
                 'size_id' => $size_29->id
@@ -2105,7 +2190,9 @@ class PreOrderController extends Controller
                 }
             }
 
-            $size_30 = Size::where('size', '30')->first();
+            $size_30 = Size::firstOrCreate([
+                'size' => '30'
+            ]);
             $BufferStock_30 = BufferProduct::where([
                 'clothes_id' => $request->clothes_id,
                 'size_id' => $size_30->id
@@ -2170,7 +2257,9 @@ class PreOrderController extends Controller
                 }
             }
 
-            $size_31 = Size::where('size', '31')->first();
+            $size_31 = Size::firstOrCreate([
+                'size' => '31'
+            ]);
             $BufferStock_31 = BufferProduct::where([
                 'clothes_id' => $request->clothes_id,
                 'size_id' => $size_31->id
@@ -2235,7 +2324,9 @@ class PreOrderController extends Controller
                 }
             }
 
-            $size_32 = Size::where('size', '32')->first();
+            $size_32 = Size::firstOrCreate([
+                'size' => '32'
+            ]);
             $BufferStock_32 = BufferProduct::where([
                 'clothes_id' => $request->clothes_id,
                 'size_id' => $size_32->id
@@ -2300,7 +2391,9 @@ class PreOrderController extends Controller
                 }
             }
 
-            $size_33 = Size::where('size', '33')->first();
+            $size_33 = Size::firstOrCreate([
+                'size' => '33'
+            ]);
             $BufferStock_33 = BufferProduct::where([
                 'clothes_id' => $request->clothes_id,
                 'size_id' => $size_33->id
@@ -2365,7 +2458,9 @@ class PreOrderController extends Controller
                 }
             }
 
-            $size_34 = Size::where('size', '34')->first();
+            $size_34 = Size::firstOrCreate([
+                'size' => '34'
+            ]);
             $BufferStock_34 = BufferProduct::where([
                 'clothes_id' => $request->clothes_id,
                 'size_id' => $size_34->id
@@ -2430,7 +2525,9 @@ class PreOrderController extends Controller
                 }
             }
 
-            $size_35 = Size::where('size', '35')->first();
+            $size_35 = Size::firstOrCreate([
+                'size' => '35'
+            ]);
             $BufferStock_35 = BufferProduct::where([
                 'clothes_id' => $request->clothes_id,
                 'size_id' => $size_35->id
@@ -2495,7 +2592,9 @@ class PreOrderController extends Controller
                 }
             }
 
-            $size_36 = Size::where('size', '36')->first();
+            $size_36 = Size::firstOrCreate([
+                'size' => '36'
+            ]);
             $BufferStock_36 = BufferProduct::where([
                 'clothes_id' => $request->clothes_id,
                 'size_id' => $size_36->id
@@ -2560,7 +2659,9 @@ class PreOrderController extends Controller
                 }
             }
 
-            $size_37 = Size::where('size', '37')->first();
+            $size_37 = Size::firstOrCreate([
+                'size' => '37'
+            ]);
             $BufferStock_37 = BufferProduct::where([
                 'clothes_id' => $request->clothes_id,
                 'size_id' => $size_37->id
@@ -2625,7 +2726,9 @@ class PreOrderController extends Controller
                 }
             }
 
-            $size_38 = Size::where('size', '38')->first();
+            $size_38 = Size::firstOrCreate([
+                'size' => '38'
+            ]);
             $BufferStock_38 = BufferProduct::where([
                 'clothes_id' => $request->clothes_id,
                 'size_id' => $size_38->id
@@ -2690,7 +2793,9 @@ class PreOrderController extends Controller
                 }
             }
 
-            $size_39 = Size::where('size', '39')->first();
+            $size_39 = Size::firstOrCreate([
+                'size' => '39'
+            ]);
             $BufferStock_39 = BufferProduct::where([
                 'clothes_id' => $request->clothes_id,
                 'size_id' => $size_39->id
@@ -2755,7 +2860,9 @@ class PreOrderController extends Controller
                 }
             }
 
-            $size_40 = Size::where('size', '40')->first();
+            $size_40 = Size::firstOrCreate([
+                'size' => '40'
+            ]);
             $BufferStock_40 = BufferProduct::where([
                 'clothes_id' => $request->clothes_id,
                 'size_id' => $size_40->id
@@ -2819,7 +2926,9 @@ class PreOrderController extends Controller
                 }
             }
 
-            $size_41 = Size::where('size', '41')->first();
+            $size_41 = Size::firstOrCreate([
+                'size' => '41'
+            ]);
             $BufferStock_41 = BufferProduct::where([
                 'clothes_id' => $request->clothes_id,
                 'size_id' => $size_41->id
@@ -2884,7 +2993,9 @@ class PreOrderController extends Controller
                 }
             }
 
-            $size_42 = Size::where('size', '42')->first();
+            $size_42 = Size::firstOrCreate([
+                'size' => '42'
+            ]);
             $BufferStock_42 = BufferProduct::where([
                 'clothes_id' => $request->clothes_id,
                 'size_id' => $size_42->id
@@ -3091,7 +3202,9 @@ class PreOrderController extends Controller
 
             DB::beginTransaction();
 
-            $size_s = Size::where('size', 's')->first();
+            $size_s = Size::firstOrCreate([
+                'size' => 'S'
+            ]);
             $BufferStock_s = BufferProduct::where([
                 'clothes_id' => $detailCart->clothes_id,
                 'size_id' => $size_s->id
@@ -3115,7 +3228,9 @@ class PreOrderController extends Controller
                 }
             }
 
-            $size_m = Size::where('size', 'm')->first();
+            $size_m = Size::firstOrCreate([
+                'size' => 'M'
+            ]);
             $BufferStock_m = BufferProduct::where([
                 'clothes_id' => $detailCart->clothes_id,
                 'size_id' => $size_m->id
@@ -3139,7 +3254,9 @@ class PreOrderController extends Controller
                 }
             }
 
-            $size_l = Size::where('size', 'l')->first();
+            $size_l = Size::firstOrCreate([
+                'size' => 'L'
+            ]);
             $BufferStock_l = BufferProduct::where([
                 'clothes_id' => $detailCart->clothes_id,
                 'size_id' => $size_l->id
@@ -3163,7 +3280,9 @@ class PreOrderController extends Controller
                 }
             }
 
-            $size_xl = Size::where('size', 'xl')->first();
+            $size_xl = Size::firstOrCreate([
+                'size' => 'XL'
+            ]);
             $BufferStock_xl = BufferProduct::where([
                 'clothes_id' => $detailCart->clothes_id,
                 'size_id' => $size_xl->id
@@ -3187,7 +3306,9 @@ class PreOrderController extends Controller
                 }
             }
 
-            $size_xxl = Size::where('size', 'xxl')->first();
+            $size_xxl = Size::firstOrCreate([
+                'size' => 'XXL'
+            ]);
             $BufferStock_xxl = BufferProduct::where([
                 'clothes_id' => $detailCart->clothes_id,
                 'size_id' => $size_xxl->id
@@ -3198,20 +3319,22 @@ class PreOrderController extends Controller
                     $qty_avaliable = $BufferStock_xxl->qty_avaliable + $detailCart->size_xxl;
                     $qty_process = $BufferStock_xxl->qty_process - $detailCart->size_xxl;
 
-                    $BufferStock_xl->update([
+                    $BufferStock_xxl->update([
                         'qty_avaliable' => $qty_avaliable,
                         'qty_proccess' => $qty_process
                     ]);
                 } elseif ($BufferStock_xxl->qty_buffer == 0) {
                     $qty_process = $BufferStock_xxl->qty_process - $detailCart->size_xxl;
 
-                    $BufferStock_xl->update([
+                    $BufferStock_xxl->update([
                         'qty_proccess' => $qty_process
                     ]);
                 }
             }
 
-            $size_xxxl = Size::where('size', 'xxxl')->first();
+            $size_xxxl = Size::firstOrCreate([
+                'size' => 'XXXL'
+            ]);
             $BufferStock_xxxl = BufferProduct::where([
                 'clothes_id' => $detailCart->clothes_id,
                 'size_id' => $size_xxxl->id
@@ -3236,7 +3359,9 @@ class PreOrderController extends Controller
                 }
             }
 
-            $size_2 = Size::where('size', '2')->first();
+            $size_2 = Size::firstOrCreate([
+                'size' => '2'
+            ]);
             $BufferStock_2 = BufferProduct::where([
                 'clothes_id' => $detailCart->clothes_id,
                 'size_id' => $size_2->id
@@ -3260,7 +3385,9 @@ class PreOrderController extends Controller
                 }
             }
 
-            $size_4 = Size::where('size', '4')->first();
+            $size_4 = Size::firstOrCreate([
+                'size' => '4'
+            ]);
             $BufferStock_4 = BufferProduct::where([
                 'clothes_id' => $detailCart->clothes_id,
                 'size_id' => $size_4->id
@@ -3284,7 +3411,9 @@ class PreOrderController extends Controller
                 }
             }
 
-            $size_6 = Size::where('size', '6')->first();
+            $size_6 = Size::firstOrCreate([
+                'size' => '6'
+            ]);
             $BufferStock_6 = BufferProduct::where([
                 'clothes_id' => $detailCart->clothes_id,
                 'size_id' => $size_6->id
@@ -3308,7 +3437,9 @@ class PreOrderController extends Controller
                 }
             }
 
-            $size_8 = Size::where('size', '8')->first();
+            $size_8 = Size::firstOrCreate([
+                'size' => '8'
+            ]);
             $BufferStock_8 = BufferProduct::where([
                 'clothes_id' => $detailCart->clothes_id,
                 'size_id' => $size_8->id
@@ -3332,7 +3463,9 @@ class PreOrderController extends Controller
                 }
             }
 
-            $size_10 = Size::where('size', '10')->first();
+            $size_10 = Size::firstOrCreate([
+                'size' => '10'
+            ]);
             $BufferStock_10 = BufferProduct::where([
                 'clothes_id' => $detailCart->clothes_id,
                 'size_id' => $size_10->id
@@ -3356,7 +3489,9 @@ class PreOrderController extends Controller
                 }
             }
 
-            $size_12 = Size::where('size', '12')->first();
+            $size_12 = Size::firstOrCreate([
+                'size' => '12'
+            ]);
             $BufferStock_12 = BufferProduct::where([
                 'clothes_id' => $detailCart->clothes_id,
                 'size_id' => $size_12->id
@@ -3380,7 +3515,9 @@ class PreOrderController extends Controller
                 }
             }
 
-            $size_27 = Size::where('size', '27')->first();
+            $size_27 = Size::firstOrCreate([
+                'size' => '27'
+            ]);
             $BufferStock_27 = BufferProduct::where([
                 'clothes_id' => $detailCart->clothes_id,
                 'size_id' => $size_27->id
@@ -3404,7 +3541,9 @@ class PreOrderController extends Controller
                 }
             }
 
-            $size_28 = Size::where('size', '28')->first();
+            $size_28 = Size::firstOrCreate([
+                'size' => '28'
+            ]);
             $BufferStock_28 = BufferProduct::where([
                 'clothes_id' => $detailCart->clothes_id,
                 'size_id' => $size_28->id
@@ -3428,7 +3567,9 @@ class PreOrderController extends Controller
                 }
             }
 
-            $size_29 = Size::where('size', '29')->first();
+            $size_29 = Size::firstOrCreate([
+                'size' => '29'
+            ]);
             $BufferStock_29 = BufferProduct::where([
                 'clothes_id' => $detailCart->clothes_id,
                 'size_id' => $size_29->id
@@ -3452,7 +3593,9 @@ class PreOrderController extends Controller
                 }
             }
 
-            $size_30 = Size::where('size', '30')->first();
+            $size_30 = Size::firstOrCreate([
+                'size' => '30'
+            ]);
             $BufferStock_30 = BufferProduct::where([
                 'clothes_id' => $detailCart->clothes_id,
                 'size_id' => $size_30->id
@@ -3476,7 +3619,9 @@ class PreOrderController extends Controller
                 }
             }
 
-            $size_30 = Size::where('size', '30')->first();
+            $size_30 = Size::firstOrCreate([
+                'size' => '30'
+            ]);
             $BufferStock_30 = BufferProduct::where([
                 'clothes_id' => $detailCart->clothes_id,
                 'size_id' => $size_30->id
@@ -3500,7 +3645,9 @@ class PreOrderController extends Controller
                 }
             }
 
-            $size_31 = Size::where('size', '31')->first();
+            $size_31 = Size::firstOrCreate([
+                'size' => '31'
+            ]);
             $BufferStock_31 = BufferProduct::where([
                 'clothes_id' => $detailCart->clothes_id,
                 'size_id' => $size_31->id
@@ -3524,7 +3671,9 @@ class PreOrderController extends Controller
                 }
             }
 
-            $size_32 = Size::where('size', '32')->first();
+            $size_32 = Size::firstOrCreate([
+                'size' => '32'
+            ]);
             $BufferStock_32 = BufferProduct::where([
                 'clothes_id' => $detailCart->clothes_id,
                 'size_id' => $size_32->id
@@ -3548,7 +3697,9 @@ class PreOrderController extends Controller
                 }
             }
 
-            $size_33 = Size::where('size', '33')->first();
+            $size_33 = Size::firstOrCreate([
+                'size' => '33'
+            ]);
             $BufferStock_33 = BufferProduct::where([
                 'clothes_id' => $detailCart->clothes_id,
                 'size_id' => $size_33->id
@@ -3572,7 +3723,9 @@ class PreOrderController extends Controller
                 }
             }
 
-            $size_34 = Size::where('size', '34')->first();
+            $size_34 = Size::firstOrCreate([
+                'size' => '34'
+            ]);
             $BufferStock_34 = BufferProduct::where([
                 'clothes_id' => $detailCart->clothes_id,
                 'size_id' => $size_34->id
@@ -3596,7 +3749,9 @@ class PreOrderController extends Controller
                 }
             }
 
-            $size_35 = Size::where('size', '35')->first();
+            $size_35 = Size::firstOrCreate([
+                'size' => '35'
+            ]);
             $BufferStock_35 = BufferProduct::where([
                 'clothes_id' => $detailCart->clothes_id,
                 'size_id' => $size_35->id
@@ -3620,7 +3775,9 @@ class PreOrderController extends Controller
                 }
             }
 
-            $size_36 = Size::where('size', '36')->first();
+            $size_36 = Size::firstOrCreate([
+                'size' => '36'
+            ]);
             $BufferStock_36 = BufferProduct::where([
                 'clothes_id' => $detailCart->clothes_id,
                 'size_id' => $size_36->id
@@ -3644,7 +3801,9 @@ class PreOrderController extends Controller
                 }
             }
 
-            $size_37 = Size::where('size', '37')->first();
+            $size_37 = Size::firstOrCreate([
+                'size' => '37'
+            ]);
             $BufferStock_37 = BufferProduct::where([
                 'clothes_id' => $detailCart->clothes_id,
                 'size_id' => $size_37->id
@@ -3668,7 +3827,9 @@ class PreOrderController extends Controller
                 }
             }
 
-            $size_38 = Size::where('size', '38')->first();
+            $size_38 = Size::firstOrCreate([
+                'size' => '38'
+            ]);
             $BufferStock_38 = BufferProduct::where([
                 'clothes_id' => $detailCart->clothes_id,
                 'size_id' => $size_38->id
@@ -3692,7 +3853,9 @@ class PreOrderController extends Controller
                 }
             }
 
-            $size_39 = Size::where('size', '39')->first();
+            $size_39 = Size::firstOrCreate([
+                'size' => '39'
+            ]);
             $BufferStock_39 = BufferProduct::where([
                 'clothes_id' => $detailCart->clothes_id,
                 'size_id' => $size_39->id
@@ -3716,7 +3879,9 @@ class PreOrderController extends Controller
                 }
             }
 
-            $size_40 = Size::where('size', '40')->first();
+            $size_40 = Size::firstOrCreate([
+                'size' => '40'
+            ]);
             $BufferStock_40 = BufferProduct::where([
                 'clothes_id' => $detailCart->clothes_id,
                 'size_id' => $size_40->id
@@ -3740,7 +3905,9 @@ class PreOrderController extends Controller
                 }
             }
 
-            $size_41 = Size::where('size', '41')->first();
+            $size_41 = Size::firstOrCreate([
+                'size' => '41'
+            ]);
             $BufferStock_41 = BufferProduct::where([
                 'clothes_id' => $detailCart->clothes_id,
                 'size_id' => $size_41->id
@@ -3764,7 +3931,9 @@ class PreOrderController extends Controller
                 }
             }
 
-            $size_42 = Size::where('size', '42')->first();
+            $size_42 = Size::firstOrCreate([
+                'size' => '42'
+            ]);
             $BufferStock_42 = BufferProduct::where([
                 'clothes_id' => $detailCart->clothes_id,
                 'size_id' => $size_42->id

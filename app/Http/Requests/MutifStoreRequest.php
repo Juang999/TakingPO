@@ -37,7 +37,6 @@ class MutifStoreRequest extends FormRequest
             'fax' => 'required',
             'addr_type' => 'required',
             'zip' => 'required',
-            'comment' => 'required'
         ];
     }
 }

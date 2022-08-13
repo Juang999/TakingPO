@@ -15,15 +15,15 @@ class TypeSeeder extends Seeder
     {
         DB::table('types')->insert([
             [
-                'type' => 'BAJU DEWASA'
+                'type' => 'Baju Anak'
             ],[
-                'type' => 'CELANA DEWASA'
+                'type' => 'Baju Dewasa'
             ],[
-                'type' => 'CELANA ANAK'
+                'type' => 'Celana Anak'
             ],[
-                'type' => 'CELANA ANAK'
+                'type' => 'Celana Dewasa'
             ],[
-                'type' => 'LAINNYA'
+                'type' => 'Lainnya'
             ]
         ]);
     }
