@@ -4,11 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Schema;
-use App\Distributor;
-use App\TableName;
-use App\Transaction;
+use App\{Distributor, TableName, Transaction};
 
 class TotalPreOrderController extends Controller
 {
@@ -19,7 +15,12 @@ class TotalPreOrderController extends Controller
      */
     public function index()
     {
-        $table_names = TableName::with('Distributor')->get();
+        $table_names = TableName::whereIn('distributor_id', function ($query) {
+            $query->select('id')
+                ->from('distributors')
+                ->where('partner_group_id', 1)
+                ->get();
+        })->with('Distributor')->get();
         if (!$table_names) {
             return response([
                 'message' => 'No Order'
@@ -31,8 +32,11 @@ class TotalPreOrderController extends Controller
             // $total_preorder = DB::table($table_name->table_name)->select(DB::raw('SUM('.$table_name->table_name.'.size_s + '.$table_name->table_name.'.size_m + '.$table_name->table_name.'.size_l + '.$table_name->table_name.'.size_xl + '.$table_name->table_name.'.size_xxl + '.$table_name->table_name.'.size_xxxl + '.$table_name->table_name.'.size_2 + '.$table_name->table_name.'.size_4 + '.$table_name->table_name.'.size_6 + '.$table_name->table_name.'.size_8 + '.$table_name->table_name.'.size_10 + '.$table_name->table_name.'.size_12) AS total'))->get();
             // $table_name['total_preorder'] = $total_preorder[0]->total;
 
-            $transaction_count = Transaction::where('distributor_id', $table_name->Distributor->id)->get();
-            $table_name['total_preorder'] = $transaction_count->count();
+            $table_name['total_preorder'] = Transaction::where('distributor_id', $table_name->Distributor->id)->count();
+            $agent = Distributor::where('distributor_id', $table_name->distributor_id)->get();
+                if ($agent->count() >= 1) {
+                    $table_name['agent'] = $agent;
+                }
 
             $table_name->Distributor->makeHidden(['image', 'address']);
         }
@@ -78,13 +82,13 @@ class TotalPreOrderController extends Controller
                 'status' => 'success',
                 'message' => 'success get PO distributor',
                 'data' => $data
-            ]);
+            ], 200);
         } catch (\Throwable $th) {
             return response()->json([
                 'status' => 'success',
                 'message' => 'success get PO distributor',
                 'error' => $th->getMessage()
-            ]);
+            ], 400);
         }
     }
 
