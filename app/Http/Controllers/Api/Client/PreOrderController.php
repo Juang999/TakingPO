@@ -2,17 +2,11 @@
 
 namespace App\Http\Controllers\Api\Client;
 
-use App\BufferProduct;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Clothes;
-use App\Distributor;
 use App\Http\Requests\PreOrderRequest;
-use App\IsActive;
-use App\Size;
-use App\TemporaryStorage;
+use App\{IsActive, MutifStoreMaster, Size, TemporaryStorage, Distributor, Clothes, BufferProduct};
 use Illuminate\Support\Facades\DB;
-use malkusch\lock\mutex\Mutex;
 
 class PreOrderController extends Controller
 {
@@ -39,6 +33,15 @@ class PreOrderController extends Controller
             return response()->json([
                 'status' => 'failed to get data',
                 'message' => 'phone '.$phone.' not registered'
+            ], 400);
+        }
+
+        $MS = MutifStoreMaster::where('distributor_id', $user->id)->count();
+
+        if ($MS == 0) {
+            return response()->json([
+                'status' => 'failed',
+                'message' => 'Akun ini belum memiliki MS'
             ], 400);
         }
 
@@ -131,13 +134,13 @@ class PreOrderController extends Controller
                     'clothes_id' => $request->clothes_id,
                     'size_id' => $size_m->id
                 ])->first();
-    
+
                 if ($BufferStock_m) {
                     if ($BufferStock_m->qty_buffer != 0) {
                         if ($BufferStock_m->qty_avaliable >= $request->size_m) {
                             $qty_avaliable = $BufferStock_m->qty_avaliable - $request->size_m;
                             $qty_process = $BufferStock_m->qty_process + $request->size_m;
-    
+
                             $BufferStock_m->update([
                                 'qty_avaliable' => $qty_avaliable,
                                 'qty_process' => $qty_process
@@ -150,7 +153,7 @@ class PreOrderController extends Controller
                         }
                     } elseif ($BufferStock_m->qty_buffer == 0) {
                         $qty_process = $BufferStock_m->qty_process + $request->size_m;
-    
+
                         $BufferStock_m->update([
                             'qty_process' => $qty_process
                         ]);
@@ -164,13 +167,13 @@ class PreOrderController extends Controller
                     'clothes_id' => $request->clothes_id,
                     'size_id' => $size_l->id
                 ])->first();
-    
+
                 if ($BufferStock_l) {
                     if ($BufferStock_l->qty_buffer != 0) {
                         if ($BufferStock_l->qty_avaliable >= $request->size_l) {
                             $qty_avaliable = $BufferStock_l->qty_avaliable - $request->size_l;
                             $qty_process = $BufferStock_l->qty_process + $request->size_l;
-    
+
                             $BufferStock_l->update([
                                 'qty_avaliable' => $qty_avaliable,
                                 'qty_process' => $qty_process
@@ -184,7 +187,7 @@ class PreOrderController extends Controller
                         }
                     } elseif ($BufferStock_l->qty_buffer == 0) {
                         $qty_process = $BufferStock_l->qty_process + $request->size_l;
-    
+
                         $BufferStock_l->update([
                             'qty_process' => $qty_process
                         ]);
@@ -198,13 +201,13 @@ class PreOrderController extends Controller
                     'clothes_id' => $request->clothes_id,
                     'size_id' => $size_xl->id
                 ])->first();
-    
+
                 if ($BufferStock_xl) {
                     if ($BufferStock_xl->qty_buffer != 0) {
                         if ($BufferStock_xl->qty_avaliable >= $request->size_xl) {
                             $qty_avaliable = $BufferStock_xl->qty_avaliable - $request->size_xl;
                             $qty_process = $BufferStock_xl->qty_process + $request->size_xl;
-    
+
                             $BufferStock_xl->update([
                                 'qty_avaliable' => $qty_avaliable,
                                 'qty_process' => $qty_process
@@ -218,7 +221,7 @@ class PreOrderController extends Controller
                         }
                     } elseif ($BufferStock_xl->qty_buffer == 0) {
                         $qty_process = $BufferStock_xl->qty_process + $request->size_xl;
-    
+
                         $BufferStock_xl->update([
                             'qty_process' => $qty_process
                         ]);
@@ -232,13 +235,13 @@ class PreOrderController extends Controller
                     'clothes_id' => $request->clothes_id,
                     'size_id' => $size_xxl->id
                 ])->first();
-    
+
                 if ($BufferStock_xxl) {
                     if ($BufferStock_xxl->qty_buffer != 0) {
                         if ($BufferStock_xxl->qty_avaliable >= $request->size_xxl) {
                             $qty_avaliable = $BufferStock_xxl->qty_avaliable - $request->size_xxl;
                             $qty_process = $BufferStock_xxl->qty_process + $request->size_xxl;
-    
+
                             $BufferStock_xxl->update([
                                 'qty_avaliable' => $qty_avaliable,
                                 'qty_process' => $qty_process
@@ -252,7 +255,7 @@ class PreOrderController extends Controller
                         }
                     } elseif ($BufferStock_xxl->qty_buffer == 0) {
                         $qty_process = $BufferStock_xxl->qty_process + $request->size_xxl;
-    
+
                         $BufferStock_xxl->update([
                             'qty_process' => $qty_process
                         ]);
@@ -266,13 +269,13 @@ class PreOrderController extends Controller
                     'clothes_id' => $request->clothes_id,
                     'size_id' => $size_xxxl->id
                 ])->first();
-    
+
                 if ($BufferStock_xxxl) {
                     if ($BufferStock_xxxl->qty_buffer != 0) {
                         if ($BufferStock_xxxl->qty_avaliable >= $request->size_xxxl) {
                             $qty_avaliable = $BufferStock_xxxl->qty_avaliable - $request->size_xxxl;
                             $qty_process = $BufferStock_xxxl->qty_process + $request->size_xxxl;
-    
+
                             $BufferStock_xxxl->update([
                                 'qty_avaliable' => $qty_avaliable,
                                 'qty_process' => $qty_process
@@ -286,7 +289,7 @@ class PreOrderController extends Controller
                         }
                     } elseif ($BufferStock_xxxl->qty_buffer == 0) {
                         $qty_process = $BufferStock_xxxl->qty_process + $request->size_xxxl;
-    
+
                         $BufferStock_xxxl->update([
                             'qty_process' => $qty_process
                         ]);
@@ -976,7 +979,7 @@ class PreOrderController extends Controller
             }
 
             $size_41 = Size::where('size', '41')->first();
-            if ($size_41) {   
+            if ($size_41) {
                 $BufferStock_41 = BufferProduct::where([
                     'clothes_id' => $request->clothes_id,
                     'size_id' => $size_41->id

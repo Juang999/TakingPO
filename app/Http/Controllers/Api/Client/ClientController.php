@@ -28,28 +28,31 @@ class ClientController extends Controller
 
         $phone_number = Phone::where('phone_number', '=', $phone)->first();
 
+        if ($phone_number == NULL) {
+            return response()->json([
+                'status' => 'failed',
+                'pesan' => 'nomor tidak ada'
+            ]);
+        } elseif ($phone_number->approved == 0) {
+            return response()->json([
+                'status' => 'waiting',
+                'message' => 'menunggu persetujuan dari admin'
+            ], 200);
+        } elseif ($phone_number->is_active == 0) {
+            return response()->json([
+                'status' => 'waiting',
+                'message' => 'kamu sudah mengganti nomor'
+            ], 200);
+        }
+
         $user = Distributor::where('id', $phone_number->distributor_id)
                             ->with('PartnerAddress', 'MutifStoreMaster.MutifStoreAddress')
                             ->first();
 
-        $new_phone_number = Phone::where([
-            ['distributor_id', '=', $user->id],
-            ['is_active', '=', 0],
-            ['approved', '=', 0]
-            ])->latest()->first();
-
-            
-            if ($new_phone_number && $phone == $new_phone_number->phone_number && $new_phone_number->is_active == 0) {
-            return response()->json([
-                'status' => 'waiting',
-                'message' => 'waiting for approval admin'
-            ], 200);
-        }
-        
         if (!$user) {
             return response()->json([
                 'status' => 'failed',
-                'message' => 'user '.$phone.' not registered'
+                'message' => 'pengguna '.$phone.' tidak terdaftar'
             ], 400);
         }
 
@@ -62,7 +65,7 @@ class ClientController extends Controller
                 'message' => 'the web is being closed'
             ], 400);
         } elseif ($activate && $activate->name == 'ACTIVE') {
-            // when web is being closed            
+            // when web is being closed
             return response()->json([
                 'status' => 'success',
                 'message' => 'hello '.$user->name,
@@ -128,18 +131,16 @@ class ClientController extends Controller
 
     public function UpdatePhone(Request $request, $phone)
     {
-        $user = Distributor::where('phone', $phone)->first();
+        try {
+            $user = Distributor::where('phone', $phone)->first();
 
-        $log_phone = new Phone;
+            if (!$user) {
+                return response()->json([
+                    'status' => 'rejected',
+                    'message' => 'user not found!'
+                ], 300);
+            }
 
-        if (!$user) {
-            return response()->json([
-                'status' => 'rejected',
-                'message' => 'user not found!'
-            ], 300);
-        }
-
-        if ($user->partner_group_id == 1 ) {
             $validator = Validator::make($request->all(), [
                 'new_phone_number' => 'required'
             ]);
@@ -150,72 +151,37 @@ class ClientController extends Controller
 
             $phone = Phone::where('distributor_id', $user->id)->latest();
 
-                Phone::create([
+            DB::beginTransaction();
+                $newPhoneNumber = Phone::create([
                     'distributor_id' => $user->id,
                     'phone_number' => $request->new_phone_number,
                     'is_active' => 0,
                     'approved' => 0
                 ]);
 
+                $modelPhone = new Phone();
+
                 activity()->causedBy($user)
-                            ->performedOn($phone)
+                            ->performedOn($modelPhone)
                             ->withProperties([
                                 'attributes' => [
-                                    'phone_number' => $phone->phone_number
+                                    'phone_number' => $newPhoneNumber->phone_number
                                 ]
                             ])->log('created');
 
-                return response()->json([
-                    'status' => 'success',
-                    'message' => 'wait for approval from admin',
-                ], 200);
-
-        } else if ($user->partner_group_id == 2 || $user->partner_group_id == 3) {
-            $validator = Validator::make($request->all(), [
-                'ms_code' => 'required',
-                'new_phone_number' => 'required'
-            ]);
-
-            if ($validator->fails()) {
-                return response()->json($validator->errors()->toJson(), 400);
-            }
-
-            // checking MS/PM
-            $mutif_store = MutifStoreMaster::where('mutif_store_code', $request->ms_code)->first();
-
-            if (!$mutif_store) {
-                return response()->json([
-                    'status' => 'rejected!',
-                    'message' => 'mutif store not found!'
-                ], 400);
-            }
-
-            // Update Phone
-            if ($mutif_store->mutif_store_code == $request->ms_code) {
-                    $phone = Phone::create([
-                        'distributor_id' => $user->id,
-                        'phone_number' => $request->new_phone_number,
-                        'is_active' => 0,
-                        'approved' => 0
-                    ]);
-
-                    activity()->causedBy($user)
-                            ->performedOn($phone)
-                            ->withProperties([
-                                'attributes' => [
-                                    'phone_number' => $phone->phone_number
-                                ]
-                            ])->log('created');
-
-                    return response()->json([
-                        'status' => 'success',
-                        'message' => 'wait for approval from admin',
-                    ], 200);
-            }
-
+            DB::commit();
             return response()->json([
-                'status' => 'success',
-                'message' => 'wait for approval from admin',
+                'status' => 'berhasil',
+                'pesan' => 'menunggu persetujuan dari adamin',
+            ], 200);
+        } catch (\Throwable $th) {
+            DB::rollBack();
+            return response()->json([
+                'status' => 'gagal',
+                'pesan' => 'gagal update nomor',
+                'error' => $th->getMessage(),
+                'baris' => $th->getLine(),
+                'file' => $th->getFile()
             ], 200);
         }
     }
@@ -233,7 +199,7 @@ class ClientController extends Controller
 
     public function PartnerGroup()
     {
-        $partner_group = PartnerGroup::get();
+        $partner_group = PartnerGroup::where('prtnr_code', '!=', 'DB')->get();
 
         return response()->json([
             'status' => 'success',
