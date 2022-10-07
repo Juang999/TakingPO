@@ -110,8 +110,6 @@ class DistributorController extends Controller
 
         $agents = Distributor::where('distributor_id', $data->id)->get(['id', 'name']);
 
-        // return response()->json($agents);
-        // dd($agents);
         foreach ($agents as $agent) {
             $ms_code = MutifStoreMaster::where('distributor_id', $agent->id)->first('mutif_store_code');
             if ($ms_code) {
@@ -120,7 +118,6 @@ class DistributorController extends Controller
                 $agent['ms_code'] = '-';
             }
         }
-
 
         $data['agent'] = $agents;
 
