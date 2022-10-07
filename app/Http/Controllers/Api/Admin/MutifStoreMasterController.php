@@ -9,6 +9,7 @@ use App\MutifStoreMaster;
 use Illuminate\Http\Request;
 use App\Requests\MutifStoreRequest;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class MutifStoreMasterController extends Controller
 {
@@ -47,45 +48,48 @@ class MutifStoreMasterController extends Controller
         $user = Distributor::find($request->agent_id);
 
         try {
-            $MutifStoreMaster = MutifStoreMaster::create([
-                'mutif_store_name' => $request->ms_ms_name,
-                'mutif_store_code' => $request->ms_code,
-                'group_code' => $user->group_code,
-                'distributor_id' => $user->id,
-                'partner_group_id' => $user->partner_group_id,
-                'open_date' => $request->open_date,
-                'status' => $request->status,
-                'msdp' => $request->msdp
-            ]);
+            DB::beginTransaction();
+                $MutifStoreMaster = MutifStoreMaster::create([
+                    'mutif_store_name' => $request->ms_ms_name,
+                    'mutif_store_code' => $request->ms_code,
+                    'group_code' => $user->group_code,
+                    'distributor_id' => $user->id,
+                    'partner_group_id' => $user->partner_group_id,
+                    'open_date' => $request->open_date,
+                    'status' => $request->status,
+                    'msdp' => $request->msdp
+                ]);
 
-            $MutfStoreAddress = MutifStoreAddress::create([
-                'mutif_store_master_id' => $MutifStoreMaster->id,
-                'address' => $request->address,
-                'province' => $request->province,
-                'regency' => $request->regency,
-                'district' => $request->district,
-                'phone_1' => $user->phone,
-                'phone_2' => $request->phone,
-                'fax_1' => $request->fax,
-                'addr_type' => $request->addr_type,
-                'zip' => $request->zip,
-                'comment' => $request->comment
-            ]);
+                $MutfStoreAddress = MutifStoreAddress::create([
+                    'mutif_store_master_id' => $MutifStoreMaster->id,
+                    'address' => $request->address,
+                    'province' => $request->province,
+                    'regency' => $request->regency,
+                    'district' => $request->district,
+                    'phone_1' => $user->phone,
+                    'phone_2' => $request->phone,
+                    'fax_1' => $request->fax,
+                    'addr_type' => $request->addr_type,
+                    'zip' => $request->zip,
+                    'comment' => $request->comment
+                ]);
 
-            activity()->causedBy(Auth::user())
-            ->performedOn($MutifStoreMaster)
-            ->withProperties([
-                'attributes' => [
-                    'mutif_store_name' => $MutifStoreMaster->mutif_store_name,
-                    'mutif_store_code' => $MutifStoreMaster->mutif_store_code
-                ]
-            ])->log('created');
+                activity()->causedBy(Auth::user())
+                ->performedOn($MutifStoreMaster)
+                ->withProperties([
+                    'attributes' => [
+                        'mutif_store_name' => $MutifStoreMaster->mutif_store_name,
+                        'mutif_store_code' => $MutifStoreMaster->mutif_store_code
+                    ]
+                ])->log('created');
 
+            DB::commit();
             return response()->json([
                 'status' => 'success',
                 'message' => 'success to create MS',
             ], 200);
         } catch (\Throwable $th) {
+            DB::rollBack();
             return response()->json([
                 'status' => 'failed',
                 'message' => 'failed to create MS',
