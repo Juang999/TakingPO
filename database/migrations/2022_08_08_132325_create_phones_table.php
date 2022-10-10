@@ -16,7 +16,7 @@ class CreatePhonesTable extends Migration
         Schema::create('phones', function (Blueprint $table) {
             $table->id();
             $table->integer('distributor_id')->constrained('distributors');
-            $table->string('phone_number');
+            $table->string('phone_number')->unique();
             $table->boolean('is_active')->default(0);
             $table->boolean('approved')->default(0);
             $table->timestamps();
