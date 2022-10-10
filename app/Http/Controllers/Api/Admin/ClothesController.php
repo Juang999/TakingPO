@@ -79,6 +79,7 @@ class ClothesController extends Controller
                     'size_8' => $request->size_8,
                     'size_10' => $request->size_10,
                     'size_12' => $request->size_12,
+                    'category' => $request->category
                 ]);
 
                 Queue::create([
