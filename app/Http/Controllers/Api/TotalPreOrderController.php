@@ -15,36 +15,37 @@ class TotalPreOrderController extends Controller
      */
     public function index()
     {
-        $table_names = TableName::whereIn('distributor_id', function ($query) {
-            $query->select('id')
-                ->from('distributors')
-                ->where('partner_group_id', 1)
-                ->get();
-        })->with('Distributor')->get();
-        if (!$table_names) {
+        $distributors = Distributor::where('partner_group_id', 1)->get();
+
+        if (!$distributors) {
             return response([
                 'message' => 'No Order'
             ], 200);
         }
 
         try {
-        foreach ($table_names as $table_name) {
+        foreach ($distributors as $distributor) {
             // $total_preorder = DB::table($table_name->table_name)->select(DB::raw('SUM('.$table_name->table_name.'.size_s + '.$table_name->table_name.'.size_m + '.$table_name->table_name.'.size_l + '.$table_name->table_name.'.size_xl + '.$table_name->table_name.'.size_xxl + '.$table_name->table_name.'.size_xxxl + '.$table_name->table_name.'.size_2 + '.$table_name->table_name.'.size_4 + '.$table_name->table_name.'.size_6 + '.$table_name->table_name.'.size_8 + '.$table_name->table_name.'.size_10 + '.$table_name->table_name.'.size_12) AS total'))->get();
             // $table_name['total_preorder'] = $total_preorder[0]->total;
 
-            $table_name['total_preorder'] = Transaction::where('distributor_id', $table_name->Distributor->id)->count();
-            $agent = Distributor::where('distributor_id', $table_name->distributor_id)->get();
-                if ($agent->count() >= 1) {
-                    $table_name['agent'] = $agent;
-                }
+            // $distributor['total_transaction'] = Transaction::where('distributor_id', $distributor->id)->count();
+            $agents = Distributor::where('distributor_id', $distributor->id)->with('MutifStoreMaster')->get();
 
-            $table_name->Distributor->makeHidden(['image', 'address']);
+            foreach ($agents as $agent) {
+                $agent['total_transaction'] = Transaction::where('distributor_id', $agent->id)->count();
+            }
+
+                if ($agents->count() >= 1) {
+                    $distributor['agent'] = $agents;
+                } else {
+                    $distributor['agent'] = [];
+                }
         }
 
             return response()->json([
             'status' => 'success',
             'message' => 'success get data',
-            'data' => $table_names,
+            'data' => $distributors,
         ], 200);
 
         } catch (\Throwable $th) {

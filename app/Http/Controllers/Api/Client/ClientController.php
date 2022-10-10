@@ -2,19 +2,12 @@
 
 namespace App\Http\Controllers\Api\Client;
 
-use App\IsActive;
-use App\Distributor;
-use App\PartnerGroup;
-use App\TemporaryStorage;
+
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\AddressRequest;
-use App\Http\Requests\RegisterRequest;
-use App\MutifStoreMaster;
-use App\PartnerAddress;
-use App\Phone;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\{DB, Validator};
+use App\Http\Requests\{RegisterRequest, AddressRequest};
+use App\{IsActive, Distributor, PartnerGroup, TemporaryStorage, PartnerAddress, Phone};
 
 class ClientController extends Controller
 {
@@ -26,7 +19,7 @@ class ClientController extends Controller
             ], 400);
         }
 
-        $phone_number = Phone::where('phone_number', '=', $phone)->first();
+        $phone_number = Phone::where('phone_number', $phone)->first();
 
         if ($phone_number == NULL) {
             return response()->json([
@@ -98,6 +91,15 @@ class ClientController extends Controller
         try {
             $partner_group = PartnerGroup::where('id', $request->partner_group_id)->first();
 
+            $existClient = Distributor::where('phone', $request->phone)->first();
+
+            if ($existClient) {
+                return response()->json([
+                    'status' => 'gagal',
+                    'message' => 'nomor sudah teregistrasi'
+                ], 300);
+            }
+
             $distributor = Distributor::create([
                 'name' => $request->name,
                 'phone' => $request->phone,
@@ -134,11 +136,18 @@ class ClientController extends Controller
         try {
             $user = Distributor::where('phone', $phone)->first();
 
+            $existPhone = Phone::where('distributor_id', $request->new_phone_number)->first();
+
             if (!$user) {
                 return response()->json([
                     'status' => 'rejected',
                     'message' => 'user not found!'
                 ], 300);
+            } elseif ($existPhone) {
+                return response()->json([
+                    'status' => 'rejected',
+                    'message' => 'phone already exist'
+                ]);
             }
 
             $validator = Validator::make($request->all(), [
@@ -148,8 +157,6 @@ class ClientController extends Controller
             if ($validator->fails()) {
                 return response()->json($validator->errors()->toJson(), 400);
             }
-
-            $phone = Phone::where('distributor_id', $user->id)->latest();
 
             DB::beginTransaction();
                 $newPhoneNumber = Phone::create([

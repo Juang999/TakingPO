@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Clothes;
-use App\{Transaction, PartnerGroup, TableName};
+use App\{Distributor, Transaction, PartnerGroup, TableName};
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -63,11 +63,11 @@ class DetailTransaction extends Controller
                 }
             }
 
-            $discount = PartnerGroup::where(function ($query) use ($transaction_code) {
+            $discount = PartnerGroup::where('id', function ($query) use ($transaction_code) {
                 $query->select('partner_group_id')
                     ->from('distributors')
                     ->where('id', $transaction_code->distributor_id)
-                    ->first();
+                    ->first(['partner_group_id']);
             })->first(['discount']);
 
             return response()->json([
