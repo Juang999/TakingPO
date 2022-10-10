@@ -577,4 +577,27 @@ class ClothesController extends Controller
             ]);
         }
     }
+    
+    public function totalOrder()
+    {
+        try {
+            $theData = Clothes::with('BufferProduct.Size')->get();
+
+            foreach ($theData as $data) {
+                $data['total'] = BufferProduct::where('clothes_id', $data->id)->sum('qty_process');
+            }
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'success to get data',
+                'data' => $theData
+            ], 200);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'status' => 'failed',
+                'message' => 'failed to get data',
+                'error' => $th->getMessage()
+            ], 400);
+        }
+    }
 }

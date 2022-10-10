@@ -26,7 +26,7 @@ Route::middleware('jwt.verify')->group(function () {
 
     // main route
     Route::apiResources([
-        'agent' => 'Api\AgentController',
+        'agent' => 'Api\Admin\AgentController',
         'clothes' => 'Api\ClothesController',
         'image' => 'Api\Admin\PhotoController',
         'distributor' => 'Api\DistributorController',
@@ -62,10 +62,12 @@ Route::middleware('jwt.verify')->group(function () {
     Route::put('/is-active/{clothes}', 'Api\ActivateClothes');
     Route::post('single-agent', 'Api\Admin\CreateSingleAgent');
     Route::get('unregistered-MS-agent', 'Api\Admin\SingleAgent');
+    Route::get('/total', 'Api\Admin\TotalController@totalOrder');
     Route::get('/search-agent/{search}', 'Api\Admin\SearchAgent');
     Route::get('/detail-transaction/{id}', 'Api\DetailTransaction');
     Route::get('/search-products/{search}', 'Api\Admin\SearchProduct');
     Route::get('/search-distributor/{search}', 'Api\Admin\SearchDistributor');
+    Route::get('/totalAllAgent', 'Api\Admin\TotalController@totalProductOrderClient');
 
 });
 
