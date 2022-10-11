@@ -95,6 +95,7 @@ class ClothesController extends Controller
                     'size_41' => $request->size_41,
                     'size_42' => $request->size_42,
                     'other' => $request->other,
+                    'category' => $request->category
                 ]);
 
                 if ($clothes->size_s > 0) {

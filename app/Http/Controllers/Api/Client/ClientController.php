@@ -42,6 +42,8 @@ class ClientController extends Controller
                             ->with('PartnerAddress', 'MutifStoreMaster.MutifStoreAddress')
                             ->first();
 
+        $cart = TemporaryStorage::where('distributor_id', $user->id)->with('Clothes.BufferProduct.Size')->get();
+
         if (!$user) {
             return response()->json([
                 'status' => 'failed',
@@ -63,6 +65,7 @@ class ClientController extends Controller
                 'status' => 'success',
                 'message' => 'hello '.$user->name,
                 'user' => $user,
+                'cart' => $cart,
                 'final_data' => []
             ], 200);
         } elseif ($activate && $activate->name == 'DONE') {

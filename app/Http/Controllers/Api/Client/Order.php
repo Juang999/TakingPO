@@ -54,6 +54,8 @@ class Order extends Controller
             'size' => $theSize
         ]);
 
+        $objectSize = "size_".strtolower($theSize);
+
         $BufferStock = BufferProduct::where([
             'clothes_id' => $temporary_storage->clothes_id,
             'size_id' => $size->id
@@ -61,8 +63,8 @@ class Order extends Controller
 
         if ($BufferStock) {
             if ($BufferStock->qty_buffer != 0) {
-                if ($request && $BufferStock->qty_avaliable != 0 && $request > $temporary_storage) {
-                    $increment = $request - $temporary_storage;
+                if ($request && $BufferStock->qty_avaliable != 0 && $request > $temporary_storage->$objectSize) {
+                    $increment = $request - $temporary_storage->$objectSize;
                     $qty_avaliable = $BufferStock->qty_avaliable - $increment;
                     $qty_process = $BufferStock->qty_process + $increment;
 
@@ -71,17 +73,17 @@ class Order extends Controller
                         'qty_process' => $qty_process
                     ]);
 
-                } elseif ($request < $temporary_storage) {
+                } elseif ($request < $temporary_storage->$objectSize) {
                     if ($request == 0) {
-                        $qty_avaliable = $BufferStock->qty_avaliable + $temporary_storage;
-                        $qty_process = $BufferStock->qty_process - $temporary_storage;
+                        $qty_avaliable = $BufferStock->qty_avaliable + $temporary_storage->$objectSize;
+                        $qty_process = $BufferStock->qty_process - $temporary_storage->$objectSize;
 
                         $BufferStock->update([
                             'qty_avaliable' => $qty_avaliable,
                             'qty_process' => $qty_process
                         ]);
                     } else {
-                        $decrement = $temporary_storage - $request;
+                        $decrement = $temporary_storage->$objectSize - $request;
                         $qty_avaliable = $BufferStock->qty_avaliable + $decrement;
                         $qty_process = $BufferStock->qty_process - $decrement;
 
@@ -92,22 +94,22 @@ class Order extends Controller
                     }
                 }
             } elseif ($BufferStock->qty_buffer == 0) {
-                if ($request > $temporary_storage) {
-                    $increment = $request - $temporary_storage;
+                if ($request > $temporary_storage->$objectSize) {
+                    $increment = $request - $temporary_storage->$objectSize;
                     $qty_process = $BufferStock->qty_process + $increment;
 
                     $BufferStock->update([
                         'qty_process' => $qty_process
                     ]);
-                } elseif ($request < $temporary_storage) {
+                } elseif ($request < $temporary_storage->$objectSize) {
                     if ($request == 0) {
-                        $qty_process = $BufferStock->qty_process - $temporary_storage;
+                        $qty_process = $BufferStock->qty_process - $temporary_storage->$objectSize;
 
                         $BufferStock->update([
                             'qty_process' => $qty_process
                         ]);
                     } else {
-                        $decrement = $temporary_storage - $request;
+                        $decrement = $temporary_storage->$objectSize - $request;
                         $qty_process = $BufferStock->qty_process - $decrement;
 
                         $BufferStock->update([

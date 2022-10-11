@@ -123,7 +123,7 @@ class PreOrderController extends Controller
         $createOrder->createOrder($request->size_38, $request->clothes_id, '38');
         $createOrder->createOrder($request->size_39, $request->clothes_id, '39');
         $createOrder->createOrder($request->size_40, $request->clothes_id, '40');
-        $createOrder->createOrder($request->size_41, $request->clothes_id, '41');        
+        $createOrder->createOrder($request->size_41, $request->clothes_id, '41');
         $createOrder->createOrder($request->size_42, $request->clothes_id, '42');
 
             $BufferStock_other = BufferProduct::where([

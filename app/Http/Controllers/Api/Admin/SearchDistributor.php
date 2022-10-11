@@ -17,10 +17,14 @@ class SearchDistributor extends Controller
     public function __invoke($search)
     {
         try {
-            $distributor = Distributor::where([
+            $distributors = Distributor::where([
                 ['partner_group_id', '=', 1],
                 ['name', 'LIKE', '%'.$search.'%']
-            ])->get();
+            ])->with('PartnerGroup')->get();
+
+            foreach ($distributors as $distributor) {
+                $distributor['total_agent'] = Distributor::where('distributor_id', $distributor->id)->count();
+            }
 
             return response()->json([
                 'status' => 'success',

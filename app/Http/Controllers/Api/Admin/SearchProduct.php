@@ -17,12 +17,16 @@ class SearchProduct extends Controller
     public function __invoke($search)
     {
         try {
-            $product = Clothes::where('article_name', 'LIKE', '%'.$search.'%')->with('Image')->get();
+            $products = Clothes::where('article_name', 'LIKE', '%'.$search.'%')->with('Type', 'Image', 'BufferProduct.Size')->get();
+            foreach ($products as $clothes) {
+                $clothes->combo = explode(',', $clothes->combo);
+                $clothes->BufferProduct->makeHidden(['created_at', 'updated_at', 'qty_avaliable', 'qty_process']);
+            }
 
             return response()->json([
                 'status' => 'success',
                 'message' => 'success to get products',
-                'data' => $product
+                'data' => $products
             ], 200);
         } catch (\Throwable $th) {
             return response()->json([

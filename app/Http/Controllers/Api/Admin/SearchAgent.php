@@ -17,15 +17,15 @@ class SearchAgent extends Controller
     public function __invoke($search)
     {
         try {
-            $agent = Distributor::where([
+            $agents = Distributor::where([
                 ['partner_group_id', '!=', 1],
                 ['name', 'LIKE', '%'.$search.'%']
-            ])->get();
+            ])->with('MutifStoreMaster.MutifStoreAddress')->get();
 
             return response()->json([
                 'status' => 'success',
                 'message' => 'success to get agent',
-                'agent' => $agent
+                'agent' => $agents
             ], 200);
         } catch (\Throwable $th) {
             return response()->json([

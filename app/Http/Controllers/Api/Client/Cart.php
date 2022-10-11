@@ -31,10 +31,6 @@ class Cart extends Controller
 
         $carts = TemporaryStorage::where('distributor_id', $user->id)->with('Clothes.BufferProduct.Size')->get();
 
-        // foreach ($carts as $cart) {
-        //     $cart['buffer_stock'] = BufferProduct::where('clothes_id', $cart->clothes_id)->with('Size')->get();
-        // }
-
         return response()->json([
             'status' => 'success',
             'message' => 'success to get data from cart',
