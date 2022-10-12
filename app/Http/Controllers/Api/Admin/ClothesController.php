@@ -2,15 +2,12 @@
 
 namespace App\Http\Controllers\Api\Admin;
 
-use App\Size;
-use App\Type;
-use App\Clothes;
-use App\BufferProduct;
+use App\Models\Queue;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\ClothesRequest;
-use App\Models\Queue;
+use App\{Size, Type, Clothes, BufferProduct};
 
 class ClothesController extends Controller
 {
@@ -577,7 +574,7 @@ class ClothesController extends Controller
             ]);
         }
     }
-    
+
     public function totalOrder()
     {
         try {
