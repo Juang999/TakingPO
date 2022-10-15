@@ -2,14 +2,12 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Validator;
 use JWTAuth;
-use Tymon\JWTAuth\Exceptions\JWTException;
 use App\User;
-use Illuminate\Support\Facades\Auth;
+use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
+use Tymon\JWTAuth\Exceptions\JWTException;
+use Illuminate\Support\Facades\{DB, Auth, Hash, Validator};
 
 class UserController extends Controller
 {
@@ -98,6 +96,23 @@ class UserController extends Controller
             return response()->json([
                 'status' => 'failed',
                 'message' => 'failed to logout',
+                'error' => $th->getMessage()
+            ], 400);
+        }
+    }
+
+    public function getUserName()
+    {
+        try {
+            $name = DB::table('users')->select('name')->where('id', Auth::user()->id)->first();
+
+            return response()->json([
+                'name' => $name->name
+            ], 200);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'status' => 'failed',
+                'message' => 'failed to get data',
                 'error' => $th->getMessage()
             ], 400);
         }

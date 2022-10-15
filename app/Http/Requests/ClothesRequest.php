@@ -92,7 +92,8 @@ class ClothesRequest extends FormRequest
             'bs_size_42' => 'required',
             'other' => 'required',
             'bs_other' => 'required',
-            'category' => 'required'
+            'category' => 'required',
+            'areaId' => 'required'
         ];
     }
 }

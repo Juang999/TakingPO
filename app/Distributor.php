@@ -64,4 +64,9 @@ class Distributor extends Model
     {
         return $this->hasMany(Phone::class);
     }
+
+    public function Area()
+    {
+        return $this->belongsTo(Area::class);
+    }
 }

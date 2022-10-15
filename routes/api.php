@@ -22,13 +22,15 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 Route::post('login', 'Api\UserController@login');
 
 Route::middleware('jwt.verify')->group(function () {
-    Route::get('user', 'Api\UserController@getAuthenticatedUser')->middleware('jwt.verify');
+    Route::get('user', 'Api\UserController@getAuthenticatedUser');
+    Route::get('userName', 'Api\UserController@getUserName');
 
     // main route
     Route::apiResources([
-        'agent' => 'Api\Admin\AgentController',
         'clothes' => 'Api\ClothesController',
+        'area' => 'Api\Admin\AreaController',
         'image' => 'Api\Admin\PhotoController',
+        'agent' => 'Api\Admin\AgentController',
         'distributor' => 'Api\DistributorController',
         'partner-group' => 'Api\PartnerGroupController',
         'mutif-store-admin' => 'Api\Admin\MutifStoreMasterController',
@@ -89,6 +91,9 @@ Route::prefix('pre-order')->group( function () {
 
     // Store all clothes
     Route::post('/store-all/{phone}', 'Api\Client\StoreAll');
+
+    // getHistory
+    Route::get('/{phone}/history', 'Api\Client\PreOrderController@history');
 });
 
 // group registration route
@@ -103,17 +108,17 @@ Route::prefix('client')->group( function () {
     Route::get('/get-list-distributor', 'Api\Client\ClientController@distributor');
 
     // route for address agent
-    Route::post('/create-address/{phone}', 'Api\Client\PartnerAddressController@store');
-    Route::put('/update-address/{phone}', 'Api\Client\PartnerAddressController@update');
+    // Route::post('/create-address/{phone}', 'Api\Client\PartnerAddressController@store');
+    // Route::put('/update-address/{phone}', 'Api\Client\PartnerAddressController@update');
 });
 
-Route::prefix('mutif-store')->group( function () {
-    Route::get('/{phone}', 'Api\Client\MutifStoreAddressController@index');
-    Route::post('/{phone}', 'Api\Client\MutifStoreAddressController@store');
-    Route::get('/{phone}/store/{id}', 'Api\Client\MutifStoreAddressController@show');
-    Route::put('/{phone}/store/{id}', 'Api\Client\MutifStoreAddressController@update');
-    Route::delete('/{phone}/store/{id}', 'Api\Client\MutifStoreAddressController@destroy');
-});
+// Route::prefix('mutif-store')->group( function () {
+//     Route::get('/{phone}', 'Api\Client\MutifStoreAddressController@index');
+//     Route::post('/{phone}', 'Api\Client\MutifStoreAddressController@store');
+//     Route::get('/{phone}/store/{id}', 'Api\Client\MutifStoreAddressController@show');
+//     Route::put('/{phone}/store/{id}', 'Api\Client\MutifStoreAddressController@update');
+//     Route::delete('/{phone}/store/{id}', 'Api\Client\MutifStoreAddressController@destroy');
+// });
 
 // testing
 Route::get('/index', 'WilayahController@index');

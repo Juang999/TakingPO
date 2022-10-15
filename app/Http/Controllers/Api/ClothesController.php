@@ -2,14 +2,12 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\BufferProduct;
-use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Clothes;
-use App\Http\Requests\ClothesRequest;
-use App\Size;
-use App\Type;
 use Illuminate\Support\Facades\DB;
+use App\Http\Controllers\Controller;
+use App\Http\Requests\ClothesRequest;
+use App\{Type, Size, Clothes, BufferProduct};
+use App\Http\Controllers\Api\Admin\LoopFunction;
 
 class ClothesController extends Controller
 {
@@ -98,359 +96,44 @@ class ClothesController extends Controller
                     'category' => $request->category
                 ]);
 
-                if ($clothes->size_s > 0) {
-                    $size_s = Size::firstOrCreate([
-                        'size' => strtoupper('s')
-                    ]);
-                    BufferProduct::create([
-                        'clothes_id' => $clothes->id,
-                        'size_id' => $size_s->id,
-                        'qty_avaliable' => $request->bs_size_s,
-                        'qty_buffer' => $request->bs_size_s
-                    ]);
-                }
+                $create = new LoopFunction();
 
-                if ($clothes->size_m > 0) {
-                    $size_m = Size::firstOrCreate([
-                        'size' => strtoupper('m')
-                    ]);
-                    BufferProduct::create([
-                        'clothes_id' => $clothes->id,
-                        'size_id' => $size_m->id,
-                        'qty_avaliable' => $request->bs_size_m,
-                        'qty_buffer' => $request->bs_size_m
-                    ]);
-                }
-
-                if ($clothes->size_l > 0) {
-                    $size_l = Size::firstOrCreate([
-                        'size' => strtoupper('l')
-                    ]);
-                    BufferProduct::create([
-                        'clothes_id' => $clothes->id,
-                        'size_id' => $size_l->id,
-                        'qty_avaliable' => $request->bs_size_l,
-                        'qty_buffer' => $request->bs_size_l
-                    ]);
-                }
-
-                if ($clothes->size_xl > 0) {
-                    $size_xl = Size::firstOrCreate([
-                        'size' => strtoupper('xl')
-                    ]);
-                    BufferProduct::create([
-                        'clothes_id' => $clothes->id,
-                        'size_id' => $size_xl->id,
-                        'qty_avaliable' => $request->bs_size_xl,
-                        'qty_buffer' => $request->bs_size_xl
-                    ]);
-                }
-
-                if ($clothes->size_xxl > 0) {
-                    $size_xxl = Size::firstOrCreate([
-                        'size' => strtoupper('xxl')
-                    ]);
-                    BufferProduct::create([
-                        'clothes_id' => $clothes->id,
-                        'size_id' => $size_xxl->id,
-                        'qty_avaliable' => $request->bs_size_xxl,
-                        'qty_buffer' => $request->bs_size_xxl
-                    ]);
-                }
-
-                if ($clothes->size_xxxl > 0) {
-                    $size_xxxl = Size::firstOrCreate([
-                        'size' => strtoupper('xxxl')
-                    ]);
-                    BufferProduct::create([
-                        'clothes_id' => $clothes->id,
-                        'size_id' => $size_xxxl->id,
-                        'qty_avaliable' => $request->bs_size_xxxl,
-                        'qty_buffer' => $request->bs_size_xxxl
-                    ]);
-                }
-
-                if ($clothes->size_2 > 0) {
-                    $size_2 = Size::firstOrCreate([
-                        'size' => '2'
-                    ]);
-                    BufferProduct::create([
-                        'clothes_id' => $clothes->id,
-                        'size_id' => $size_2->id,
-                        'qty_avaliable' => $request->bs_size_2,
-                        'qty_buffer' => $request->bs_size_2
-                    ]);
-                }
-
-                if ($clothes->size_4 > 0) {
-                    $size_4 = Size::firstOrCreate([
-                        'size' => '4'
-                    ]);
-                    BufferProduct::create([
-                        'clothes_id' => $clothes->id,
-                        'size_id' => $size_4->id,
-                        'qty_avaliable' => $request->bs_size_4,
-                        'qty_buffer' => $request->bs_size_4
-                    ]);
-                }
-
-                if ($clothes->size_6 > 0) {
-                    $size_6 = Size::firstOrCreate([
-                        'size' => '6'
-                    ]);
-                    BufferProduct::create([
-                        'clothes_id' => $clothes->id,
-                        'size_id' => $size_6->id,
-                        'qty_avaliable' => $request->bs_size_6,
-                        'qty_buffer' => $request->bs_size_6
-                    ]);
-                }
-
-                if ($clothes->size_8 > 0) {
-                    $size_8 = Size::firstOrCreate([
-                        'size' => '8'
-                    ]);
-                    BufferProduct::create([
-                        'clothes_id' => $clothes->id,
-                        'size_id' => $size_8->id,
-                        'qty_avaliable' => $request->bs_size_8,
-                        'qty_buffer' => $request->bs_size_8
-                    ]);
-                }
-
-                if ($clothes->size_10 > 0) {
-                    $size_10 = Size::firstOrCreate([
-                        'size' => '10'
-                    ]);
-                    BufferProduct::create([
-                        'clothes_id' => $clothes->id,
-                        'size_id' => $size_10->id,
-                        'qty_avaliable' => $request->bs_size_10,
-                        'qty_buffer' => $request->bs_size_10
-                    ]);
-                }
-
-                if ($clothes->size_12 > 0) {
-                    $size_12 = Size::firstOrCreate([
-                        'size' => '12'
-                    ]);
-                    BufferProduct::create([
-                        'clothes_id' => $clothes->id,
-                        'size_id' => $size_12->id,
-                        'qty_avaliable' => $request->bs_size_12,
-                        'qty_buffer' => $request->bs_size_12
-                    ]);
-                }
-
-                if ($clothes->size_27 > 0) {
-                    $size_27 = Size::firstOrCreate([
-                        'size' => '27'
-                    ]);
-                    BufferProduct::create([
-                        'clothes_id' => $clothes->id,
-                        'size_id' => $size_27->id,
-                        'qty_avaliable' => $request->bs_size_27,
-                        'qty_buffer' => $request->bs_size_27
-                    ]);
-                }
-
-                if ($clothes->size_28 > 0) {
-                    $size_28 = Size::firstOrCreate([
-                        'size' => '28'
-                    ]);
-                    BufferProduct::create([
-                        'clothes_id' => $clothes->id,
-                        'size_id' => $size_28->id,
-                        'qty_avaliable' => $request->bs_size_28,
-                        'qty_buffer' => $request->bs_size_28
-                    ]);
-                }
-
-                if ($clothes->size_29 > 0) {
-                    $size_29 = Size::firstOrCreate([
-                        'size' => '29'
-                    ]);
-                    BufferProduct::create([
-                        'clothes_id' => $clothes->id,
-                        'size_id' => $size_29->id,
-                        'qty_avaliable' => $request->bs_size_29,
-                        'qty_buffer' => $request->bs_size_29
-                    ]);
-                }
-
-                if ($clothes->size_30 > 0) {
-                    $size_30 = Size::firstOrCreate([
-                        'size' => '30'
-                    ]);
-                    BufferProduct::create([
-                        'clothes_id' => $clothes->id,
-                        'size_id' => $size_30->id,
-                        'qty_avaliable' => $request->bs_size_30,
-                        'qty_buffer' => $request->bs_size_30
-                    ]);
-                }
-
-                if ($clothes->size_31 > 0) {
-                    $size_31 = Size::firstOrCreate([
-                        'size' => '31'
-                    ]);
-                    BufferProduct::create([
-                        'clothes_id' => $clothes->id,
-                        'size_id' => $size_31->id,
-                        'qty_avaliable' => $request->bs_size_31,
-                        'qty_buffer' => $request->bs_size_31
-                    ]);
-                }
-
-                if ($clothes->size_32 > 0) {
-                    $size_32 = Size::firstOrCreate([
-                        'size' => '32'
-                    ]);
-                    BufferProduct::create([
-                        'clothes_id' => $clothes->id,
-                        'size_id' => $size_32->id,
-                        'qty_avaliable' => $request->bs_size_32,
-                        'qty_buffer' => $request->bs_size_32
-                    ]);
-                }
-
-                if ($clothes->size_33 > 0) {
-                    $size_33 = Size::firstOrCreate([
-                        'size' => '33'
-                    ]);
-                    BufferProduct::create([
-                        'clothes_id' => $clothes->id,
-                        'size_id' => $size_33->id,
-                        'qty_avaliable' => $request->bs_size_33,
-                        'qty_buffer' => $request->bs_size_33
-                    ]);
-                }
-
-                if ($clothes->size_34 > 0) {
-                    $size_34 = Size::firstOrCreate([
-                        'size' => '34'
-                    ]);
-                    BufferProduct::create([
-                        'clothes_id' => $clothes->id,
-                        'size_id' => $size_34->id,
-                        'qty_avaliable' => $request->bs_size_34,
-                        'qty_buffer' => $request->bs_size_34
-                    ]);
-                }
-
-                if ($clothes->size_35 > 0) {
-                    $size_35 = Size::firstOrCreate([
-                        'size' => '35'
-                    ]);
-                    BufferProduct::create([
-                        'clothes_id' => $clothes->id,
-                        'size_id' => $size_35->id,
-                        'qty_avaliable' => $request->bs_size_35,
-                        'qty_buffer' => $request->bs_size_35
-                    ]);
-                }
-
-                if ($clothes->size_36 > 0) {
-                    $size_36 = Size::firstOrCreate([
-                        'size' => '36'
-                    ]);
-                    BufferProduct::create([
-                        'clothes_id' => $clothes->id,
-                        'size_id' => $size_36->id,
-                        'qty_avaliable' => $request->bs_size_36,
-                        'qty_buffer' => $request->bs_size_36
-                    ]);
-                }
-
-                if ($clothes->size_37 > 0) {
-                    $size_37 = Size::firstOrCreate([
-                        'size' => '37'
-                    ]);
-                    BufferProduct::create([
-                        'clothes_id' => $clothes->id,
-                        'size_id' => $size_37->id,
-                        'qty_avaliable' => $request->bs_size_37,
-                        'qty_buffer' => $request->bs_size_37
-                    ]);
-                }
-
-                if ($clothes->size_38 > 0) {
-                    $size_38 = Size::firstOrCreate([
-                        'size' => '38'
-                    ]);
-                    BufferProduct::create([
-                        'clothes_id' => $clothes->id,
-                        'size_id' => $size_38->id,
-                        'qty_avaliable' => $request->bs_size_38,
-                        'qty_buffer' => $request->bs_size_38
-                    ]);
-                }
-
-                if ($clothes->size_39 > 0) {
-                    $size_39 = Size::firstOrCreate([
-                        'size' => '39'
-                    ]);
-                    BufferProduct::create([
-                        'clothes_id' => $clothes->id,
-                        'size_id' => $size_39->id,
-                        'qty_avaliable' => $request->bs_size_39,
-                        'qty_buffer' => $request->bs_size_39
-                    ]);
-                }
-
-                if ($clothes->size_40 > 0) {
-                    $size_40 = Size::firstOrCreate([
-                        'size' => '40'
-                    ]);
-                    BufferProduct::create([
-                        'clothes_id' => $clothes->id,
-                        'size_id' => $size_40->id,
-                        'qty_avaliable' => $request->bs_size_40,
-                        'qty_buffer' => $request->bs_size_40
-                    ]);
-                }
-
-                if ($clothes->size_41 > 0) {
-                    $size_41 = Size::firstOrCreate([
-                        'size' => '41'
-                    ]);
-                    BufferProduct::create([
-                        'clothes_id' => $clothes->id,
-                        'size_id' => $size_41->id,
-                        'qty_avaliable' => $request->bs_size_41,
-                        'qty_buffer' => $request->bs_size_41
-                    ]);
-                }
-
-                if ($clothes->size_42 > 0) {
-                    $size_42 = Size::firstOrCreate([
-                        'size' => '42'
-                    ]);
-                    BufferProduct::create([
-                        'clothes_id' => $clothes->id,
-                        'size_id' => $size_42->id,
-                        'qty_avaliable' => $request->bs_size_42,
-                        'qty_buffer' => $request->bs_size_42
-                    ]);
-                }
-
-                if ($clothes->other > 0) {
-                    $other = Size::firstOrCreate([
-                        'size' => 'other'
-                    ]);
-                    BufferProduct::create([
-                        'clothes_id' => $clothes->id,
-                        'size_id' => $other->id,
-                        'qty_avaliable' => $request->other,
-                        'qty_buffer' => $request->other
-                    ]);
-                }
+                $create->createClothes('S', $request->areaId, $clothes->id, $request->size_s, $request->bs_size_s);
+                $create->createClothes('M', $request->areaId, $clothes->id, $request->size_m, $request->bs_size_m);
+                $create->createClothes('L', $request->areaId, $clothes->id, $request->size_l, $request->bs_size_l);
+                $create->createClothes('XL', $request->areaId, $clothes->id, $request->size_xl, $request->bs_size_xl);
+                $create->createClothes('XXL', $request->areaId, $clothes->id, $request->size_xxl, $request->bs_size_xxl);
+                $create->createClothes('XXXL', $request->areaId, $clothes->id, $request->size_xxxl, $request->bs_size_xxxl);
+                $create->createClothes('2', $request->areaId, $clothes->id, $request->size_2, $request->bs_size_2);
+                $create->createClothes('4', $request->areaId, $clothes->id, $request->size_4, $request->bs_size_4);
+                $create->createClothes('6', $request->areaId, $clothes->id, $request->size_6, $request->bs_size_6);
+                $create->createClothes('8', $request->areaId, $clothes->id, $request->size_8, $request->bs_size_8);
+                $create->createClothes('10', $request->areaId, $clothes->id, $request->size_10, $request->bs_size_10);
+                $create->createClothes('12', $request->areaId, $clothes->id, $request->size_12, $request->bs_size_12);
+                $create->createClothes('27', $request->areaId, $clothes->id, $request->size_27, $request->bs_size_27);
+                $create->createClothes('28', $request->areaId, $clothes->id, $request->size_28, $request->bs_size_28);
+                $create->createClothes('29', $request->areaId, $clothes->id, $request->size_29, $request->bs_size_29);
+                $create->createClothes('30', $request->areaId, $clothes->id, $request->size_30, $request->bs_size_30);
+                $create->createClothes('31', $request->areaId, $clothes->id, $request->size_31, $request->bs_size_31);
+                $create->createClothes('32', $request->areaId, $clothes->id, $request->size_32, $request->bs_size_32);
+                $create->createClothes('33', $request->areaId, $clothes->id, $request->size_33, $request->bs_size_33);
+                $create->createClothes('34', $request->areaId, $clothes->id, $request->size_34, $request->bs_size_34);
+                $create->createClothes('35', $request->areaId, $clothes->id, $request->size_35, $request->bs_size_35);
+                $create->createClothes('36', $request->areaId, $clothes->id, $request->size_36, $request->bs_size_36);
+                $create->createClothes('37', $request->areaId, $clothes->id, $request->size_37, $request->bs_size_37);
+                $create->createClothes('38', $request->areaId, $clothes->id, $request->size_38, $request->bs_size_38);
+                $create->createClothes('39', $request->areaId, $clothes->id, $request->size_39, $request->bs_size_39);
+                $create->createClothes('40', $request->areaId, $clothes->id, $request->size_40, $request->bs_size_40);
+                $create->createClothes('41', $request->areaId, $clothes->id, $request->size_41, $request->bs_size_41);
+                $create->createClothes('42', $request->areaId, $clothes->id, $request->size_42, $request->bs_size_42);
+                $create->createClothes('other', $request->areaId, $clothes->id, $request->other, $request->bs_other);
 
             DB::commit();
 
             return response()->json([
                 'status' => 'success',
                 'message' => 'success create data',
+                'data' => $clothes,
                 'clothes_id' => $clothes->id
             ], 200);
         } catch (\Throwable $th) {

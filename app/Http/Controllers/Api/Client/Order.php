@@ -125,25 +125,27 @@ class Order extends Controller
     {
         $detailCart = TemporaryStorage::find($id);
 
-        $size_s = Size::firstOrCreate([
+        $size = Size::firstOrCreate([
             'size' => $theSize
         ]);
         $BufferStock = BufferProduct::where([
             'clothes_id' => $detailCart->clothes_id,
-            'size_id' => $size_s->id
-        ])->first();
+            'size_id' => $size->id
+            ])->first();
+
+            $objectSize = "size_".strtolower($theSize);
 
         if ($BufferStock) {
             if ($BufferStock->qty_buffer > 0) {
-                $qty_avaliable = $BufferStock->qty_avaliable + $detailCart->size_s;
-                $qty_process = $BufferStock->qty_process - $detailCart->size_s;
+                $qty_avaliable = $BufferStock->qty_avaliable + $detailCart->$objectSize;
+                $qty_process = $BufferStock->qty_process - $detailCart->$objectSize;
 
                 $BufferStock->update([
                     'qty_avaliable' => $qty_avaliable,
                     'qty_proccess' => $qty_process
                 ]);
             } elseif ($BufferStock->qty_buffer == 0) {
-                $qty_process = $BufferStock->qty_process - $detailCart->size_s;
+                $qty_process = $BufferStock->qty_process - $detailCart->$objectSize;
 
                 $BufferStock->update([
                     'qty_proccess' => $qty_process

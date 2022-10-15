@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Api\Admin;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\{DB, Auth, Schema};
-use App\{MutifStoreMaster, Distributor, PartnerGroup, MutifStoreAddress, TableName};
+use App\{MutifStoreMaster, Distributor, PartnerGroup, MutifStoreAddress, Phone, TableName};
 
 class AgentController extends Controller
 {
@@ -86,6 +86,13 @@ class AgentController extends Controller
                     'group_code' => $partner_group->prtnr_code,
                     'training_level' => $request->ms_training_level,
                     'partner_group_id' => $partner_group->id,
+                ]);
+
+                Phone::create([
+                    'distributor_id' => $agent->id,
+                    'phone_number' => $agent->phone,
+                    'is_active' => 1,
+                    'approved' => 1
                 ]);
 
                 if ($request->ms_open_date) {
@@ -182,7 +189,7 @@ class AgentController extends Controller
         try {
             DB::beginTransaction();
                 $TableName = TableName::where('distributor_id', $agent->id)->first();
-    
+
                 if ($TableName) {
                     if ($request->phone) {
                         Schema::rename($TableName->table_name, 'db_'.$request->phone);
@@ -191,22 +198,22 @@ class AgentController extends Controller
                         ]);
                     }
                 }
-    
+
                 $user_id = Auth::user()->id;
-    
+
                 $agent->update([
                     'name' => ($request->name) ? $request->name : $agent->name,
                     'phone' => ($request->phone) ? $request->phone : $agent->phone,
                     'prtnr_upd_by' => $user_id
                 ]);
-    
+
                 $mutif_store_master = MutifStoreMaster::where('distributor_id', $agent->id)->first();
                 $mutif_store_address = MutifStoreAddress::where('mutif_store_master_id', $mutif_store_master->id)->first();
-    
+
                 if ($request->partner_group_id) {
                     $partner_group = PartnerGroup::where('id', $request->partner_group_id)->first();
                 }
-    
+
                 $mutif_store_master->update([
                     'mutif_store_master' => ($request->ms_ms_name) ? $request->ms_ms_name : $mutif_store_master->mutif_store_name,
                     'mutif_store_code' => ($request->ms_code) ? $request->ms_code : $mutif_store_master->mutif_store_code,
@@ -220,7 +227,7 @@ class AgentController extends Controller
                     'url' => ($request->url) ? $request->url : $mutif_store_master->url,
                     'remarks' => ($request->remarks) ? $request->remarks : $mutif_store_master->remarks
                 ]);
-    
+
                 $mutif_store_address->update([
                     'prtnr_upd_by' => $user_id,
                     'address' => ($request->address) ? $request->address : $mutif_store_address->address,
@@ -233,14 +240,14 @@ class AgentController extends Controller
                     'zip' => ($request->zip) ? $request->zip : $mutif_store_address->zip,
                     'comment' => ($request->comment) ? $request->comment : $mutif_store_address->comment
                 ]);
-    
+
             DB::commit();
-    
+
             return response()->json([
                 'status' => 'success',
                 'message' => 'success to update'
             ], 200);
-    
+
             } catch (\Throwable $th) {
                 return response()->json([
                     'status' => 'failed',
