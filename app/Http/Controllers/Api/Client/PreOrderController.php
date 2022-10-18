@@ -25,7 +25,7 @@ class PreOrderController extends Controller
         if ($activate->name == 'DONE') {
             return response()->json([
                 'status' => 'closed',
-                'message' => 'ISMAIL BURIQUE',
+                'message' => 'sesi berakhir',
                 'data' => []
             ], 300);
         }

@@ -109,7 +109,7 @@ class ClientController extends Controller
                 'distributor_id' => $request->distributor_id,
                 'group_code' => $partner_group->prtnr_code,
                 'partner_group_id' => $partner_group->id,
-                'level' => 'bronze'
+                'area_id' => $request->area_id
             ]);
 
             $phone = Phone::create([

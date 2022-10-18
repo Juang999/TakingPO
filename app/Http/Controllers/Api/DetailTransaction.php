@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Http\Controllers\Controller;
 use App\Models\Clothes;
-use App\{Distributor, Transaction, PartnerGroup, TableName};
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use App\Http\Controllers\Controller;
+use App\{Distributor, Transaction, PartnerGroup, TableName};
 
 class DetailTransaction extends Controller
 {

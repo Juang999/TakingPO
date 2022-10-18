@@ -86,6 +86,7 @@ class AgentController extends Controller
                     'group_code' => $partner_group->prtnr_code,
                     'training_level' => $request->ms_training_level,
                     'partner_group_id' => $partner_group->id,
+                    'area_id' => $request->area_id
                 ]);
 
                 Phone::create([

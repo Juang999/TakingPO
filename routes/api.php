@@ -73,6 +73,7 @@ Route::middleware('jwt.verify')->group(function () {
     Route::get('/total', 'Api\Admin\TotalController@totalOrder');
     Route::get('/totalAllAgent', 'Api\Admin\TotalController@totalProductOrderClient');
     Route::get('/totalAgentWithDB', 'Api\Admin\TotalController@totalAgentWithDB');
+    Route::get('detailTotalAgent/{id}', 'Api\Admin\TotalController@detailTotalAgentWithD');
 
 });
 
@@ -108,6 +109,7 @@ Route::prefix('client')->group( function () {
     Route::get('/get-list-distributor', 'Api\Client\ClientController@distributor');
 
     // route for address agent
+    Route::get('area-client', 'Api\Client\getArea');
     // Route::post('/create-address/{phone}', 'Api\Client\PartnerAddressController@store');
     // Route::put('/update-address/{phone}', 'Api\Client\PartnerAddressController@update');
 });
@@ -121,13 +123,3 @@ Route::prefix('client')->group( function () {
 // });
 
 // testing
-Route::get('/index', 'WilayahController@index');
-Route::post('/testing', 'TestingController@index')->middleware('Logger');
-
-Route::get('/testing', function () {
-    NotificationCreated::dispatch('hello world');
-
-    return response()->json([
-        'status' => 'success'
-    ]);
-});
