@@ -798,4 +798,73 @@ class ClothesController extends Controller
             ]);
         }
     }
+
+    public function getProduct()
+    {
+        try {
+            $data = Clothes::select('id', 'article_name')->paginate(15);
+
+            foreach($data as $theData) {
+                $theData->ID = openssl_encrypt($theData->id, 'aes-128-ctr', 'clothes_id', 0, 1234567891011121);
+            }
+
+            $data->makeHidden('id');
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'success to get data',
+                'data' => $data
+            ], 200);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'status' => 'failed',
+                'message' => 'failed to get data',
+                'error' => $th->getMessage(),
+            ], 400);
+        }
+    }
+
+    public function getDetailProduct($id)
+    {
+        try {
+            $decrypt = openssl_decrypt($id, 'aes-128-ctr', 'clothes_id', 0, 1234567891011121);
+
+            $data = Clothes::select("id", "entity_name", "article_name", "color", "material", "combo", "special_feature", "keyword", "description", "slug", "group_article", "type_id", "is_active")
+                            ->where('id', $decrypt)
+                            ->first();
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'success to get data',
+                'data' => $data
+            ], 200);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'status' => 'failed',
+                'message' => 'failed to get data',
+                'error' => $th->getMessage()
+            ], 400);
+        }
+    }
+
+    public function findProduct($name)
+    {
+        try {
+            $data = Clothes::select("id", "entity_name", "article_name", "color", "material", "combo", "special_feature", "keyword", "description", "slug", "group_article", "type_id", "is_active")
+                            ->where('entity_name', 'LIKE', '%'.$name.'%')
+                            ->get();
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'success to get data',
+                'data' => $data
+            ], 200);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'status' => 'failed',
+                'message' => 'failed to get data',
+                'error' => $th->getMessage()
+            ], 400);
+        }
+    }
 }

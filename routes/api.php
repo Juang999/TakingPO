@@ -102,7 +102,7 @@ Route::prefix('client')->group( function () {
     // Login & Register
     Route::get('login/{phone}', 'Api\Client\ClientController@login');
     Route::post('register', 'Api\Client\ClientController@register');
-    Route::put('update-phone/{phone}', 'Api\Client\ClientController@UpdatePhone');
+    Route::put('update-p/hone/{phone}', 'Api\Client\ClientController@UpdatePhone');
 
     // Get list group & distributor
     Route::get('/get-list-group', 'Api\Client\ClientController@PartnerGroup');
@@ -112,6 +112,12 @@ Route::prefix('client')->group( function () {
     Route::get('area-client', 'Api\Client\getArea');
     // Route::post('/create-address/{phone}', 'Api\Client\PartnerAddressController@store');
     // Route::put('/update-address/{phone}', 'Api\Client\PartnerAddressController@update');
+});
+
+Route::prefix('product')->group(function () {
+    Route::get('/', 'Api\ClothesController@getProduct');
+    Route::get('/{id}', 'Api\ClothesController@getDetailProduct');
+    Route::get('/find/{name}', 'Api\ClothesController@findProduct');
 });
 
 // Route::prefix('mutif-store')->group( function () {
