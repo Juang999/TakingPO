@@ -867,4 +867,13 @@ class ClothesController extends Controller
             ], 400);
         }
     }
+
+    public function Product(Request $request)
+    {
+        try {
+            
+        } catch (\Throwable $th) {
+
+        }
+    }
 }
