@@ -6,7 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\ClothesRequest;
-use App\{Type, Size, Clothes, BufferProduct};
+use App\{Type, Size, Clothes, BufferProduct, Image};
 use App\Http\Controllers\Api\Admin\LoopFunction;
 
 class ClothesController extends Controller
@@ -870,10 +870,111 @@ class ClothesController extends Controller
 
     public function Product(Request $request)
     {
-        try {
-            
-        } catch (\Throwable $th) {
+        $request->validate([
+            'entity_name' => 'required',
+            'article_name' => 'required',
+            'color' => 'required',
+            'material' => 'required',
+            'combo' => 'required',
+            'special_feature' => 'required',
+            'keyword' => 'required',
+            'description' => 'required',
+            'slug' => 'required',
+            'type_id' => 'required',
+        ]);
 
+        try {
+            $clothes = Clothes::create([
+                'entity_name' => $request->entity_name,
+                'article_name' => $request->article_name,
+                'color' => $request->color,
+                'material' => $request->material,
+                'combo' => $request->combo,
+                'special_feature' => $request->special_feature,
+                'keyword' => $request->keyword,
+                'description' => $request->description,
+                'slug' => $request->product_name,
+                'type_id' => $request->type,
+                'size_s' => 0,
+                'size_m' => 0,
+                'size_l' => 0,
+                'size_xl' => 0,
+                'size_xxl' => 0,
+                'size_xxxl' => 0,
+                'size_2' => 0,
+                'size_4' => 0,
+                'size_6' => 0,
+                'size_8' => 0,
+                'size_10' => 0,
+                'size_12' => 0,
+                'size_27' => 0,
+                'size_28' => 0,
+                'size_29' => 0,
+                'size_30' => 0,
+                'size_31' => 0,
+                'size_32' => 0,
+                'size_33' => 0,
+                'size_34' => 0,
+                'size_35' => 0,
+                'size_36' => 0,
+                'size_37' => 0,
+                'size_38' => 0,
+                'size_39' => 0,
+                'size_40' => 0,
+                'size_41' => 0,
+                'size_42' => 0,
+                'other' => 0,
+            ]);
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'success to create data clothes',
+                'data' => $clothes
+            ], 200);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'status' => 'failed',
+                'message' => 'failed to create data clothes',
+                'error' => $th->getMessage()
+            ], 400);
+        }
+    }
+
+    public function getType(){
+        try {
+            $type = Type::get();
+
+            return response()->json([
+                'status' => 'failed',
+                'message' => 'failed to get data type',
+                'data' => $type
+            ], 200);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'status' => 'failed',
+                'message' => 'failed to get data type',
+                'error' => $th->getMessage()
+            ], 400);
+        }
+    }
+
+    public function getFirstPhoto($photoId){
+        try {
+            $rawImage = Image::where('clothes_id', $photoId)->first(['photo']);
+
+            $image = ($rawImage != null) ? $rawImage['photo'] : 'https://th.bing.com/th/id/OIP.r9Zvt3xyXchx4hdU8-9zrQAAAA?w=202&h=202&c=7&r=0&o=5&dpr=1.3&pid=1.7';
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'success to get image',
+                'data' => $image
+            ], 200);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'status' => 'failed',
+                'message' => 'failed to get image',
+                'error' => $th->getMessage()
+            ], 400);
         }
     }
 }

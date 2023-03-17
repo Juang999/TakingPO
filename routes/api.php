@@ -118,6 +118,8 @@ Route::prefix('product')->group(function () {
     Route::get('/', 'Api\ClothesController@getProduct');
     Route::get('/{id}', 'Api\ClothesController@getDetailProduct');
     Route::get('/find/{name}', 'Api\ClothesController@findProduct');
+    Route::get('type', 'Api\ClothesController@getType');
+    Route::get('/firstPhoto/{photoId}', 'Api\ClothesController@getFirstPhoto');
 });
 
 // Route::prefix('mutif-store')->group( function () {
