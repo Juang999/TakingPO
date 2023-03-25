@@ -827,11 +827,13 @@ class ClothesController extends Controller
     public function getDetailProduct($id)
     {
         try {
-            $decrypt = openssl_decrypt($id, 'aes-128-ctr', 'clothes_id', 0, 1234567891011121);
-
             $data = Clothes::select("id", "entity_name", "article_name", "color", "material", "combo", "special_feature", "keyword", "description", "slug", "group_article", "type_id", "is_active")
-                            ->where('id', $decrypt)
+                            ->where('id', $id)
                             ->first();
+
+            $data->image = (DB::table('images')->where('clothes_id', $data->id)->first() == null)
+                            ? ["photo" => "https://th.bing.com/th/id/OIP.r9Zvt3xyXchx4hdU8-9zrQAAAA?w=202&h=202&c=7&r=0&o=5&dpr=1.3&pid=1.7"]
+                            : DB::table('images')->where('clothes_id', $data->id)->get(['photo']);
 
             return response()->json([
                 'status' => 'success',
@@ -960,9 +962,9 @@ class ClothesController extends Controller
 
     public function getFirstPhoto($photoId){
         try {
-            $rawImage = Image::where('clothes_id', $photoId)->first(['photo']);
+            $rawImage = DB::table('images')->where('clothes_id', $photoId)->first(['photo']);
 
-            $image = ($rawImage != null) ? $rawImage['photo'] : 'https://th.bing.com/th/id/OIP.r9Zvt3xyXchx4hdU8-9zrQAAAA?w=202&h=202&c=7&r=0&o=5&dpr=1.3&pid=1.7';
+            $image = ($rawImage != null) ? $rawImage->photo : 'https://th.bing.com/th/id/OIP.r9Zvt3xyXchx4hdU8-9zrQAAAA?w=202&h=202&c=7&r=0&o=5&dpr=1.3&pid=1.7';
 
             return response()->json([
                 'status' => 'success',
