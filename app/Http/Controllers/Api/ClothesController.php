@@ -832,8 +832,8 @@ class ClothesController extends Controller
                             ->first();
 
             $data->image = (DB::table('images')->where('clothes_id', $data->id)->first() == null)
-                            ? ["photo" => "https://th.bing.com/th/id/OIP.r9Zvt3xyXchx4hdU8-9zrQAAAA?w=202&h=202&c=7&r=0&o=5&dpr=1.3&pid=1.7"]
-                            : DB::table('images')->where('clothes_id', $data->id)->get(['photo']);
+                            ? [["photo" => "https://th.bing.com/th/id/OIP.r9Zvt3xyXchx4hdU8-9zrQAAAA?w=202&h=202&c=7&r=0&o=5&dpr=1.3&pid=1.7"]]
+                            : DB::table('images')->where('clothes_id', $data->id)->get();
 
             return response()->json([
                 'status' => 'success',
