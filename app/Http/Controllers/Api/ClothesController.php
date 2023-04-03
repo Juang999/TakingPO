@@ -881,8 +881,6 @@ class ClothesController extends Controller
             'special_feature' => 'required',
             'keyword' => 'required',
             'description' => 'required',
-            'slug' => 'required',
-            'type_id' => 'required',
         ]);
 
         try {
@@ -895,8 +893,8 @@ class ClothesController extends Controller
                 'special_feature' => $request->special_feature,
                 'keyword' => $request->keyword,
                 'description' => $request->description,
-                'slug' => $request->product_name,
-                'type_id' => $request->type,
+                'slug' => $request->article_name,
+                'type_id' => 0,
                 'size_s' => 0,
                 'size_m' => 0,
                 'size_l' => 0,
@@ -926,7 +924,11 @@ class ClothesController extends Controller
                 'size_41' => 0,
                 'size_42' => 0,
                 'other' => 0,
+                'category' => 0
             ]);
+
+
+            
 
             return response()->json([
                 'status' => 'success',
@@ -977,6 +979,41 @@ class ClothesController extends Controller
                 'message' => 'failed to get image',
                 'error' => $th->getMessage()
             ], 400);
+        }
+    }
+
+    public function storeProduct(Request $request) {
+        try {
+            $request->validate([
+                'entity_name' => 'required',
+                'article_name' => 'required',
+                'color' => 'required',
+                'material' => 'required',
+                'combo' => 'required',
+                'special_feature' => 'required',
+                'keyword' => 'required',
+                'description' => 'required',
+                'group_article' => 'required',
+                'photo' => 'required|mimes:jpg,png',
+            ]);
+
+            dd($request->all());
+
+            $clothes = Clothes::create([
+                'entity_name' => $request->entity_name,
+                'article_name' => $request->article_name,
+                'color' => $request->color,
+                'material' => $request->material,
+                'combo' => $request->combo,
+                'special_feature' => $request->special_feature,
+                'keyword' => $request->keyword,
+                'description' => $request->description,
+                'group_article' => $request->group_article,
+                'photo' => $request->photo,
+            ]);
+
+        } catch (\Throwable $th) {
+
         }
     }
 }
