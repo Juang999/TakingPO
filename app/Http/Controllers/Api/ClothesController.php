@@ -927,9 +927,6 @@ class ClothesController extends Controller
                 'category' => 0
             ]);
 
-
-            
-
             return response()->json([
                 'status' => 'success',
                 'message' => 'success to create data clothes',
