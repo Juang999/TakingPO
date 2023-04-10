@@ -21,3 +21,5 @@ Route::get('/', function () {
     // event( new NotificationCreated );
     return view('welcome');
 });
+
+Route::post('image', 'Web\Image');
