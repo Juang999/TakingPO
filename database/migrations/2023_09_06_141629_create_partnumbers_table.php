@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateAddColumnTable extends Migration
+class CreatePartnumbersTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,8 +13,12 @@ class CreateAddColumnTable extends Migration
      */
     public function up()
     {
-        Schema::table('clothes', function (Blueprint $table) {
-            $table->string('category')->nullable();
+        Schema::create('partnumbers', function (Blueprint $table) {
+            $table->id();
+            $table->integer('clothes_id');
+            $table->integer('image_id');
+            $table->string('partnumber');
+            $table->timestamps();
         });
     }
 
@@ -25,6 +29,6 @@ class CreateAddColumnTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('clothes');
+        Schema::dropIfExists('partnumbers');
     }
 }
