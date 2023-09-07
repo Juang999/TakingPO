@@ -8,6 +8,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\ClothesRequest;
 use App\{Type, Size, Clothes, BufferProduct, Image};
 use App\Http\Controllers\Api\Admin\LoopFunction;
+use App\Models\{Partnumber};
 
 class ClothesController extends Controller
 {
@@ -64,69 +65,46 @@ class ClothesController extends Controller
                     'slug' => $request->article_name,
                     'group_article' => $request->group_article,
                     'type_id' => $type->id,
-                    'size_s' => $request->size_s,
-                    'size_m' => $request->size_m,
-                    'size_l' => $request->size_l,
-                    'size_xl' => $request->size_xl,
-                    'size_xxl' => $request->size_xxl,
-                    'size_xxxl' => $request->size_xxxl,
-                    'size_2' => $request->size_2,
-                    'size_4' => $request->size_4,
-                    'size_6' => $request->size_6,
-                    'size_8' => $request->size_8,
-                    'size_10' => $request->size_10,
-                    'size_12' => $request->size_12,
-                    'size_27' => $request->size_27,
-                    'size_28' => $request->size_28,
-                    'size_29' => $request->size_29,
-                    'size_30' => $request->size_30,
-                    'size_31' => $request->size_31,
-                    'size_32' => $request->size_32,
-                    'size_33' => $request->size_33,
-                    'size_34' => $request->size_34,
-                    'size_35' => $request->size_35,
-                    'size_36' => $request->size_36,
-                    'size_37' => $request->size_37,
-                    'size_38' => $request->size_38,
-                    'size_39' => $request->size_39,
-                    'size_40' => $request->size_40,
-                    'size_41' => $request->size_41,
-                    'size_42' => $request->size_42,
-                    'other' => $request->other,
-                    'category' => $request->category
+                    'size_s' => 0,
+                    'size_m' => 0,
+                    'size_l' => 0,
+                    'size_xl' => 0,
+                    'size_xxl' => 0,
+                    'size_xxxl' => 0,
+                    'size_2' => 0,
+                    'size_4' => 0,
+                    'size_6' => 0,
+                    'size_8' => 0,
+                    'size_10' => 0,
+                    'size_12' => 0,
+                    'size_27' => 0,
+                    'size_28' => 0,
+                    'size_29' => 0,
+                    'size_30' => 0,
+                    'size_31' => 0,
+                    'size_32' => 0,
+                    'size_33' => 0,
+                    'size_34' => 0,
+                    'size_35' => 0,
+                    'size_36' => 0,
+                    'size_37' => 0,
+                    'size_38' => 0,
+                    'size_39' => 0,
+                    'size_40' => 0,
+                    'size_41' => 0,
+                    'size_42' => 0,
+                    'other' => 0
                 ]);
 
-                $create = new LoopFunction();
+                $dataPartnumbers = explode(', ', $request->partnumber);
 
-                $create->createClothes('S', $request->areaId, $clothes->id, $request->size_s, $request->bs_size_s);
-                $create->createClothes('M', $request->areaId, $clothes->id, $request->size_m, $request->bs_size_m);
-                $create->createClothes('L', $request->areaId, $clothes->id, $request->size_l, $request->bs_size_l);
-                $create->createClothes('XL', $request->areaId, $clothes->id, $request->size_xl, $request->bs_size_xl);
-                $create->createClothes('XXL', $request->areaId, $clothes->id, $request->size_xxl, $request->bs_size_xxl);
-                $create->createClothes('XXXL', $request->areaId, $clothes->id, $request->size_xxxl, $request->bs_size_xxxl);
-                $create->createClothes('2', $request->areaId, $clothes->id, $request->size_2, $request->bs_size_2);
-                $create->createClothes('4', $request->areaId, $clothes->id, $request->size_4, $request->bs_size_4);
-                $create->createClothes('6', $request->areaId, $clothes->id, $request->size_6, $request->bs_size_6);
-                $create->createClothes('8', $request->areaId, $clothes->id, $request->size_8, $request->bs_size_8);
-                $create->createClothes('10', $request->areaId, $clothes->id, $request->size_10, $request->bs_size_10);
-                $create->createClothes('12', $request->areaId, $clothes->id, $request->size_12, $request->bs_size_12);
-                $create->createClothes('27', $request->areaId, $clothes->id, $request->size_27, $request->bs_size_27);
-                $create->createClothes('28', $request->areaId, $clothes->id, $request->size_28, $request->bs_size_28);
-                $create->createClothes('29', $request->areaId, $clothes->id, $request->size_29, $request->bs_size_29);
-                $create->createClothes('30', $request->areaId, $clothes->id, $request->size_30, $request->bs_size_30);
-                $create->createClothes('31', $request->areaId, $clothes->id, $request->size_31, $request->bs_size_31);
-                $create->createClothes('32', $request->areaId, $clothes->id, $request->size_32, $request->bs_size_32);
-                $create->createClothes('33', $request->areaId, $clothes->id, $request->size_33, $request->bs_size_33);
-                $create->createClothes('34', $request->areaId, $clothes->id, $request->size_34, $request->bs_size_34);
-                $create->createClothes('35', $request->areaId, $clothes->id, $request->size_35, $request->bs_size_35);
-                $create->createClothes('36', $request->areaId, $clothes->id, $request->size_36, $request->bs_size_36);
-                $create->createClothes('37', $request->areaId, $clothes->id, $request->size_37, $request->bs_size_37);
-                $create->createClothes('38', $request->areaId, $clothes->id, $request->size_38, $request->bs_size_38);
-                $create->createClothes('39', $request->areaId, $clothes->id, $request->size_39, $request->bs_size_39);
-                $create->createClothes('40', $request->areaId, $clothes->id, $request->size_40, $request->bs_size_40);
-                $create->createClothes('41', $request->areaId, $clothes->id, $request->size_41, $request->bs_size_41);
-                $create->createClothes('42', $request->areaId, $clothes->id, $request->size_42, $request->bs_size_42);
-                $create->createClothes('other', $request->areaId, $clothes->id, $request->other, $request->bs_other);
+                $partnumber = collect($dataPartnumbers)->each(function ($query) use ($request, $clothes) {
+                    Partnumber::create([
+                        "clothes_id" => $clothes->id,
+                        "image_id" => $request->image_id,
+                        "partnumber" => $query
+                    ]);
+                });
 
             DB::commit();
 
