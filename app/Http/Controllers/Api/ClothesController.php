@@ -98,7 +98,7 @@ class ClothesController extends Controller
 
                 $dataPartnumbers = explode(', ', $request->partnumber);
 
-                $partnumber = collect($dataPartnumbers)->each(function ($query) use ($request, $clothes) {
+                collect($dataPartnumbers)->each(function ($query) use ($request, $clothes) {
                     Partnumber::create([
                         "clothes_id" => $clothes->id,
                         "image_id" => $request->image_id,
@@ -140,7 +140,13 @@ class ClothesController extends Controller
             ], 404);
         }
 
-        $clothes = Clothes::where('id', $clothes)->with('Type', 'Image', 'BufferProduct.Size')->first();
+        $clothes = Clothes::where('id', $clothes)
+                            ->with(['Type' => fn ($query) => $query->select('id', 'type'),
+                                    'Image',
+                                    'BufferProduct.Size',
+                                    'Partnumber' => fn ($query) => $query->select('id', 'clothes_id', 'partnumber')
+                                    ])
+                            ->first();
 
         $clothes->combo = explode(',', $clothes->combo);
         $clothes->size_2 = explode(',', $clothes->size_2);
