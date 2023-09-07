@@ -36,6 +36,17 @@ Route::middleware('jwt.verify')->group(function () {
         'mutif-store-admin' => 'Api\Admin\MutifStoreMasterController',
     ]);
 
+    Route::apiResource('partnumber', 'Api\Admin\PartnumberController')
+        ->except('index');
+
+    // Route::prefix('partnumber')->group(function () {
+    //     Route::post('/', 'Api\Admin\PartnumberController@store');
+    // });
+
+    // Route::post('partnumber', function () {
+    //     dd('hello world');
+    // });
+
     // route with exception
     Route::apiResource('entity', 'Api\EntityController')
     ->parameters(['entity' => 'entity'])
