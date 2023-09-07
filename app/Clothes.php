@@ -41,4 +41,9 @@ class Clothes extends Model
     {
         return $this->hasMany(BufferProduct::class);
     }
+
+    public function Partnumber()
+    {
+        return $this->hasMany(Models\Partnumber::class);
+    }
 }

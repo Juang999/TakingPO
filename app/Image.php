@@ -21,4 +21,9 @@ class Image extends Model
     {
         return $this->belongsTo(Clothes::class);
     }
+
+    public function Partnumber()
+    {
+        return $this->hasMany(Models\Partnumber::class);
+    }
 }
