@@ -32,15 +32,19 @@ class PartnumberController extends Controller
         try {
             $imageId = Partnumber::where('clothes_id', $request->clothes_id)->first('image_id');
 
-            $partnumber = Partnumber::create([
-                'clothes_id' => $request->clothes_id,
-                'image_id' => $imageId->image_id,
-                'partnumber' => $request->partnumber
-            ]);
+            $partnumber = explode(', ', $request->partnumber);
+
+            collect($partnumber)->each(function ($query) use ($request, $imageId) {
+                Partnumber::create([
+                    'clothes_id' => $request->clothes_id,
+                    'image_id' => $imageId->image_id,
+                    'partnumber' => $query
+                ]);
+            });
 
             return response()->json([
                 'status' => 'success!',
-                'data' => $partnumber,
+                'data' => true,
                 'error' => null
             ], 200);
         } catch (\Throwable $th) {
