@@ -25,6 +25,7 @@ class CreatePartnumberRequest extends FormRequest
     {
         return [
             'clothes_id' => 'required',
+            'image_id' => 'required',
             'partnumber' => 'required',
         ];
     }

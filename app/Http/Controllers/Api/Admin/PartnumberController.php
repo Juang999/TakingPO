@@ -30,28 +30,30 @@ class PartnumberController extends Controller
     public function store(CreatePartnumberRequest $request)
     {
         try {
-            $imageId = Partnumber::where('clothes_id', $request->clothes_id)->first('image_id');
+            $partnumbers = explode(', ', $request->partnumber);
 
-            $partnumber = explode(', ', $request->partnumber);
+            $dataPartnumber = [];
 
-            collect($partnumber)->each(function ($query) use ($request, $imageId) {
-                Partnumber::create([
+            foreach ($partnumbers as $partnumber) {
+                array_push($dataPartnumber, [
                     'clothes_id' => $request->clothes_id,
-                    'image_id' => $imageId->image_id,
-                    'partnumber' => $query
+                    'image_id' => $request->image_id,
+                    'partnumber' => $partnumber
                 ]);
-            });
+            }
+
+            $inputPartnumber = DB::table('partnumbers')->insert($dataPartnumber);
 
             return response()->json([
                 'status' => 'success!',
-                'data' => true,
-                'error' => null
+                'data' => $inputPartnumber,
+                'message' => null
             ], 200);
         } catch (\Throwable $th) {
             return response()->json([
                 'status' => 'failed!',
                 'data' => null,
-                'error' => $th->getMessage()
+                'message' => $th->getMessage()
             ], 400);
         }
     }
