@@ -142,4 +142,10 @@ Route::prefix('product')->group(function () {
 //     Route::delete('/{phone}/store/{id}', 'Api\Client\MutifStoreAddressController@destroy');
 // });
 
+Route::prefix('exapro')->group(function () {
+    Route::get('/{partnumber}/image', 'Api\Client\ImageController@show');
+    Route::get('/{partnumber}/description', 'Api\Client\ProductController@show');
+});
+
+
 // testing

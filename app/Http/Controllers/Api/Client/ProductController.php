@@ -1,0 +1,36 @@
+<?php
+
+namespace App\Http\Controllers\Api\Client;
+
+use App\Http\Controllers\Controller;
+use Illuminate\Http\Request;
+use App\{Clothes, Image};
+
+class ProductController extends Controller
+{
+    public function show ($partnumber) {
+        try {
+            $description = Clothes::select('clothes.id', 'clothes.entity_name', 'clothes.article_name', 'clothes.color', 'clothes.material', 'clothes.combo', 'clothes.special_feature', 'clothes.keyword', 'clothes.description', 'clothes.slug', 'clothes.group_article', 'clothes.type_id', 'images.photo')
+                                    ->leftJoin('images', 'images.clothes_id', '=', 'clothes.id')
+                                    ->where('clothes.id', '=', function ($query) use ($partnumber) {
+                                        $query->select('clothes_id')
+                                            ->from('partnumbers')
+                                            ->where('partnumber', '=', $partnumber)
+                                            ->first();
+                                    })
+                                    ->first();
+
+            return response()->json([
+                'status' => 'success',
+                'data' => $description,
+                'error' => null
+            ], 200);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'status' => 'failed',
+                'data' => null,
+                'error' => $th->getMessage()
+            ]);
+        }
+    }
+}
