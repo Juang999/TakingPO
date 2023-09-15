@@ -20,6 +20,24 @@ class ProductController extends Controller
                                     })
                                     ->first();
 
+            if ($description == null) {
+                $description = [
+                    "id" => 0,
+                    "entity_name" => "-",
+                    "article_name" => "-",
+                    "color" => "-",
+                    "material" => "-",
+                    "combo" => "-",
+                    "special_feature" => "-",
+                    "keyword" => "-",
+                    "description" => "-",
+                    "slug" => "-",
+                    "group_article" => 0,
+                    "type_id" => 0,
+                    "photo" => '-'
+                ];
+            }
+
             return response()->json([
                 'status' => 'success',
                 'data' => $description,
