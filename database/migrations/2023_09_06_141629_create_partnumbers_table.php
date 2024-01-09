@@ -15,8 +15,8 @@ class CreatePartnumbersTable extends Migration
     {
         Schema::create('partnumbers', function (Blueprint $table) {
             $table->id();
-            $table->integer('clothes_id');
-            $table->integer('image_id');
+            $table->integer('clothes_id')->nullable();
+            $table->integer('image_id')->nullable();
             $table->string('partnumber');
             $table->timestamps();
         });
