@@ -145,6 +145,7 @@ Route::prefix('product')->group(function () {
 Route::prefix('exapro')->group(function () {
     Route::get('/{partnumber}/image', 'Api\Client\ImageController@show');
     Route::get('/{partnumber}/description', 'Api\Client\ProductController@show');
+    Route::get('/image-catalog', 'Api\Client\ImageController@getImageCatalog');
 });
 
 
