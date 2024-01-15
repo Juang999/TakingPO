@@ -18,23 +18,24 @@ class ClothesController extends Controller
      */
     public function index()
     {
-        $clothess = Clothes::orderBy('group_article')->with('Type', 'Image', 'BufferProduct.Size')->get();
-
-        foreach ($clothess as $clothes) {
-            $clothes->combo = explode(',', $clothes->combo);
-            $clothes->size_2 = explode(',', $clothes->size_2);
-            $clothes->size_4 = explode(',', $clothes->size_4);
-            $clothes->size_6 = explode(',', $clothes->size_6);
-            $clothes->size_8 = explode(',', $clothes->size_8);
-            $clothes->size_10 = explode(',', $clothes->size_10);
-            $clothes->size_12 = explode(',', $clothes->size_12);
-            $clothes->BufferProduct->makeHidden(['created_at', 'updated_at', 'qty_avaliable', 'qty_process']);
-        }
+        $clothes = Clothes::select([
+                                    'id',
+                                    'entity_name','article_name',
+                                    'color','material',
+                                    'combo','special_feature',
+                                    'keyword','description','slug',
+                                    'group_article','type_id','is_active',
+                                ])
+                            ->when(request()->search, fn ($query) =>
+                                $query->where('article_name', 'LIKE', "%".request()->search."%")
+                            )
+                            ->orderBy('type_id', 'DESC')
+                            ->paginate(50);
 
         return response()->json([
             'status' => 'success',
             'message' => 'success get data',
-            'data' => $clothess
+            'data' => $clothes
         ], 200);
     }
 

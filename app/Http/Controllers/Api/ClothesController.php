@@ -19,30 +19,34 @@ class ClothesController extends Controller
      */
     public function index()
     {
-        $clothess = Clothes::with(['Type',
-                                    'Image',
-                                    'BufferProduct' => function ($query) {
-                                        $query->select('id', 'clothes_id', 'size_id');
-                                    },
-                                    'BufferProduct.Size'
+        $clothes = Clothes::select([
+                                    'id',
+                                    'entity_name','article_name',
+                                    'color','material',
+                                    'combo','special_feature',
+                                    'keyword','description','slug',
+                                    'group_article','type_id','is_active',
                                 ])
-                            ->orderBy('type_id', 'DESC')
+                            ->when(request()->search, fn ($query) =>
+                                $query->where('article_name', 'LIKE', "%".request()->search."%")
+                            )
+                            ->with([
+                                    'Partnumber' => fn ($query) =>
+                                        $query->select('clothes_id', 'partnumber'),
+                                    'Image' => fn ($query) =>
+                                        $query->select('clothes_id', 'photo')
+                                ])
+                            ->orderBy('id', 'ASC')
                             ->paginate(10);
 
-        foreach ($clothess as $clothes) {
-            $clothes->combo = explode(',', $clothes->combo);
-            $clothes->size_2 = explode(',', $clothes->size_2);
-            $clothes->size_4 = explode(',', $clothes->size_4);
-            $clothes->size_6 = explode(',', $clothes->size_6);
-            $clothes->size_8 = explode(',', $clothes->size_8);
-            $clothes->size_10 = explode(',', $clothes->size_10);
-            $clothes->size_12 = explode(',', $clothes->size_12);
+        foreach ($clothes as $singleClothes) {
+            $singleClothes->combo = explode(', ', $singleClothes->combo);
         }
 
         return response()->json([
             'status' => 'success',
             'message' => 'success get data',
-            'data' => $clothess
+            'data' => $clothes
         ], 200);
     }
 
@@ -76,13 +80,15 @@ class ClothesController extends Controller
 
                 $dataPartnumbers = explode(', ', $request->partnumber);
 
-                collect($dataPartnumbers)->each(function ($query) use ($request, $clothes) {
-                    Partnumber::create([
+                $bulkPartnumber = collect($dataPartnumbers)->map(function ($query) use ($request, $clothes) {
+                    return [
                         "clothes_id" => $clothes->id,
                         "image_id" => $request->image_id,
                         "partnumber" => $query
-                    ]);
-                });
+                    ];
+                })->toArray();
+
+                DB::table('partnumbers')->insert($bulkPartnumber);
 
             DB::commit();
 
