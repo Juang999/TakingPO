@@ -19,7 +19,15 @@ class ClothesController extends Controller
      */
     public function index()
     {
-        $clothess = Clothes::orderBy('type_id', 'DESC')->with('Type', 'Image', 'BufferProduct.Size')->get();
+        $clothess = Clothes::with(['Type',
+                                    'Image',
+                                    'BufferProduct' => function ($query) {
+                                        $query->select('id', 'clothes_id', 'size_id');
+                                    },
+                                    'BufferProduct.Size'
+                                ])
+                            ->orderBy('type_id', 'DESC')
+                            ->paginate(10);
 
         foreach ($clothess as $clothes) {
             $clothes->combo = explode(',', $clothes->combo);
@@ -29,7 +37,6 @@ class ClothesController extends Controller
             $clothes->size_8 = explode(',', $clothes->size_8);
             $clothes->size_10 = explode(',', $clothes->size_10);
             $clothes->size_12 = explode(',', $clothes->size_12);
-            $clothes->BufferProduct->makeHidden(['created_at', 'updated_at', 'qty_avaliable', 'qty_process']);
         }
 
         return response()->json([
@@ -64,36 +71,7 @@ class ClothesController extends Controller
                     'description' => $request->description,
                     'slug' => $request->article_name,
                     'group_article' => $request->group_article,
-                    'type_id' => $type->id,
-                    'size_s' => 0,
-                    'size_m' => 0,
-                    'size_l' => 0,
-                    'size_xl' => 0,
-                    'size_xxl' => 0,
-                    'size_xxxl' => 0,
-                    'size_2' => 0,
-                    'size_4' => 0,
-                    'size_6' => 0,
-                    'size_8' => 0,
-                    'size_10' => 0,
-                    'size_12' => 0,
-                    'size_27' => 0,
-                    'size_28' => 0,
-                    'size_29' => 0,
-                    'size_30' => 0,
-                    'size_31' => 0,
-                    'size_32' => 0,
-                    'size_33' => 0,
-                    'size_34' => 0,
-                    'size_35' => 0,
-                    'size_36' => 0,
-                    'size_37' => 0,
-                    'size_38' => 0,
-                    'size_39' => 0,
-                    'size_40' => 0,
-                    'size_41' => 0,
-                    'size_42' => 0,
-                    'other' => 0
+                    'type_id' => $type->id
                 ]);
 
                 $dataPartnumbers = explode(', ', $request->partnumber);
@@ -836,8 +814,21 @@ class ClothesController extends Controller
     public function findProduct($name)
     {
         try {
-            $data = Clothes::select("id", "entity_name", "article_name", "color", "material", "combo", "special_feature", "keyword", "description", "slug", "group_article", "type_id", "is_active")
-                            ->where('entity_name', 'LIKE', '%'.$name.'%')
+            $data = Clothes::select(
+                                "id",
+                                "entity_name",
+                                "article_name",
+                                "color",
+                                "material",
+                                "combo",
+                                "special_feature",
+                                "keyword",
+                                "description",
+                                "slug",
+                                "group_article",
+                                "type_id",
+                                "is_active"
+                            )->where('entity_name', 'LIKE', '%'.$name.'%')
                             ->get();
 
             return response()->json([
@@ -878,37 +869,7 @@ class ClothesController extends Controller
                 'keyword' => $request->keyword,
                 'description' => $request->description,
                 'slug' => $request->article_name,
-                'type_id' => 0,
-                'size_s' => 0,
-                'size_m' => 0,
-                'size_l' => 0,
-                'size_xl' => 0,
-                'size_xxl' => 0,
-                'size_xxxl' => 0,
-                'size_2' => 0,
-                'size_4' => 0,
-                'size_6' => 0,
-                'size_8' => 0,
-                'size_10' => 0,
-                'size_12' => 0,
-                'size_27' => 0,
-                'size_28' => 0,
-                'size_29' => 0,
-                'size_30' => 0,
-                'size_31' => 0,
-                'size_32' => 0,
-                'size_33' => 0,
-                'size_34' => 0,
-                'size_35' => 0,
-                'size_36' => 0,
-                'size_37' => 0,
-                'size_38' => 0,
-                'size_39' => 0,
-                'size_40' => 0,
-                'size_41' => 0,
-                'size_42' => 0,
-                'other' => 0,
-                'category' => 0
+                'category' => '0'
             ]);
 
             return response()->json([
