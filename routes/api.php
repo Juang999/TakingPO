@@ -27,7 +27,7 @@ Route::middleware('jwt.verify')->group(function () {
 
     // main route
     Route::apiResources([
-        'clothes' => 'Api\ClothesController',
+        'clothes' => 'Api\Admin\ClothesController',
         'area' => 'Api\Admin\AreaController',
         'image' => 'Api\Admin\PhotoController',
         'agent' => 'Api\Admin\AgentController',
@@ -48,7 +48,7 @@ Route::middleware('jwt.verify')->group(function () {
     // });
 
     // route with exception
-    Route::apiResource('entity', 'Api\EntityController')
+    Route::apiResource('entity', 'Api\Admin\EntityController')
     ->parameters(['entity' => 'entity'])
     ->only('index', 'update');
 
@@ -82,8 +82,8 @@ Route::middleware('jwt.verify')->group(function () {
 
     // API for report
     Route::get('/total', 'Api\Admin\TotalController@totalOrder');
-    Route::get('/totalAllAgent', 'Api\Admin\TotalController@totalProductOrderClient');
     Route::get('/totalAgentWithDB', 'Api\Admin\TotalController@totalAgentWithDB');
+    Route::get('/totalAllAgent', 'Api\Admin\TotalController@totalProductOrderClient');
     Route::get('detailTotalAgent/{id}', 'Api\Admin\TotalController@detailTotalAgentWithD');
 
 });
@@ -110,6 +110,9 @@ Route::prefix('pre-order')->group( function () {
 
 // group registration route
 Route::prefix('client')->group( function () {
+    Route::prefix('auth')->group( function () {
+        Route::post('login', 'Api\Client\AuthController@');
+    });
     // Login & Register
     Route::get('login/{phone}', 'Api\Client\ClientController@login');
     Route::post('register', 'Api\Client\ClientController@register');
