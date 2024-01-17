@@ -153,20 +153,7 @@ class ClothesController extends Controller
     public function update(Request $request, Clothes $clothes)
     {
         try {
-            $type = Type::where('type', $request->type)->first();
-
-            $req = [
-                'entity_name' => ($request->entity_name) ? $request->entity_name : $clothes->entity_name,
-                'article_name' => ($request->article_name) ? $request->article_name : $clothes->article_name,
-                'color' => ($request->color) ? $request->color : $clothes->color,
-                'material' => ($request->material) ? $request->material : $clothes->material,
-                'combo' => ($request->combo) ? $request->combo : $clothes->combo,
-                'special_feature' => ($request->special_feature) ? $request->special_feature : $clothes->special_feature,
-                'keyword' => ($request->keyword) ? $request->keyword : $clothes->keyword,
-                'description' => ($request->description) ? $request->description : $clothes->description,
-                'slug' => ($request->product_name) ? $request->product_name : $clothes->slug,
-                'type_id' => ($request->type) ? $type->id : $clothes->type_id
-            ];
+            $req = $this->checkRequest($request, $clothes);
 
             $clothes->update([
                 'entity_name' => $req['entity_name'],
@@ -240,5 +227,23 @@ class ClothesController extends Controller
                 'error' => $th->getMessage()
             ], 400);
         }
+    }
+
+    protected function checkRequest ($request, $clothes)
+    {
+        $req = [
+            'entity_name' => ($request->entity_name) ? $request->entity_name : $clothes->entity_name,
+            'article_name' => ($request->article_name) ? $request->article_name : $clothes->article_name,
+            'color' => ($request->color) ? $request->color : $clothes->color,
+            'material' => ($request->material) ? $request->material : $clothes->material,
+            'combo' => ($request->combo) ? $request->combo : $clothes->combo,
+            'special_feature' => ($request->special_feature) ? $request->special_feature : $clothes->special_feature,
+            'keyword' => ($request->keyword) ? $request->keyword : $clothes->keyword,
+            'description' => ($request->description) ? $request->description : $clothes->description,
+            'slug' => ($request->product_name) ? $request->product_name : $clothes->slug,
+            'type_id' => ($request->type_id) ? $request->type_id : $clothes->type_id
+        ];
+
+        return $req;
     }
 }
