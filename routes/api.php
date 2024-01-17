@@ -36,6 +36,8 @@ Route::middleware('jwt.verify')->group(function () {
         'mutif-store-admin' => 'Api\Admin\MutifStoreMasterController',
     ]);
 
+    // Route::prefix('')
+
     Route::apiResource('partnumber', 'Api\Admin\PartnumberController')
         ->except('index');
 
@@ -67,7 +69,6 @@ Route::middleware('jwt.verify')->group(function () {
 
     // single route
     Route::get('/logs', 'Api\Admin\Logger');
-    Route::post('/photo/{id}', 'Api\UploadPhoto');
     Route::get('/status', 'Api\Admin\SessionStatus');
     Route::post('logout', 'Api\UserController@logout');
     Route::get('get-new-member', 'Api\AccRegistration');
@@ -78,6 +79,7 @@ Route::middleware('jwt.verify')->group(function () {
     Route::get('/search-agent/{search}', 'Api\Admin\SearchAgent');
     Route::get('/detail-transaction/{id}', 'Api\DetailTransaction');
     Route::get('/search-products/{search}', 'Api\Admin\SearchProduct');
+    Route::post('/photo/{clothes_id}', 'Api\Admin\ImageController@uploadPhoto');
     Route::get('/search-distributor/{search}', 'Api\Admin\SearchDistributor');
 
     // API for report
