@@ -133,6 +133,8 @@ class ClothesController extends Controller
                             ->where('id', '=', $clothes)
                             ->first();
 
+        $clothes->combo = explode(', ', $clothes->combo);
+
 
         return response()->json([
             'status' => 'success',
