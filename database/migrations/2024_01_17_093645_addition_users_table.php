@@ -1,10 +1,11 @@
 <?php
 
+use Doctrine\DBAL\Event\SchemaAlterTableEventArgs;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class AdditionalUsersTable extends Migration
+class AdditionUsersTable extends Migration
 {
     /**
      * Run the migrations.
@@ -14,7 +15,7 @@ class AdditionalUsersTable extends Migration
     public function up()
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->unsignedBigInteger('customer_id')->after('password')->nullable();
+            $table->foreign('partner_id')->references('id')->on('distributors');
         });
     }
 

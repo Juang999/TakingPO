@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class AdditionalUsersTable extends Migration
+class AdditionPartnersTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,8 +13,8 @@ class AdditionalUsersTable extends Migration
      */
     public function up()
     {
-        Schema::table('users', function (Blueprint $table) {
-            $table->unsignedBigInteger('customer_id')->after('password')->nullable();
+        Schema::table('partners', function (Blueprint $table) {
+            $table->foreign('partner_group_id')->references('id')->on('partner_groups');
         });
     }
 
@@ -25,6 +25,6 @@ class AdditionalUsersTable extends Migration
      */
     public function down()
     {
-        Schema::drop('users');
+        Schema::drop('partners');
     }
 }

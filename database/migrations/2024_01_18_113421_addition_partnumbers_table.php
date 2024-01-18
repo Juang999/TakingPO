@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class AdditionalUsersTable extends Migration
+class AdditionPartnumbersTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,8 +13,9 @@ class AdditionalUsersTable extends Migration
      */
     public function up()
     {
-        Schema::table('users', function (Blueprint $table) {
-            $table->unsignedBigInteger('customer_id')->after('password')->nullable();
+        Schema::table('partnumbers', function (Blueprint $table) {
+            $table->unsignedBigInteger('clothes_id')->unique()->change();
+            $table->foreign('clothes_id')->references('id')->on('clothes');
         });
     }
 
@@ -25,6 +26,6 @@ class AdditionalUsersTable extends Migration
      */
     public function down()
     {
-        Schema::drop('users');
+        Schema::drop('partnumbers');
     }
 }

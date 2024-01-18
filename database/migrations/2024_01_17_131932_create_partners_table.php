@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreatePartnerGroupsTable extends Migration
+class CreatePartnersTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,15 +13,17 @@ class CreatePartnerGroupsTable extends Migration
      */
     public function up()
     {
-        Schema::create('partner_groups', function (Blueprint $table) {
+        Schema::create('partners', function (Blueprint $table) {
             $table->id();
+            $table->string('name');
+            $table->string('phone')->unique()->nullable();
+            $table->integer('parent_id')->nullable();
+            $table->string('group_code')->nullable();
+            $table->integer('partner_group_id')->constrained('parter_groups')->nullable();
+            $table->string('level')->nullable();
+            $table->string('training_level')->nullable();
             $table->integer('prtnr_add_by')->constrained('users')->nullable();
             $table->integer('prtnr_upd_by')->constrained('users')->nullable();
-            $table->string('prtnr_code');
-            $table->string('prtnr_name');
-            $table->string('prtnr_desc');
-            $table->decimal('discount', 10, 9)->default(0);
-            $table->boolean('is_active')->default(0);
             $table->timestamps();
         });
     }
@@ -33,6 +35,6 @@ class CreatePartnerGroupsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('partner_groups');
+        Schema::dropIfExists('partners');
     }
 }
