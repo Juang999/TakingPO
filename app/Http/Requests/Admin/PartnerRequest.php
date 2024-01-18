@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Http\Requests\Partnumber;
+namespace App\Http\Requests\Admin;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class CreatePartnumberRequest extends FormRequest
+class PartnerRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -24,9 +24,13 @@ class CreatePartnumberRequest extends FormRequest
     public function rules()
     {
         return [
-            'clothes_id' => 'required|unique:partnumbers,clothes_id',
-            'image_id' => 'required',
-            'partnumber' => 'required',
+            'name' => 'required',
+            'phone' => 'required|integer|min:10',
+            'parent_id' => 'nullable',
+            'group_code' => 'required',
+            'partner_group_id' => 'required',
+            'level' => 'required',
+            'training_level' => 'required',
         ];
     }
 }
