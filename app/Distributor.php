@@ -69,4 +69,9 @@ class Distributor extends Model
     {
         return $this->belongsTo(Area::class);
     }
+
+    public function User()
+    {
+        return $this->hasOne(User::class, 'partner_id', 'id');
+    }
 }
