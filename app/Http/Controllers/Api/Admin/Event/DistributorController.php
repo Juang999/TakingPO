@@ -1,27 +1,23 @@
 <?php
 
-namespace App\Http\Controllers\Api;
+namespace App\Http\Controllers\Api\Admin\Event;
 
-use App\TableName;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-// use Illuminate\Support\Facades\;
-use Illuminate\Support\Facades\Schema;
-// use App\Http\Requests\;
 use Illuminate\Support\Facades\{Auth, DB};
-use App\Http\Requests\{DistributorRequest, UpdateDistributorRequest};
+use App\Http\Requests\{Admin\Distributor\DistributorRequest, UpdateDistributorRequest};
 use App\{PartnerGroup, Distributor, PartnerAddress, MutifStoreMaster};
 
 class DistributorController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
     public function index()
     {
-        $datas = Distributor::where('partner_group_id', 1)->with('PartnerGroup')->get();
+        $datas = Distributor::where('partner_group_id', 1)
+                            ->when(request()->searchdistributor, function ($query) {
+                                $query->where('name', 'like', '%'.request()->searchname.'%');
+                            })
+                            ->with('PartnerGroup')
+                            ->get();
 
         foreach ($datas as $data) {
             $data['total_agent'] = Distributor::where('distributor_id', $data->id)->count();
@@ -42,17 +38,11 @@ class DistributorController extends Controller
         }
     }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
     public function store(DistributorRequest $request)
     {
-        $user_id = Auth::user()->id;
-
         try {
+            $user_id = Auth::user()->id;
+
             DB::beginTransaction();
                 $distributor = Distributor::create([
                     'name' => $request->name,
@@ -64,24 +54,14 @@ class DistributorController extends Controller
                     'phone' => $request->phone
                 ]);
 
-                $address = PartnerAddress::create([
-                    'distributor_id' => $distributor->id,
-                    'prtnra_add_by' => $user_id,
-                    'address' => $request->address,
-                    'district' => $request->district,
-                    'regency' => $request->regency,
-                    'province' => $request->province,
-                    'addr_type' => $request->addr_type,
-                    'zip' => $request->zip,
-                ]);
+                $address = $this->createAddressDistributor($request, $distributor->id, $user_id);
 
             DB::commit();
 
             return response()->json([
                 'status' => 'success',
                 'message' => 'distributor registered',
-                'data' => $distributor,
-                'address' => $address
+                'data' => ["agent" => $distributor, "address" => $address],
             ]);
         } catch (\Throwable $th) {
             DB::rollBack();
@@ -94,12 +74,6 @@ class DistributorController extends Controller
         }
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function show($distributor)
     {
         $data = Distributor::where('id', $distributor)->with('PartnerAddress')->first();
@@ -131,25 +105,10 @@ class DistributorController extends Controller
             ], 400);
         }
     }
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
+
     public function update(Request $request, Distributor $distributor)
     {
         try {
-            $table_name = TableName::where('distributor_id', $distributor->id)->first();
-
-            if ($table_name) {
-                Schema::rename($table_name->table_name, 'db_'.$request->phone);
-                $table_name->update([
-                    'table_name' => 'db_'.$request->phone
-                ]);
-            }
-
             $user_id = Auth::user()->id;
 
             $distributor->update([
@@ -194,12 +153,6 @@ class DistributorController extends Controller
         }
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function destroy(Distributor $distributor)
     {
         try {
@@ -216,5 +169,19 @@ class DistributorController extends Controller
                 'error' => $th->getMessage()
             ]);
         }
+    }
+
+    private function createAddressDistributor($request, $distributor_id, $user_id)
+    {
+        PartnerAddress::create([
+            'distributor_id' => $distributor_id,
+            'prtnra_add_by' => $user_id,
+            'address' => $request->address,
+            'district' => $request->district,
+            'regency' => $request->regency,
+            'province' => $request->province,
+            'addr_type' => $request->addr_type,
+            'zip' => $request->zip,
+        ]);
     }
 }

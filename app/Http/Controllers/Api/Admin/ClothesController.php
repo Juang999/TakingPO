@@ -74,7 +74,8 @@ class ClothesController extends Controller
                     'description' => $request->description,
                     'slug' => $request->article_name,
                     'group_article' => $request->group_article,
-                    'type_id' => $type->id
+                    'type_id' => $type->id,
+                    'is_active' => 1
                 ]);
 
                 $dataPartnumbers = explode(', ', $request->partnumber);

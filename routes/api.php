@@ -27,27 +27,43 @@ Route::middleware('jwt.verify')->group(function () {
 
     // main route
     Route::apiResources([
-        'clothes' => 'Api\Admin\ClothesController',
         'area' => 'Api\Admin\AreaController',
         'image' => 'Api\Admin\PhotoController',
         'agent' => 'Api\Admin\AgentController',
+        'clothes' => 'Api\Admin\ClothesController',
         'distributor' => 'Api\DistributorController',
         'partner-group' => 'Api\PartnerGroupController',
         'mutif-store-admin' => 'Api\Admin\MutifStoreMasterController',
     ]);
 
-    // Route::prefix('')
+    Route::prefix('partnumber')->group(function () {
+        Route::post('/', 'Api\Admin\PartnumberController@store');
+        Route::delete('/{partnumber}/delete', 'Api\Admin\PartnumberController@destroy');
+    });
 
-    Route::apiResource('partnumber', 'Api\Admin\PartnumberController')
-        ->except('index');
+    Route::prefix('v2')->group(function () {
+        Route::prefix('agent')->group(function () {
+            Route::get('/', 'Api\Admin\Event\AgentController@index');
+            Route::post('/', 'Api\Admin\Event\AgentController@store');
+            Route::put('/{id}/update', 'Api\Admin\Event\AgentController@update');
+        });
 
-    // Route::prefix('partnumber')->group(function () {
-    //     Route::post('/', 'Api\Admin\PartnumberController@store');
-    // });
+        Route::prefix('distributor')->group(function () {
+            Route::get('/', 'Api\Admin\Event\DistributorController@index');
+            Route::post('/', 'Api\Admin\Event\DistributorController@store');
+        });
 
-    // Route::post('partnumber', function () {
-    //     dd('hello world');
-    // });
+        Route::prefix('clothes')->group(function () {
+            Route::post('/create', 'Api\Admin\Event\ClothesController@store');
+            Route::get('/', 'Api\Admin\Event\ClothesController@getAllClothes');
+            Route::put('/{id}/update', 'Api\Admin\Event\ClothesController@updateClothes');
+            Route::get('/{id}/detail', 'Api\Admin\Event\ClothesController@getDetailClothes');
+        });
+
+        Route::prefix('buffer-product')->group(function () {
+        // Route::post()
+        });
+    });
 
     // route with exception
     Route::apiResource('entity', 'Api\Admin\EntityController')
@@ -79,8 +95,8 @@ Route::middleware('jwt.verify')->group(function () {
     Route::get('/search-agent/{search}', 'Api\Admin\SearchAgent');
     Route::get('/detail-transaction/{id}', 'Api\DetailTransaction');
     Route::get('/search-products/{search}', 'Api\Admin\SearchProduct');
-    Route::post('/photo/{clothes_id}', 'Api\Admin\ImageController@uploadPhoto');
     Route::get('/search-distributor/{search}', 'Api\Admin\SearchDistributor');
+    Route::post('/photo/{clothes_id}', 'Api\Admin\ImageController@uploadPhoto');
 
     // API for report
     Route::get('/total', 'Api\Admin\TotalController@totalOrder');
