@@ -3,9 +3,9 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
-use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Distributor extends Model
 {
@@ -45,11 +45,6 @@ class Distributor extends Model
         return $this->hasOne(PartnerAddress::class);
     }
 
-    public function Agent()
-    {
-        return $this->hasMany(Agent::class);
-    }
-
     public function PartnerGroup()
     {
         return $this->belongsTo(PartnerGroup::class);
@@ -73,5 +68,15 @@ class Distributor extends Model
     public function User()
     {
         return $this->hasOne(User::class, 'partner_id', 'id');
+    }
+
+    public function Agent()
+    {
+        return $this->hasMany(Distributor::class, 'distributor_id', 'id');
+    }
+
+    public function Distributor()
+    {
+        return $this->belongsTo(Distributor::class, 'distributor_id', 'id');
     }
 }
