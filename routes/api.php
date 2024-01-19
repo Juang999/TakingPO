@@ -31,7 +31,6 @@ Route::middleware('jwt.verify')->group(function () {
         'image' => 'Api\Admin\PhotoController',
         'agent' => 'Api\Admin\AgentController',
         'clothes' => 'Api\Admin\ClothesController',
-        'distributor' => 'Api\DistributorController',
         'partner-group' => 'Api\PartnerGroupController',
         'mutif-store-admin' => 'Api\Admin\MutifStoreMasterController',
     ]);
@@ -51,6 +50,8 @@ Route::middleware('jwt.verify')->group(function () {
         Route::prefix('distributor')->group(function () {
             Route::get('/', 'Api\Admin\Event\DistributorController@index');
             Route::post('/', 'Api\Admin\Event\DistributorController@store');
+            Route::get('/{id}/detail', 'Api\Admin\Event\DistributorController@show');
+            Route::put('/{id}/update', 'Api\Admin\Event\DistributorController@update');
         });
 
         Route::prefix('clothes')->group(function () {

@@ -34,7 +34,8 @@ class CreateClothesRequest extends FormRequest
             'description' => 'required',
             'group_article' => 'required',
             'type_id' => 'required',
-            'buffer_stock' => 'required|array',
+            'stock' => 'required',
+            'price' => 'required',
             'partnumber' => 'required'
         ];
     }

@@ -118,11 +118,12 @@ class ClothesController extends Controller
                     'slug' => $slug,
                     'group_article' => $request->group_article,
                     'type_id' => $request->type_id,
-                    'is_active' => 1
+                    'is_active' => 1,
+                    'price' => $request->price
                 ]);
 
                 $this->inputPartnumber($clothes->id, $request->partnumber);
-                $this->inputBufferStock($request->buffer_stock, $clothes->id);
+                $this->inputBufferStock($request->stock, $clothes->id);
             DB::commit();
 
             return response()->json([
@@ -139,24 +140,14 @@ class ClothesController extends Controller
         }
     }
 
-    private function inputBufferStock($bufferStock, $clothesId)
+    private function inputBufferStock($stock, $clothesId)
     {
-        $dataBufferStock = collect($bufferStock)->map(function($item) use ($clothesId) {
-            $decodedItem = json_decode($item, true);
-            $sizeId = $this->getSizeId($decodedItem['size']);
-
-            return [
-                'clothes_id' => $clothesId,
-                'size_id' => $sizeId,
-                'qty_avaliable' => $decodedItem['stock'],
-                'qty_process' => 0,
-                'qty_buffer' => 0,
-                'created_at' => Carbon::now()->format('Y-m-d H:m:s'),
-                'updated_at' => Carbon::now()->format('Y-m-d H:m:s')
-            ];
-        })->toArray();
-
-        DB::table('buffer_products')->insert($dataBufferStock);
+        BufferProduct::create([
+            'clothes_id' => $clothesId,
+            'qty_avaliable' => $stock,
+            'qty_process' => 0,
+            'qty_buffer' => 0
+        ]);
     }
 
     public function updateClothes(UpdateClothesRequest $request, $id)

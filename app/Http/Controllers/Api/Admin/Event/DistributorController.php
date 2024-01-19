@@ -12,16 +12,27 @@ class DistributorController extends Controller
 {
     public function index()
     {
-        $datas = Distributor::where('partner_group_id', 1)
-                            ->when(request()->searchdistributor, function ($query) {
-                                $query->where('name', 'like', '%'.request()->searchname.'%');
-                            })
-                            ->with('PartnerGroup')
-                            ->get();
+        $distributorName = request()->searchdistributor;
 
-        foreach ($datas as $data) {
-            $data['total_agent'] = Distributor::where('distributor_id', $data->id)->count();
-        }
+        $datas = Distributor::select(
+                                'distributors.id',
+                                'distributors.name',
+                                'distributors.phone',
+                                'distributors.group_code',
+                                'distributors.partner_group_id',
+                                'distributors.level',
+                                'distributors.training_level',
+                                'distributors.prtnr_add_by',
+                                'distributors.prtnr_upd_by',
+                                DB::raw("(SELECT COUNT(agent.id) FROM distributors AS agent WHERE agent.distributor_id = distributors.id) AS total_agent"),
+                                'partner_groups.prtnr_name AS partner_group',
+                                DB::raw("CAST(partner_groups.discount * 100 AS UNSIGNED INTEGER) AS discount"),
+                            )->leftJoin('partner_groups', 'partner_groups.id', '=', 'distributors.partner_group_id')
+                            ->where('distributors.partner_group_id', '=', 1)
+                            ->when($distributorName, function ($query) use ($distributorName) {
+                                $query->where('distributors.name', 'like', '%'.$distributorName.'%')->get();
+                            })
+                            ->paginate(10);
 
         try {
             return response()->json([
@@ -74,22 +85,47 @@ class DistributorController extends Controller
         }
     }
 
-    public function show($distributor)
+    public function show($id)
     {
-        $data = Distributor::where('id', $distributor)->with('PartnerAddress')->first();
+        $data = Distributor::select(
+                                'distributors.id',
+                                'distributors.name',
+                                'distributors.phone',
+                                'distributors.distributor_id',
+                                'distributors.group_code',
+                                'distributors.partner_group_id',
+                                'distributors.level',
+                                'distributors.training_level',
+                                'partner_addresses.address',
+                                'partner_addresses.district',
+                                'partner_addresses.regency',
+                                'partner_addresses.province',
+                                'partner_addresses.phone_1',
+                                'partner_addresses.phone_2',
+                                'partner_addresses.fax_1',
+                                'partner_addresses.fax_2',
+                                'partner_addresses.addr_type',
+                                'partner_addresses.zip',
+                                'partner_addresses.comment',
+                                'partner_addresses.active',
+                            )->with([
+                                'Agent' => function ($query) {
+                                    $query->select(
+                                            'distributors.id',
+                                            'distributors.name',
+                                            'distributors.phone',
+                                            'distributors.distributor_id',
+                                            'distributors.group_code',
+                                            'distributors.partner_group_id',
+                                            'distributors.level',
+                                            'distributors.training_level',
+                                            'mutif_store_masters.mutif_store_code'
+                                        )->leftJoin('mutif_store_masters', 'mutif_store_masters.distributor_id', '=', 'distributors.id');
+                                }
+                                ])->leftJoin('partner_addresses', 'partner_addresses.distributor_id', '=', 'distributors.id')
+                                ->where('distributors.id', $id)
+                    ->first();
 
-        $agents = Distributor::where('distributor_id', $data->id)->get(['id', 'name']);
-
-        foreach ($agents as $agent) {
-            $ms_code = MutifStoreMaster::where('distributor_id', $agent->id)->first('mutif_store_code');
-            if ($ms_code) {
-                $agent['ms_code'] = $ms_code['mutif_store_code'];
-            } else {
-                $agent['ms_code'] = '-';
-            }
-        }
-
-        $data['agent'] = $agents;
 
         try {
             return response()->json([
@@ -106,38 +142,20 @@ class DistributorController extends Controller
         }
     }
 
-    public function update(Request $request, Distributor $distributor)
+    public function update(Request $request, $id)
     {
         try {
             $user_id = Auth::user()->id;
+            $req = $this->checkRequest($request, $id);
 
-            $distributor->update([
-                'name' => ($request->name)? $request->name : $distributor->name,
-                'phone' => ($request->phone)? $request->phone : $distributor->phone,
+            Distributor::where('id', '=', $id)->update([
+                'name' => $req['checkRequestDistributor']['name'],
+                'phone' => $req['checkRequestDistributor']['phone'],
                 'prtnr_upd_by' => $user_id
             ]);
 
-
             if ($request->address) {
-                $address = PartnerAddress::where('distributor_id', $distributor->id)->first();
-
-                if ($address) {
-                    $address->update([
-                        'distributor_id' => $distributor->id,
-                        'address' => ($request->address)? $request->address : $address->address,
-                        'district' => ($request->district)? $request->district : $address->district,
-                        'regency' => ($request->regency)? $request->regency : $address->regency,
-                        'province' => ($request->province)? $request->province : $address->province
-                    ]);
-                } else {
-                    PartnerAddress::create([
-                        'distributor_id' => $distributor->id,
-                        'address' => $request->address,
-                        'district' => $request->district,
-                        'regency' => $request->regency,
-                        'province' => $request->province
-                    ]);
-                }
+                $this->updateAddressDistributor($req['checkRequestDistributorAddress'], $id);
             }
 
             return response()->json([
@@ -182,6 +200,36 @@ class DistributorController extends Controller
             'province' => $request->province,
             'addr_type' => $request->addr_type,
             'zip' => $request->zip,
+        ]);
+    }
+
+    private function checkRequest($request, $id)
+    {
+        $distributor = Distributor::where('id', '=', $id)->first();
+        $address = PartnerAddress::where('distributor_id', $distributor->id)->first();
+
+        $checkRequestDistributor = [
+            'name' => ($request->name) ? $request->name : $distributor->name,
+            'phone' => ($request->phone) ? $request->phone : $distributor->phone,
+        ];
+
+        $checkRequestDistributorAddress = [
+            'address' => ($request->address) ? $request->address : $address->address,
+            'district' => ($request->district) ? $request->district : $address->district,
+            'regency' => ($request->regency) ? $request->regency : $address->regency,
+            'province' => ($request->province) ? $request->province : $address->province
+        ];
+
+        return compact('checkRequestDistributor', 'checkRequestDistributorAddress');
+    }
+
+    private function updateAddressDistributor($request, $id)
+    {
+        PartnerAddress::where('distributor_id', '=', $id)->update([
+            'address' => $request['address'],
+            'district' => $request['district'],
+            'regency' => $request['regency'],
+            'province' => $request['province']
         ]);
     }
 }

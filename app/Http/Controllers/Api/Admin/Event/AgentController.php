@@ -12,42 +12,35 @@ class AgentController extends Controller
 {
     public function index()
     {
-        $datas = MutifStoreMaster::get();
-
-        foreach ($datas as $data) {
-            $data->agent = Distributor::where('id', $data->distributor_id)->first();
-            $data->distributor = Distributor::where('id', $data->agent->distributor_id)->first();
-
-            $data->makeHidden([
-                'ms_add_by',
-                'ms_upd_by',
-                'group_code',
-                'msdp',
-                'partner_group_id',
-                'url',
-                'remarks',
-                'created_at',
-                'updated_at',
-                'distributor_id'
-            ]);
-
-            $data->agent->makeHidden([
-                'distributor_id',
-                'group_code',
-                'group_code',
-                'partner_group_id',
-                'level',
-                'training_level',
-                'prtnr_add_by',
-                'prtnr_upd_by',
-                'deleted_at'
-            ]);
-        }
+        $dataAgent = MutifStoreMaster::select(
+                                    'mutif_store_masters.id',
+                                    'mutif_store_masters.mutif_store_name',
+                                    'mutif_store_masters.mutif_store_code',
+                                    'mutif_store_masters.open_date',
+                                    'mutif_store_masters.status',
+                                    'mutif_store_addresses.address',
+                                    'mutif_store_addresses.province',
+                                    'mutif_store_addresses.regency',
+                                    'mutif_store_addresses.district',
+                                    'mutif_store_addresses.phone_1',
+                                    'mutif_store_addresses.phone_2',
+                                    'mutif_store_addresses.fax_1',
+                                    'mutif_store_addresses.fax_2',
+                                    'mutif_store_addresses.addr_type',
+                                    'mutif_store_addresses.zip',
+                                    'mutif_store_masters.distributor_id AS agent_id',
+                                    'agent.name AS agent_name',
+                                    'distributor.id AS distributor_id',
+                                    'distributor.name AS distributor_name'
+                                )->leftJoin('distributors AS agent', 'agent.id', '=', 'mutif_store_masters.distributor_id')
+                                ->leftJoin('distributors AS distributor', 'distributor.id', '=', 'agent.distributor_id')
+                                ->leftJoin('mutif_store_addresses', 'mutif_store_addresses.mutif_store_master_id', '=', 'mutif_store_masters.id')
+                                ->paginate(10);
 
         return response()->json([
             'status' => 'success',
             'message' => 'success to get data',
-            'data' => $datas
+            'data' => $dataAgent
         ], 200);
     }
 
