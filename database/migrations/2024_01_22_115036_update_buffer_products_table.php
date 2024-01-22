@@ -14,7 +14,8 @@ class UpdateBufferProductsTable extends Migration
     public function up()
     {
         Schema::table('buffer_products', function (Blueprint $table) {
-            $table->integer('size_id')->nullable()->change();
+            $table->unsignedBigInteger('clothes_id')->change();
+            $table->foreign('clothes_id')->references('id')->on('products');
         });
     }
 
@@ -25,6 +26,6 @@ class UpdateBufferProductsTable extends Migration
      */
     public function down()
     {
-        //
+        Schema::drop('buffer_products');
     }
 }

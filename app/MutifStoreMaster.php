@@ -16,7 +16,7 @@ class MutifStoreMaster extends Model
 
     public function Agent()
     {
-        return $this->belongsTo(Distributor::class);
+        return $this->belongsTo(Distributor::class, 'distributor_id', 'id');
     }
 
     public function MutifStoreAddress()

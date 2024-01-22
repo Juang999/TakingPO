@@ -44,6 +44,7 @@ Route::middleware('jwt.verify')->group(function () {
         Route::prefix('agent')->group(function () {
             Route::get('/', 'Api\Admin\Event\AgentController@index');
             Route::post('/', 'Api\Admin\Event\AgentController@store');
+            Route::get('/{id}/detail', 'Api\Admin\Event\AgentController@show');
             Route::put('/{id}/update', 'Api\Admin\Event\AgentController@update');
         });
 
@@ -52,17 +53,19 @@ Route::middleware('jwt.verify')->group(function () {
             Route::post('/', 'Api\Admin\Event\DistributorController@store');
             Route::get('/{id}/detail', 'Api\Admin\Event\DistributorController@show');
             Route::put('/{id}/update', 'Api\Admin\Event\DistributorController@update');
+            Route::get('/list', 'Api\Admin\Event\DistributorController@getListDistributor');
         });
 
-        Route::prefix('clothes')->group(function () {
-            Route::post('/create', 'Api\Admin\Event\ClothesController@store');
-            Route::get('/', 'Api\Admin\Event\ClothesController@getAllClothes');
-            Route::put('/{id}/update', 'Api\Admin\Event\ClothesController@updateClothes');
-            Route::get('/{id}/detail', 'Api\Admin\Event\ClothesController@getDetailClothes');
+        Route::prefix('product')->group(function () {
+            Route::get('/', 'Api\Admin\Event\ProductController@getAllProduct');
+            Route::post('/create', 'Api\Admin\Event\ProductController@storeProduct');
+            Route::put('/{id}/update', 'Api\Admin\Event\ProductController@updateProduct');
+            Route::get('/{id}/detail', 'Api\Admin\Event\ProductController@getDetailProduct');
         });
 
         Route::prefix('buffer-product')->group(function () {
-        // Route::post()
+            Route::post('/create', 'Api\Admin\Event\BufferProductController@createBufferProduct');
+            Route::patch('/{buffer_product}/increase-amount', 'Api\Admin\Event\BufferProductController@increaseAmount');
         });
     });
 
@@ -109,52 +112,52 @@ Route::middleware('jwt.verify')->group(function () {
 
 // group pre-order route
 // Route::apiResource('pre-order/{phone}', 'Api\Client\PreOrderController');
-Route::prefix('pre-order')->group( function () {
-    // CRUD for Taking PO from client
-    Route::get('/{phone}', 'Api\Client\PreOrderController@index');
-    Route::post('/{phone}', 'Api\Client\PreOrderController@store');
-    Route::delete('/{phone}/clothes/{id}', 'Api\Client\PreOrderController@destroy');
-    Route::put('/{phone}/cart/{id}', 'Api\Client\PreOrderController@update');
-    Route::get('/{phone}/clothes/{id}', 'Api\Client\PreOrderController@show');
+// Route::prefix('pre-order')->group( function () {
+//     // CRUD for Taking PO from client
+//     Route::get('/{phone}', 'Api\Client\PreOrderController@index');
+//     Route::post('/{phone}', 'Api\Client\PreOrderController@store');
+//     Route::delete('/{phone}/clothes/{id}', 'Api\Client\PreOrderController@destroy');
+//     Route::put('/{phone}/cart/{id}', 'Api\Client\PreOrderController@update');
+//     Route::get('/{phone}/clothes/{id}', 'Api\Client\PreOrderController@show');
 
-    // cart
-    Route::get('cart/{phone}', 'Api\Client\Cart');
+//     // cart
+//     Route::get('cart/{phone}', 'Api\Client\Cart');
 
-    // Store all clothes
-    Route::post('/store-all/{phone}', 'Api\Client\StoreAll');
+//     // Store all clothes
+//     Route::post('/store-all/{phone}', 'Api\Client\StoreAll');
 
-    // getHistory
-    Route::get('/{phone}/history', 'Api\Client\PreOrderController@history');
-});
+//     // getHistory
+//     Route::get('/{phone}/history', 'Api\Client\PreOrderController@history');
+// });
 
 // group registration route
 Route::prefix('client')->group( function () {
     Route::prefix('auth')->group( function () {
-        Route::post('login', 'Api\Client\AuthController@');
+        Route::post('login', 'Api\Client\AuthController@login');
     });
     // Login & Register
-    Route::get('login/{phone}', 'Api\Client\ClientController@login');
-    Route::post('register', 'Api\Client\ClientController@register');
-    Route::put('update-p/hone/{phone}', 'Api\Client\ClientController@UpdatePhone');
+    // Route::get('login/{phone}', 'Api\Client\ClientController@login');
+    // Route::post('register', 'Api\Client\ClientController@register');
+    // Route::put('update-p/hone/{phone}', 'Api\Client\ClientController@UpdatePhone');
 
     // Get list group & distributor
-    Route::get('/get-list-group', 'Api\Client\ClientController@PartnerGroup');
-    Route::get('/get-list-distributor', 'Api\Client\ClientController@distributor');
+    // Route::get('/get-list-group', 'Api\Client\ClientController@PartnerGroup');
+    // Route::get('/get-list-distributor', 'Api\Client\ClientController@distributor');
 
     // route for address agent
-    Route::get('area-client', 'Api\Client\getArea');
+    // Route::get('area-client', 'Api\Client\getArea');
     // Route::post('/create-address/{phone}', 'Api\Client\PartnerAddressController@store');
     // Route::put('/update-address/{phone}', 'Api\Client\PartnerAddressController@update');
 });
 
-Route::prefix('product')->group(function () {
-    Route::get('/', 'Api\ClothesController@getProduct');
-    Route::get('/{id}', 'Api\ClothesController@getDetailProduct');
-    Route::get('/find/{name}', 'Api\ClothesController@findProduct');
-    Route::get('type', 'Api\ClothesController@getType');
-    Route::get('/firstPhoto/{photoId}', 'Api\ClothesController@getFirstPhoto');
-    Route::post('/storeProduct', 'Api\ClothesController@Product');
-});
+// Route::prefix('product')->group(function () {
+//     Route::get('/', 'Api\ClothesController@getProduct');
+//     Route::get('/{id}', 'Api\ClothesController@getDetailProduct');
+//     Route::get('/find/{name}', 'Api\ClothesController@findProduct');
+//     Route::get('type', 'Api\ClothesController@getType');
+//     Route::get('/firstPhoto/{photoId}', 'Api\ClothesController@getFirstPhoto');
+//     Route::post('/storeProduct', 'Api\ClothesController@Product');
+// });
 
 // Route::prefix('mutif-store')->group( function () {
 //     Route::get('/{phone}', 'Api\Client\MutifStoreAddressController@index');

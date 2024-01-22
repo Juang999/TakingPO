@@ -2,39 +2,43 @@
 
 namespace App\Http\Controllers\Api\Admin\Event;
 
-use Carbon\Carbon;
+use App\Models\{Product, PartnumberProduct, BufferProduct};
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
-use App\Models\{BufferProduct, Clothes, Size, Partnumber};
 use App\Http\Requests\Admin\Clothes\{CreateClothesRequest, UpdateClothesRequest};
+// use App\Models\;
 
-class ClothesController extends Controller
+class ProductController extends Controller
 {
-    public function getAllClothes()
+    public function getAllProduct()
     {
         try {
-            $clothes = Clothes::select([
-                                    'clothes.id',
-                                    'clothes.entity_name',
-                                    'clothes.article_name',
-                                    'clothes.color',
-                                    'clothes.material',
-                                    'clothes.combo',
-                                    'clothes.special_feature',
-                                    'clothes.keyword',
-                                    'clothes.description',
-                                    'clothes.slug',
-                                    'clothes.group_article',
-                                    'clothes.type_id',
-                                    'clothes.is_active',
-                                    DB::raw("(SELECT photo FROM images WHERE clothes_id = clothes.id LIMIT 1 OFFSET 0) AS photo"),
-                                    DB::raw("CASE WHEN partnumbers.partnumber IS NULL THEN '-' ELSE partnumbers.partnumber END AS partnumber")
+            $clothes = Product::select([
+                                    'products.id',
+                                    'products.entity_name',
+                                    'products.article_name',
+                                    'products.color',
+                                    'products.material',
+                                    'products.combo',
+                                    'products.special_feature',
+                                    'products.keyword',
+                                    'products.description',
+                                    'products.slug',
+                                    'products.group_article',
+                                    'products.type_id',
+                                    'products.is_active',
+                                    DB::raw("(SELECT photo FROM images WHERE clothes_id = products.id LIMIT 1 OFFSET 0) AS photo"),
+                                    DB::raw("CASE WHEN partnumber_products.partnumber IS NULL THEN '-' ELSE partnumber_products.partnumber END AS partnumber")
                                 ])->when(request()->searchname, fn($query) =>
                                     $query->where('article_name', 'LIKE', '%'.request()->searchname.'%')
                                 )
-                                ->leftJoin('partnumbers', 'partnumbers.clothes_id', '=', 'clothes.id')
+                                ->leftJoin('partnumber_products', 'partnumber_products.product_id', '=', 'products.id')
                                 ->paginate(10);
+
+            foreach ($clothes as $clothing) {
+                $clothing->combo = explode(', ', $clothing->combo);
+            }
 
             return response()->json([
                 'status' => 'success',
@@ -50,30 +54,30 @@ class ClothesController extends Controller
         }
     }
 
-    public function getDetailClothes($id)
+    public function getDetailProduct($id)
     {
         try {
-            $clothes = Clothes::select(
-                                    'clothes.id',
-                                    'clothes.entity_name',
-                                    'clothes.article_name',
-                                    'clothes.color',
-                                    'clothes.material',
-                                    'clothes.combo',
-                                    'clothes.special_feature',
-                                    'clothes.keyword',
-                                    'clothes.description',
-                                    'clothes.slug',
-                                    'clothes.group_article',
+            $clothes = Product::select(
+                                    'products.id',
+                                    'products.entity_name',
+                                    'products.article_name',
+                                    'products.color',
+                                    'products.material',
+                                    'products.combo',
+                                    'products.special_feature',
+                                    'products.keyword',
+                                    'products.description',
+                                    'products.slug',
+                                    'products.group_article',
                                     DB::raw("CASE WHEN types.type IS NULL THEN '-' ELSE types.type END AS type"),
-                                    'partnumbers.partnumber',
-                                    'clothes.is_active'
-                                )->leftJoin('types', 'types.id', '=', 'clothes.type_id')
-                                ->leftJoin('partnumbers', 'partnumbers.clothes_id', '=', 'clothes.id')
-                                ->where('clothes.id', '=', $id)
+                                    'partnumber_products.partnumber',
+                                    'products.is_active'
+                                )->leftJoin('types', 'types.id', '=', 'products.type_id')
+                                ->leftJoin('partnumber_products', 'partnumber_products.product_id', '=', 'products.id')
+                                ->where('products.id', '=', $id)
                                 ->with([
-                                        'Image' => function ($query) {
-                                            $query->select('id', 'clothes_id', 'photo');
+                                        'Photo' => function ($query) {
+                                            $query->select('id', 'product_id', 'photo');
                                         },
                                         'BufferProduct' => function ($query) {
                                             $query->select(
@@ -100,13 +104,13 @@ class ClothesController extends Controller
         }
     }
 
-    public function store(CreateClothesRequest $request)
+    public function storeProduct(CreateClothesRequest $request)
     {
         try {
             DB::beginTransaction();
                 $slug = implode('-', explode(' ', $request->article_name));
 
-                $clothes = Clothes::create([
+                $clothes = Product::create([
                     'entity_name' => $request->entity_name,
                     'article_name' => $request->article_name,
                     'color' => $request->color,
@@ -140,22 +144,12 @@ class ClothesController extends Controller
         }
     }
 
-    private function inputBufferStock($stock, $clothesId)
-    {
-        BufferProduct::create([
-            'clothes_id' => $clothesId,
-            'qty_avaliable' => $stock,
-            'qty_process' => 0,
-            'qty_buffer' => 0
-        ]);
-    }
-
-    public function updateClothes(UpdateClothesRequest $request, $id)
+    public function updateProduct(UpdateClothesRequest $request, $id)
     {
         try {
             $req = $this->checkRequest($request, $id);
 
-            Clothes::where('id', '=', $id)->update([
+            Product::where('id', '=', $id)->update([
                 'entity_name' => $req['entity_name'],
                 'article_name' => $req['article_name'],
                 'color' => $req['color'],
@@ -186,7 +180,7 @@ class ClothesController extends Controller
 
     private function checkRequest($request, $id)
     {
-        $clothes = Clothes::where('id', '=', $id)->first();
+        $clothes = Product::where('id', '=', $id)->first();
         $slug = implode('-', explode(' ', strtolower(($request->article_name) ? $request->article_name : $clothes->article_name)));
 
         return [
@@ -207,15 +201,19 @@ class ClothesController extends Controller
 
     private function inputPartnumber($clothesId, $partnumber)
     {
-        Partnumber::create([
-            'clothes_id' => $clothesId,
+        PartnumberProduct::create([
+            'product_id' => $clothesId,
             'partnumber' => $partnumber
         ]);
     }
 
-    private function getSizeId($size)
+    private function inputBufferStock($stock, $clothesId)
     {
-        $sizeId = Size::where('size', '=', $size)->first('id');
-        return $sizeId->id;
+        BufferProduct::create([
+            'clothes_id' => $clothesId,
+            'qty_avaliable' => $stock,
+            'qty_process' => 0,
+            'qty_buffer' => 0
+        ]);
     }
 }

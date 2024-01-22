@@ -46,6 +46,7 @@ class UpdateAgentRequest extends FormRequest
             'addr_type' => 'nullable',
             'zip' => 'nullable',
             'comment' => 'nullable',
+            'distributor_id' => 'nullable'
         ];
     }
 }

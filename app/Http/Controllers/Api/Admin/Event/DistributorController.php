@@ -5,8 +5,8 @@ namespace App\Http\Controllers\Api\Admin\Event;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\{Auth, DB};
-use App\Http\Requests\{Admin\Distributor\DistributorRequest, UpdateDistributorRequest};
 use App\{PartnerGroup, Distributor, PartnerAddress, MutifStoreMaster};
+use App\Http\Requests\{Admin\Distributor\DistributorRequest, UpdateDistributorRequest};
 
 class DistributorController extends Controller
 {
@@ -154,9 +154,7 @@ class DistributorController extends Controller
                 'prtnr_upd_by' => $user_id
             ]);
 
-            if ($request->address) {
-                $this->updateAddressDistributor($req['checkRequestDistributorAddress'], $id);
-            }
+            $this->updateAddressDistributor($req['checkRequestDistributorAddress'], $id);
 
             return response()->json([
                 'status' => 'success',
@@ -189,6 +187,25 @@ class DistributorController extends Controller
         }
     }
 
+    public function getListDistributor()
+    {
+        try {
+            $listDistributor = Distributor::select('id', 'name')->where('partner_group_id', '=', 1)->get();
+
+            return response()->json([
+                'status' => 'success',
+                'data' => $listDistributor,
+                'error' => null
+            ], 200);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'status' => 'failed',
+                'data' => null,
+                'error' => $th->getMessage()
+            ], 400);
+        }
+    }
+
     private function createAddressDistributor($request, $distributor_id, $user_id)
     {
         PartnerAddress::create([
@@ -205,8 +222,8 @@ class DistributorController extends Controller
 
     private function checkRequest($request, $id)
     {
-        $distributor = Distributor::where('id', '=', $id)->first();
-        $address = PartnerAddress::where('distributor_id', $distributor->id)->first();
+        $distributor = Distributor::select('id', 'name', 'phone')->where('id', '=', $id)->first();
+        $address = PartnerAddress::select('address','district','regency','province','zip')->where('distributor_id', $distributor->id)->first();
 
         $checkRequestDistributor = [
             'name' => ($request->name) ? $request->name : $distributor->name,
@@ -217,7 +234,8 @@ class DistributorController extends Controller
             'address' => ($request->address) ? $request->address : $address->address,
             'district' => ($request->district) ? $request->district : $address->district,
             'regency' => ($request->regency) ? $request->regency : $address->regency,
-            'province' => ($request->province) ? $request->province : $address->province
+            'province' => ($request->province) ? $request->province : $address->province,
+            'zip' => ($request->zip) ? $request->zip : $address->zip
         ];
 
         return compact('checkRequestDistributor', 'checkRequestDistributorAddress');
@@ -229,7 +247,8 @@ class DistributorController extends Controller
             'address' => $request['address'],
             'district' => $request['district'],
             'regency' => $request['regency'],
-            'province' => $request['province']
+            'province' => $request['province'],
+            'zip' => $request['zip']
         ]);
     }
 }

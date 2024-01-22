@@ -94,15 +94,39 @@ class AgentController extends Controller
     public function show($id)
     {
         try {
-            $agent = Distributor::where('id',$id)->with('PartnerGroup', 'MutifStoreMaster.MutifStoreAddress')->first();
-            $agent['distributor'] = Distributor::where('id', $agent->distributor_id)->first();
-
-            // $agent['distributor'] = Distributor::where('id', $agent->distributor_id)->first();
+            $MutifStore = MutifStoreMaster::select(
+                                                'mutif_store_masters.id',
+                                                'mutif_store_name',
+                                                'mutif_store_code',
+                                                'distributor_id',
+                                                'open_date',
+                                                'status',
+                                                'msdp',
+                                                'url',
+                                                'remarks',
+                                                'msa.address',
+                                                'msa.province',
+                                                'msa.regency',
+                                                'msa.district',
+                                                'msa.phone_1',
+                                                'msa.phone_2',
+                                                'msa.fax_1',
+                                                'msa.fax_2',
+                                                'msa.addr_type',
+                                                'msa.zip'
+                                            )->leftJoin('mutif_store_addresses AS msa', 'msa.mutif_store_master_id', '=', 'mutif_store_masters.id')
+                                            ->with(['Agent' => function ($query) {
+                                                $query->select('distributors.id AS id', 'distributors.name AS agent_name', 'distributors.phone', 'distributors.group_code', 'groups.prtnr_name', 'distributor.id AS distributor_id', 'distributor.name AS distributor_name')
+                                                    ->leftJoin('partner_groups AS groups', 'groups.id', '=', 'distributors.partner_group_id')
+                                                    ->leftJoin('distributors AS distributor', 'distributor.id', '=', 'distributors.distributor_id');
+                                            }])
+                                            ->where('mutif_store_masters.id', '=', $id)
+                                            ->first();
 
             return response()->json([
                 'status' => 'success',
                 'message' => 'success to get detail data',
-                'data' => $agent
+                'data' => $MutifStore
             ], 200);
         } catch (\Throwable $th) {
             return response()->json([
@@ -117,9 +141,14 @@ class AgentController extends Controller
     {
         try {
             $user_id = Auth::user()->id;
-            $getDataAgent = Distributor::where('id', '=', $id)->first();
+            $mutifStoreMaster = MutifStoreMaster::where('id', $id)->first();
+            $getDataAgent = Distributor::where('id', '=', function($query) use ($id) {
+                $query->select('distributor_id')
+                    ->from('mutif_store_masters')
+                    ->where('id', '=', $id)
+                    ->first();
+            })->first();
             $partnerGroup = PartnerGroup::where('id', $request->partner_group_id)->first();
-            $mutifStoreMaster = MutifStoreMaster::where('distributor_id', $getDataAgent->id)->first();
             $mutifStoreAddress = MutifStoreAddress::where('mutif_store_master_id', $mutifStoreMaster->id)->first();
 
             // request
@@ -129,6 +158,7 @@ class AgentController extends Controller
                 $getDataAgent->update([
                     'name' => $req['requestAgent']['name'],
                     'phone' => $req['requestAgent']['phone'],
+                    'distributor_id' => $req['requestAgent']['distributor_id'],
                     'prtnr_upd_by' => $user_id
                 ]);
 
@@ -193,7 +223,11 @@ class AgentController extends Controller
                     'regency' => $request->ms_regency,
                     'district' => $request->ms_district,
                     'phone_1' => $request->ms_phone,
-                    'phone_2' => ($request->ms_phone_2) ? $request->ms_phone_2 : 0
+                    'phone_2' => ($request->ms_phone_2) ? $request->ms_phone_2 : 0,
+                    'fax_1' => $request->fax_1,
+                    'addr_type' => $request->addr_type,
+                    'comment' => $request->comment,
+                    'zip' => $request->zip
                 ]);
     }
 
@@ -202,6 +236,7 @@ class AgentController extends Controller
         $requestAgent = [
             'name' => ($request->name) ? $request->name : $agent->name,
             'phone' => ($request->phone) ? $request->phone : $agent->phone,
+            'distributor_id' => ($request->distributor_id) ? $request->distributor_id : $agent->distributor_id
         ];
 
         $requestMutifStore = [
@@ -209,7 +244,7 @@ class AgentController extends Controller
             'mutif_store_code' => ($request->ms_code) ? $request->ms_code : $mutifStoreMaster->mutif_store_code,
             'group_code' => ($request->partner_group_id) ? $partnerGroup->prtnr_code : $mutifStoreMaster->group_code,
             'partner_group_id' => ($request->partner_group_id) ? $partnerGroup->id : $mutifStoreMaster->partner_group_id,
-            'distributor_id' => ($request->distributor_id) ? $request->distributor_id : $mutifStoreMaster->distributor_id,
+            // 'distributor_id' => ($request->distributor_id) ? $request->distributor_id : $mutifStoreMaster->distributor_id,
             'open_date' => ($request->open_date) ? $request->open_date : $mutifStoreMaster->open_date,
             'status' => ($request->status) ? $request->status : $mutifStoreMaster->status,
             'msdp' => ($request->msdp) ? $request->msdp : $mutifStoreMaster->msdp,
@@ -240,7 +275,7 @@ class AgentController extends Controller
             'mutif_store_code' => $req['requestMutifStore']['mutif_store_code'],
             'group_code' => $req['requestMutifStore']['group_code'],
             'partner_group_id' => $req['requestMutifStore']['partner_group_id'],
-            'distributor_id' => $req['requestMutifStore']['distributor_id'],
+            // 'distributor_id' => $req['requestMutifStore']['distributor_id'],
             'open_date' => $req['requestMutifStore']['open_date'],
             'status' => $req['requestMutifStore']['status'],
             'msdp' => $req['requestMutifStore']['msdp'],

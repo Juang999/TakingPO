@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class BufferProduct extends Model
 {
-    protected $fillable = ['id'];
+    protected $guarded = ['id'];
 
     public function Size()
     {
@@ -16,5 +16,10 @@ class BufferProduct extends Model
     public function Clothes()
     {
         return $this->belongsTo(Clothes::class(), 'clothes_id', 'id');
+    }
+
+    public function Product()
+    {
+        return $this->belongsTo(Product::class(), 'clothes_id', 'id');
     }
 }
