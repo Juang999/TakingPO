@@ -35,6 +35,8 @@ class UpdateClothesRequest extends FormRequest
             'group_article' => 'nullable',
             'type_id' => 'nullable',
             'is_active' => 'nullable',
+            'price' => 'nullable',
+            'qty' => 'nullable'
         ];
     }
 }

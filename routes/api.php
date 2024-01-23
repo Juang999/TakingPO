@@ -59,6 +59,7 @@ Route::middleware('jwt.verify')->group(function () {
         Route::prefix('product')->group(function () {
             Route::get('/', 'Api\Admin\Event\ProductController@getAllProduct');
             Route::post('/create', 'Api\Admin\Event\ProductController@storeProduct');
+            Route::post('/input-photo', 'Api\Admin\Event\ProductController@inputImage');
             Route::put('/{id}/update', 'Api\Admin\Event\ProductController@updateProduct');
             Route::get('/{id}/detail', 'Api\Admin\Event\ProductController@getDetailProduct');
         });
@@ -66,6 +67,16 @@ Route::middleware('jwt.verify')->group(function () {
         Route::prefix('buffer-product')->group(function () {
             Route::post('/create', 'Api\Admin\Event\BufferProductController@createBufferProduct');
             Route::patch('/{buffer_product}/increase-amount', 'Api\Admin\Event\BufferProductController@increaseAmount');
+        });
+
+        Route::prefix('event')->group(function () {
+            Route::get('/', 'Api\Admin\Event\EventController@getEvent');
+            Route::post('/', 'Api\Admin\Event\EventController@createEvent');
+            Route::delete('/{id}/delete-session', 'Api\Admin\Event\EventController@deleteSession');
+            Route::get('/{id}/detail', 'Api\Admin\Event\EventController@getDetailEvent');
+            Route::post('/input-session', 'Api\Admin\Event\EventController@createSession');
+            Route::delete('/{id}/delete-detail-session', 'Api\Admin\Event\EventController@deleteDetailSession');
+            Route::post('/input-detail-session', 'Api\Admin\Event\EventController@inputDetailSession');
         });
     });
 
@@ -133,8 +144,19 @@ Route::middleware('jwt.verify')->group(function () {
 // group registration route
 Route::prefix('client')->group( function () {
     Route::prefix('auth')->group( function () {
-        Route::post('login', 'Api\Client\AuthController@login');
+        Route::post('login', 'Api\Client\Event\ClientController@login');
+        Route::post('register', 'Api\Client\Event\ClientController@register');
     });
+
+    Route::prefix('master')->group(function () {
+        Route::get('distributor', 'Api\Client\Event\DistributorController@distributorList');
+    });
+
+    Route::prefix('SB')->middleware('client-check')->group(function () {
+        Route::get('product', 'Api\Client\Event\ProductController@getProduct');
+    });
+
+    // Route::prefix('SB')->mid
     // Login & Register
     // Route::get('login/{phone}', 'Api\Client\ClientController@login');
     // Route::post('register', 'Api\Client\ClientController@register');
