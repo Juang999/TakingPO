@@ -2,18 +2,20 @@
 
 namespace App\Http\Controllers\Api\Admin\Event;
 
-use App\Models\{Product, PartnumberProduct, BufferProduct};
+use App\Models\{Product, PartnumberProduct, BufferProduct, Photo};
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\Clothes\{CreateClothesRequest, UpdateClothesRequest};
-// use App\Models\;
+use Carbon\Carbon;
 
 class ProductController extends Controller
 {
     public function getAllProduct()
     {
         try {
+            $searchname = request()->searchname;
+
             $clothes = Product::select([
                                     'products.id',
                                     'products.entity_name',
@@ -30,8 +32,8 @@ class ProductController extends Controller
                                     'products.is_active',
                                     DB::raw("(SELECT photo FROM images WHERE clothes_id = products.id LIMIT 1 OFFSET 0) AS photo"),
                                     DB::raw("CASE WHEN partnumber_products.partnumber IS NULL THEN '-' ELSE partnumber_products.partnumber END AS partnumber")
-                                ])->when(request()->searchname, fn($query) =>
-                                    $query->where('article_name', 'LIKE', '%'.request()->searchname.'%')
+                                ])->when($searchname, fn($query) =>
+                                    $query->where('article_name', 'LIKE', "%$searchname%")
                                 )
                                 ->leftJoin('partnumber_products', 'partnumber_products.product_id', '=', 'products.id')
                                 ->paginate(10);
@@ -57,7 +59,7 @@ class ProductController extends Controller
     public function getDetailProduct($id)
     {
         try {
-            $clothes = Product::select(
+            $product = Product::select(
                                     'products.id',
                                     'products.entity_name',
                                     'products.article_name',
@@ -68,6 +70,7 @@ class ProductController extends Controller
                                     'products.keyword',
                                     'products.description',
                                     'products.slug',
+                                    'products.price',
                                     'products.group_article',
                                     DB::raw("CASE WHEN types.type IS NULL THEN '-' ELSE types.type END AS type"),
                                     'partnumber_products.partnumber',
@@ -90,9 +93,12 @@ class ProductController extends Controller
                                     ])
                                 ->first();
 
+
+            $product->combo = explode(', ', $product->combo);
+
             return response()->json([
                 'status' => 'success',
-                'data' => $clothes,
+                'data' => $product,
                 'error' => null
             ], 200);
         } catch (\Throwable $th) {
@@ -150,19 +156,22 @@ class ProductController extends Controller
             $req = $this->checkRequest($request, $id);
 
             Product::where('id', '=', $id)->update([
-                'entity_name' => $req['entity_name'],
-                'article_name' => $req['article_name'],
-                'color' => $req['color'],
-                'material' => $req['material'],
-                'combo' => $req['combo'],
-                'special_feature' => $req['special_feature'],
-                'keyword' => $req['keyword'],
-                'description' => $req['description'],
-                'slug' => $req['slug'],
-                'group_article' => $req['group_article'],
-                'type_id' => $req['type_id'],
-                'is_active' => $req['is_active'],
+                'entity_name' => $req['requestProduct']['entity_name'],
+                'article_name' => $req['requestProduct']['article_name'],
+                'color' => $req['requestProduct']['color'],
+                'material' => $req['requestProduct']['material'],
+                'combo' => $req['requestProduct']['combo'],
+                'special_feature' => $req['requestProduct']['special_feature'],
+                'keyword' => $req['requestProduct']['keyword'],
+                'description' => $req['requestProduct']['description'],
+                'slug' => $req['requestProduct']['slug'],
+                'group_article' => $req['requestProduct']['group_article'],
+                'type_id' => $req['requestProduct']['type_id'],
+                'price' => $req['requestProduct']['price'],
+                'is_active' => $req['requestProduct']['is_active'],
             ]);
+
+            $this->updateBuffer($req['requestBuffer'], $id);
 
             return response()->json([
                 'status' => 'success',
@@ -178,12 +187,43 @@ class ProductController extends Controller
         }
     }
 
+    public function inputImage(Request $request)
+    {
+        try {
+            $inputPhoto = collect($request->input_photo)->map(function ($data) {
+                $decodeData = json_decode($data, true);
+
+                return [
+                    "product_id" => $decodeData['product_id'],
+                    "photo" => $decodeData['photo'],
+                    "created_at" => Carbon::now()->format('Y-m-d H:m:s'),
+                    "updated_at" => Carbon::now()->format('Y-m-d H:m:s')
+                ];
+            })->toArray();
+
+            DB::table('photos')->insert($inputPhoto);
+
+            return response()->json([
+                'status' => 'success',
+                'data' => true,
+                'error' => null
+            ], 200);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'status' => 'failed',
+                'data' => null,
+                'error' => $th->getMessage()
+            ], 400);
+        }
+    }
+
     private function checkRequest($request, $id)
     {
         $clothes = Product::where('id', '=', $id)->first();
+        $buffer_product = BufferProduct::where('clothes_id', '=', $id)->first();
         $slug = implode('-', explode(' ', strtolower(($request->article_name) ? $request->article_name : $clothes->article_name)));
 
-        return [
+        $requestProduct = [
             "entity_name" => ($request->entity_name) ? $request->entity_name : $clothes->entity_name,
             "article_name" => ($request->article_name) ? $request->article_name : $clothes->article_name,
             "color" => ($request->color) ? $request->color : $clothes->color,
@@ -193,10 +233,26 @@ class ProductController extends Controller
             "keyword" => ($request->keyword) ? $request->keyword : $clothes->keyword,
             "description" => ($request->description) ? $request->description : $clothes->description,
             "slug" => ($request->article_name) ? $slug : $clothes->slug,
+            "price" => ($request->price) ? $request->price : $clothes->price,
             "group_article" => ($request->group_article) ? $request->group_article : $clothes->group_article,
             "type_id" => ($request->type_id) ? $request->type_id : $clothes->type_id,
             "is_active" => ($request->is_active) ? $request->is_active : $clothes->is_active,
         ];
+
+        $requestBuffer = [
+            "qty_avaliable" => ($request->qty) ? $request->qty : $buffer_product->qty_avaliable,
+            "qty_buffer" => ($request->qty) ? $request->qty : $buffer_product->qty_buffer,
+        ];
+
+        return compact('requestProduct', 'requestBuffer');
+    }
+
+    private function updateBuffer($request, $id)
+    {
+        BufferProduct::where('clothes_id', '=', $id)->update([
+            'qty_avaliable' => $request['qty_avaliable'],
+            'qty_buffer' => $request['qty_buffer'],
+        ]);
     }
 
     private function inputPartnumber($clothesId, $partnumber)
