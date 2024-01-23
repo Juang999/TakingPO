@@ -17,4 +17,9 @@ class Product extends Model
     {
         return $this->hasOne(BufferProduct::class, 'clothes_id', 'id');
     }
+
+    public function DetailSession()
+    {
+        return $this->hasMany(DetailSession::class, 'product_id', 'id');
+    }
 }
