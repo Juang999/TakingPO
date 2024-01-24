@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Http\Requests\Client\Auth;
+namespace App\Http\Requests\Admin\Event;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class ClientRegisterRequest extends FormRequest
+class CreateDetailSessionRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -24,11 +24,8 @@ class ClientRegisterRequest extends FormRequest
     public function rules()
     {
         return [
-            'name' => 'required',
-            'phone_1' => 'required|unique:distributors,phone',
-            'distributor_id' => 'nullable',
-            'partner_group_id' => 'required',
-            'address' => 'required'
+            'session_id' => 'required',
+            'product_id' => 'required'
         ];
     }
 }
