@@ -72,9 +72,12 @@ Route::middleware('jwt.verify')->group(function () {
         Route::prefix('event')->group(function () {
             Route::get('/', 'Api\Admin\Event\EventController@getEvent');
             Route::post('/', 'Api\Admin\Event\EventController@createEvent');
+            Route::delete('/{id}/delete-event', 'Api\Admin\Event\EventController@deleteEvent');
             Route::delete('/{id}/delete-session', 'Api\Admin\Event\EventController@deleteSession');
             Route::get('/{id}/detail', 'Api\Admin\Event\EventController@getDetailEvent');
             Route::post('/input-session', 'Api\Admin\Event\EventController@createSession');
+            Route::put('/{id}/update-event', 'Api\Admin\Event\EventController@updateEvent');
+            Route::patch('/{id}/activate-event', 'Api\Admin\Event\EventController@activateEvent');
             Route::delete('/{id}/delete-detail-session', 'Api\Admin\Event\EventController@deleteDetailSession');
             Route::post('/input-detail-session', 'Api\Admin\Event\EventController@inputDetailSession');
         });
@@ -146,14 +149,21 @@ Route::prefix('client')->group( function () {
     Route::prefix('auth')->group( function () {
         Route::post('login', 'Api\Client\Event\ClientController@login');
         Route::post('register', 'Api\Client\Event\ClientController@register');
+        Route::get('partner-group', 'Api\Client\Event\ClientController@partnerGroupList');
     });
 
     Route::prefix('master')->group(function () {
-        Route::get('distributor', 'Api\Client\Event\DistributorController@distributorList');
+        Route::get('current-event', 'Api\Client\Event\MasterController@activeEvent');
+        Route::get('distributor', 'Api\Client\Event\MasterController@distributorList');
     });
 
     Route::prefix('SB')->middleware('client-check')->group(function () {
-        Route::get('product', 'Api\Client\Event\ProductController@getProduct');
+        Route::get('product', 'Api\Client\Event\OrderController@getProduct');
+        Route::post('chart-input', 'Api\Client\Event\OrderController@inputIntoChart');
+        Route::get('/{eventId}/data-chart', 'Api\Client\Event\OrderController@getDataChart');
+        Route::patch('/{id}/update-chart', 'Api\Client\Event\OrderController@updateDataChart');
+        Route::delete('/{id}/delete-chart', 'Api\Client\Event\OrderController@deleteDataChart');
+        Route::post('/{eventId}/order', 'Api\Client\Event\OrderController@createOrder');
     });
 
     // Route::prefix('SB')->mid

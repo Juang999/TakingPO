@@ -13,13 +13,13 @@ class ClientController extends Controller
     public function register(ClientRegisterRequest $request)
     {
         try {
-            $dataPartnerGroup = $this->getPartnerGroup();
+            $dataPartnerGroup = $this->getPartnerGroup($request->partner_group_id);
 
             DB::beginTransaction();
                 $distributor = Distributor::create([
                     'name' => $request->name,
                     'phone' => $request->phone_1,
-                    'distributor_id' => $request->distributor_id,
+                    'distributor_id' => ($request->partner_group_id == 1) ? 0 : $request->distributor_id,
                     'partner_group_id' => $dataPartnerGroup->id,
                     'group_code' => $dataPartnerGroup->prtnr_code,
                     'level' => 'BRONZE',
@@ -71,9 +71,28 @@ class ClientController extends Controller
         }
     }
 
-    private function getPartnerGroup()
+    public function partnerGroupList()
     {
-        $partnerGroup = PartnerGroup::select('id', 'prtnr_code')->where('id', '=', 3)->first();
+        try {
+            $dataPartnerGroup = PartnerGroup::select('id', 'prtnr_name')->get();
+
+            return response()->json([
+                'status' => 'success',
+                'data' => $dataPartnerGroup,
+                'error' => null
+            ], 200);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'status' => 'failed',
+                'data' => null,
+                'error' => $th->getMessage()
+            ], 400);
+        }
+    }
+
+    private function getPartnerGroup($partnerGrouId)
+    {
+        $partnerGroup = PartnerGroup::select('id', 'prtnr_code')->where('id', '=', $partnerGrouId)->first();
 
         return $partnerGroup;
     }

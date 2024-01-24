@@ -23,10 +23,18 @@ class ProductController extends Controller
                                 'keyword',
                                 'description',
                                 'price'
-                            )->when($searchName, function ($query) use ($searchName) {
+                            )->where('group_article', '=', function ($query) {
+                                $query->select('id')
+                                    ->from('events')
+                                    ->where('is_active', '=', true)
+                                    ->first();
+                            })
+                            ->when($searchName, function ($query) use ($searchName) {
                                 $query->where('article_name', 'like', "%$searchName%");
                             })
-                            ->with('Photo')
+                            ->with(['Photo' => function ($query) {
+                                $query->select('id', 'product_id', 'photo');
+                            }])
                             ->paginate(30);
 
             foreach ($products as $product) {
@@ -45,6 +53,5 @@ class ProductController extends Controller
                 'error' => $th->getMessage()
             ], 400);
         }
-
     }
 }
