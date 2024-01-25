@@ -28,7 +28,12 @@ class ClientRegisterRequest extends FormRequest
             'phone_1' => 'required|unique:distributors,phone',
             'distributor_id' => 'nullable',
             'partner_group_id' => 'required',
-            'address' => 'required'
+            'address' => 'required',
+            'province' => 'required',
+            'city' => 'required',
+            'subdistrict' => 'required',
+            'open_date' => 'nullable',
+            'status' => 'nullable'
         ];
     }
 }

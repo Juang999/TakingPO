@@ -72,7 +72,6 @@ class AgentController extends Controller
                     'partner_group_id' => $getDataPartnerGroup->id,
                 ]);
 
-                $this->createUser($request->ms_name, $agent->id);
                 $this->createMutifStore($request, $user_id, $getDataPartnerGroup, $agent->id);
             DB::commit();
 
