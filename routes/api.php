@@ -150,6 +150,7 @@ Route::prefix('client')->group( function () {
         Route::post('login', 'Api\Client\Event\ClientController@login');
         Route::post('register', 'Api\Client\Event\ClientController@register');
         Route::get('partner-group', 'Api\Client\Event\ClientController@partnerGroupList');
+        Route::post('register-distributor', 'Api\Client\Event\ClientController@registerDistributor');
     });
 
     Route::prefix('master')->group(function () {
@@ -159,11 +160,11 @@ Route::prefix('client')->group( function () {
 
     Route::prefix('SB')->middleware('client-check')->group(function () {
         Route::get('product', 'Api\Client\Event\OrderController@getProduct');
+        Route::delete('/{id}/delete-chart', 'Api\Client\Event\OrderController@deleteDataChart');
         Route::post('chart-input', 'Api\Client\Event\OrderController@inputIntoChart');
+        Route::post('/{eventId}/order', 'Api\Client\Event\OrderController@createOrder');
         Route::get('/{eventId}/data-chart', 'Api\Client\Event\OrderController@getDataChart');
         Route::patch('/{id}/update-chart', 'Api\Client\Event\OrderController@updateDataChart');
-        Route::delete('/{id}/delete-chart', 'Api\Client\Event\OrderController@deleteDataChart');
-        Route::post('/{eventId}/order', 'Api\Client\Event\OrderController@createOrder');
     });
 
     // Route::prefix('SB')->mid
