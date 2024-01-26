@@ -100,7 +100,7 @@ class ClientController extends Controller
                 $distributor = Distributor::create([
                     'name' => $request->name,
                     'phone' => $request->phone_1,
-                    'distributor_id' => $request->distributor_id,
+                    'distributor_id' => 0,
                     'partner_group_id' => 1,
                     'group_code' => 'DB',
                     'level' => 'BRONZE',

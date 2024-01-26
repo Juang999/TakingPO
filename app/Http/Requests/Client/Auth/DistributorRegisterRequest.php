@@ -26,7 +26,6 @@ class DistributorRegisterRequest extends FormRequest
         return [
             'name' => 'required',
             'phone_1' => 'required|unique:distributors,phone',
-            'distributor_id' => 'nullable',
             'address' => 'required',
             'province' => 'required',
             'city' => 'required',

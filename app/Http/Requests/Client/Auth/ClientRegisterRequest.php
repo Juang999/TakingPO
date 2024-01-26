@@ -33,7 +33,8 @@ class ClientRegisterRequest extends FormRequest
             'city' => 'required',
             'subdistrict' => 'required',
             'open_date' => 'nullable',
-            'status' => 'nullable'
+            'status' => 'nullable',
+            'zip' => 'required'
         ];
     }
 }
