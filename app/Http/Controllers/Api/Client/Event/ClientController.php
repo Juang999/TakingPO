@@ -150,7 +150,7 @@ class ClientController extends Controller
         $msCode = $this->createMsCode($request->open_date);
 
         $mutifStoreMaster = MutifStoreMaster::create([
-            'mutif_store_name' => "$request->mutif_store_name $request->subdistrict",
+            'mutif_store_name' => "MUTIF STORE $request->subdistrict",
             'mutif_store_code' => $msCode,
             'distributor_id' => $clientId,
             'open_date' => $request->open_date,
