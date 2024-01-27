@@ -175,8 +175,81 @@ class OrderController extends Controller
             })->where('event_id', '=', $eventId)
             ->when($searchProduct, function ($query) use ($searchProduct) {
                 $query->where('products.article_name', 'LIKE', "%$searchProduct%");
-            })
-            ->get();
+            })->get();
+
+            return response()->json([
+                'status' => 'success',
+                'data' => $dataChart,
+                'error' => null
+            ], 200);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'status' => 'failed',
+                'data' => null,
+                'error' => $th->getMessage()
+            ], 400);
+        }
+    }
+
+    public function countDataChart($eventId)
+    {
+        try {
+            $searchProduct = request()->searchproduct;
+
+            $dataChart = Chart::select(
+                'charts.id',
+                'products.entity_name',
+                'products.article_name',
+                'products.color',
+                'products.combo',
+                'products.material',
+                'products.keyword',
+                'products.type_id',
+                'types.type',
+                'products.description',
+                'products.price',
+                'charts.size_S',
+                'charts.size_M',
+                'charts.size_L',
+                'charts.size_XL',
+                'charts.size_XXL',
+                'charts.size_XXXL',
+                'charts.size_2',
+                'charts.size_4',
+                'charts.size_6',
+                'charts.size_8',
+                'charts.size_10',
+                'charts.size_12',
+                'charts.size_27',
+                'charts.size_28',
+                'charts.size_29',
+                'charts.size_30',
+                'charts.size_31',
+                'charts.size_32',
+                'charts.size_33',
+                'charts.size_34',
+                'charts.size_35',
+                'charts.size_36',
+                'charts.size_37',
+                'charts.size_38',
+                'charts.size_39',
+                'charts.size_40',
+                'charts.size_41',
+                'charts.size_42',
+                'charts.created_at'
+
+            )->join('products', 'products.id', '=', 'charts.product_id')
+            ->join('types', 'types.id', '=', 'products.type_id')
+            ->where('charts.client_id', '=', function($query) {
+                $phoneNumber = request()->header('phone');
+                $query->select('id')
+                    ->from('distributors')
+                    ->where('phone', '=', $phoneNumber)
+                    ->first();
+            })->where('event_id', '=', $eventId)
+            ->when($searchProduct, function ($query) use ($searchProduct) {
+                $query->where('products.article_name', 'LIKE', "%$searchProduct%");
+            })->count();
 
             return response()->json([
                 'status' => 'success',

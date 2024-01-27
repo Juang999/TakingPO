@@ -164,8 +164,11 @@ Route::prefix('client')->group( function () {
         Route::post('chart-input', 'Api\Client\Event\OrderController@inputIntoChart');
         Route::post('/{eventId}/order', 'Api\Client\Event\OrderController@createOrder');
         Route::get('/{eventId}/data-chart', 'Api\Client\Event\OrderController@getDataChart');
+        Route::get('/{eventId}/count-data-chart', 'Api\Client\Event\OrderController@countDataChart');
         Route::patch('/{id}/update-chart', 'Api\Client\Event\OrderController@updateDataChart');
     });
+
+    Route::post('verification', 'Api\Client\Event\ClientController@verification');
 
     // Route::prefix('SB')->mid
     // Login & Register

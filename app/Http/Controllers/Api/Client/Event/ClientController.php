@@ -124,6 +124,27 @@ class ClientController extends Controller
         }
     }
 
+    public function verification()
+    {
+        try {
+            $phoneNumber = request()->header('phone');
+
+            $dataClient = Distributor::where('phone', '=', $phoneNumber)->first();
+
+            return response()->json([
+                'status' => ($dataClient) ? 'success' : 'failed',
+                'data' => ($dataClient) ? 'nomor terdaftar' : 'nomor tidak terdaftar',
+                'error' => null
+            ], ($dataClient) ? 200 : 300);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'status' => 'failed',
+                'data' => null,
+                'error' => $th->getMessage()
+            ], 400);
+        }
+    }
+
     private function getPartnerGroup($partnerGrouId)
     {
         $partnerGroup = PartnerGroup::select('id', 'prtnr_code')->where('id', '=', $partnerGrouId)->first();
