@@ -41,7 +41,7 @@ class OrderController extends Controller
                             ->with(['Photo' => function ($query) {
                                 $query->select('id', 'product_id', 'photo');
                             }])
-                            ->paginate(3);
+                            ->paginate(1);
 
             foreach ($products as $product) {
                 $product->combo = explode(', ', $product->combo);
@@ -130,6 +130,8 @@ class OrderController extends Controller
                 'products.combo',
                 'products.material',
                 'products.keyword',
+                'products.type_id',
+                'types.type',
                 'products.description',
                 'products.price',
                 'charts.size_S',
@@ -163,6 +165,7 @@ class OrderController extends Controller
                 'charts.created_at'
 
             )->join('products', 'products.id', '=', 'charts.product_id')
+            ->join('types', 'types.id', '=', 'products.type_id')
             ->where('charts.client_id', '=', function($query) {
                 $phoneNumber = request()->header('phone');
                 $query->select('id')
@@ -301,7 +304,7 @@ class OrderController extends Controller
 
     public function historyOrder()
     {
-        
+
     }
 
     private function checkRequestCreate($request, $headerPhone)
