@@ -11,7 +11,7 @@ use App\Http\Requests\Client\Order\{InputOrderRequest, UpdateOrderRequest};
 
 class OrderController extends Controller
 {
-    public function getProduct()
+    public function getProduct($eventId)
     {
         try {
             $searchName = request()->search_name;
@@ -34,6 +34,20 @@ class OrderController extends Controller
                                     ->from('events')
                                     ->where('is_active', '=', true)
                                     ->first();
+                            })
+                            ->whereNotIn('products.id', function ($query) use ($eventId) {
+                                $phoneNumber = request()->header('phone');
+
+                                $query->select('product_id')
+                                    ->from('charts')
+                                    ->where([
+                                        ['client_id', '=', function ($query) use ($phoneNumber) {
+                                            $query->select('id')
+                                                ->from('distributors')
+                                                ->where('phone', '=', $phoneNumber);
+                                        }],
+                                        ['event_id', '=', $eventId]
+                                    ]);
                             })
                             ->when($searchName, function ($query) use ($searchName) {
                                 $query->where('products.article_name', 'like', "%$searchName%");
@@ -124,6 +138,7 @@ class OrderController extends Controller
 
             $dataChart = Chart::select(
                 'charts.id',
+                'charts.product_id',
                 'products.entity_name',
                 'products.article_name',
                 'products.color',
@@ -175,7 +190,10 @@ class OrderController extends Controller
             })->where('event_id', '=', $eventId)
             ->when($searchProduct, function ($query) use ($searchProduct) {
                 $query->where('products.article_name', 'LIKE', "%$searchProduct%");
-            })->get();
+            })->with(['Photo' => function ($query) {
+                $query->select('photo');
+            }])
+            ->get();
 
             return response()->json([
                 'status' => 'success',
@@ -279,35 +297,35 @@ class OrderController extends Controller
                         ->first();
                 }]
             ])->update([
-                'size_S' => $request['S'],
-                'size_M' => $request['M'],
-                'size_L' => $request['L'],
-                'size_XL' => $request['XL'],
-                'size_XXL' => $request['XXL'],
-                'size_XXXL' => $request['XXXL'],
-                'size_2' => $request['2'],
-                'size_4' => $request['4'],
-                'size_6' => $request['6'],
-                'size_8' => $request['8'],
-                'size_10' => $request['10'],
-                'size_12' => $request['12'],
-                'size_27' => $request['27'],
-                'size_28' => $request['28'],
-                'size_29' => $request['29'],
-                'size_30' => $request['30'],
-                'size_31' => $request['31'],
-                'size_32' => $request['32'],
-                'size_33' => $request['33'],
-                'size_34' => $request['34'],
-                'size_35' => $request['35'],
-                'size_36' => $request['36'],
-                'size_37' => $request['37'],
-                'size_38' => $request['38'],
-                'size_39' => $request['39'],
-                'size_40' => $request['40'],
-                'size_41' => $request['41'],
-                'size_42' => $request['42'],
-                'size_other' => $request['other']
+                'size_S' => $request['size_S'],
+                'size_M' => $request['size_M'],
+                'size_L' => $request['size_L'],
+                'size_XL' => $request['size_XL'],
+                'size_XXL' => $request['size_XXL'],
+                'size_XXXL' => $request['size_XXXL'],
+                'size_2' => $request['size_2'],
+                'size_4' => $request['size_4'],
+                'size_6' => $request['size_6'],
+                'size_8' => $request['size_8'],
+                'size_10' => $request['size_10'],
+                'size_12' => $request['size_12'],
+                'size_27' => $request['size_27'],
+                'size_28' => $request['size_28'],
+                'size_29' => $request['size_29'],
+                'size_30' => $request['size_30'],
+                'size_31' => $request['size_31'],
+                'size_32' => $request['size_32'],
+                'size_33' => $request['size_33'],
+                'size_34' => $request['size_34'],
+                'size_35' => $request['size_35'],
+                'size_36' => $request['size_36'],
+                'size_37' => $request['size_37'],
+                'size_38' => $request['size_38'],
+                'size_39' => $request['size_39'],
+                'size_40' => $request['size_40'],
+                'size_41' => $request['size_41'],
+                'size_42' => $request['size_42'],
+                'size_other' => $request['size_other']
             ]);
 
             return response()->json([
@@ -390,35 +408,35 @@ class OrderController extends Controller
             'event_id' => $request['event_id'],
             'session_id' => null,
             'product_id' => $request['product_id'],
-            'size_S' => ($request['size_S']) ? $request['size_S'] : 0,
-            'size_M' => ($request['size_M']) ? $request['size_M'] : 0,
-            'size_L' => ($request['size_L']) ? $request['size_L'] : 0,
-            'size_XL' => ($request['size_XL']) ? $request['size_XL'] : 0,
-            'size_XXL' => ($request['size_XXL']) ? $request['size_XXL'] : 0,
-            'size_XXXL' => ($request['size_XXXL']) ? $request['size_XXXL'] : 0,
-            'size_2' => ($request['size_2']) ? $request['size_2'] : 0,
-            'size_4' => ($request['size_4']) ? $request['size_4'] : 0,
-            'size_6' => ($request['size_6']) ? $request['size_6'] : 0,
-            'size_8' => ($request['size_8']) ? $request['size_8'] : 0,
-            'size_10' => ($request['size_10']) ? $request['size_10'] : 0,
-            'size_12' => ($request['size_12']) ? $request['size_12'] : 0,
-            'size_27' => ($request['size_27']) ? $request['size_27'] : 0,
-            'size_28' => ($request['size_28']) ? $request['size_28'] : 0,
-            'size_29' => ($request['size_29']) ? $request['size_29'] : 0,
-            'size_30' => ($request['size_30']) ? $request['size_30'] : 0,
-            'size_31' => ($request['size_31']) ? $request['size_31'] : 0,
-            'size_32' => ($request['size_32']) ? $request['size_32'] : 0,
-            'size_33' => ($request['size_33']) ? $request['size_33'] : 0,
-            'size_34' => ($request['size_34']) ? $request['size_34'] : 0,
-            'size_35' => ($request['size_35']) ? $request['size_35'] : 0,
-            'size_36' => ($request['size_36']) ? $request['size_36'] : 0,
-            'size_37' => ($request['size_37']) ? $request['size_37'] : 0,
-            'size_38' => ($request['size_38']) ? $request['size_38'] : 0,
-            'size_39' => ($request['size_39']) ? $request['size_39'] : 0,
-            'size_40' => ($request['size_40']) ? $request['size_40'] : 0,
-            'size_41' => ($request['size_41']) ? $request['size_41'] : 0,
-            'size_42' => ($request['size_42']) ? $request['size_42'] : 0,
-            'size_other' => ($request['size_other']) ? $request['size_other'] : 0,
+            'size_S' => (array_key_exists('size_S', $request)) ? $request['size_S'] : 0,
+            'size_M' => (array_key_exists('size_M', $request)) ? $request['size_M'] : 0,
+            'size_L' => (array_key_exists('size_L', $request)) ? $request['size_L'] : 0,
+            'size_XL' => (array_key_exists('size_XL', $request)) ? $request['size_XL'] : 0,
+            'size_XXL' => (array_key_exists('size_XXL', $request)) ? $request['size_XXL'] : 0,
+            'size_XXXL' => (array_key_exists('size_XXXL', $request)) ? $request['size_XXXL'] : 0,
+            'size_2' => (array_key_exists('size_2', $request)) ? $request['size_2'] : 0,
+            'size_4' => (array_key_exists('size_4', $request)) ? $request['size_4'] : 0,
+            'size_6' => (array_key_exists('size_6', $request)) ? $request['size_6'] : 0,
+            'size_8' => (array_key_exists('size_8', $request)) ? $request['size_8'] : 0,
+            'size_10' => (array_key_exists('size_10', $request)) ? $request['size_10'] : 0,
+            'size_12' => (array_key_exists('size_12', $request)) ? $request['size_12'] : 0,
+            'size_27' => (array_key_exists('size_27', $request)) ? $request['size_27'] : 0,
+            'size_28' => (array_key_exists('size_28', $request)) ? $request['size_28'] : 0,
+            'size_29' => (array_key_exists('size_29', $request)) ? $request['size_29'] : 0,
+            'size_30' => (array_key_exists('size_30', $request)) ? $request['size_30'] : 0,
+            'size_31' => (array_key_exists('size_31', $request)) ? $request['size_31'] : 0,
+            'size_32' => (array_key_exists('size_32', $request)) ? $request['size_32'] : 0,
+            'size_33' => (array_key_exists('size_33', $request)) ? $request['size_33'] : 0,
+            'size_34' => (array_key_exists('size_34', $request)) ? $request['size_34'] : 0,
+            'size_35' => (array_key_exists('size_35', $request)) ? $request['size_35'] : 0,
+            'size_36' => (array_key_exists('size_36', $request)) ? $request['size_36'] : 0,
+            'size_37' => (array_key_exists('size_37', $request)) ? $request['size_37'] : 0,
+            'size_38' => (array_key_exists('size_38', $request)) ? $request['size_38'] : 0,
+            'size_39' => (array_key_exists('size_39', $request)) ? $request['size_39'] : 0,
+            'size_40' => (array_key_exists('size_40', $request)) ? $request['size_40'] : 0,
+            'size_41' => (array_key_exists('size_41', $request)) ? $request['size_41'] : 0,
+            'size_42' => (array_key_exists('size_42', $request)) ? $request['size_42'] : 0,
+            'size_other' => (array_key_exists('size_other', $request)) ? $request['size_other'] : 0,
         ];
     }
 
@@ -428,35 +446,35 @@ class OrderController extends Controller
         $request = collect($request)->toArray();
 
         return [
-            'S' => ($request['size_S'] !== NULL) ? $request['size_S'] : $dataChart->size_S,
-            'M' => ($request['size_M'] !== NULL) ? $request['size_M'] : $dataChart->size_M,
-            'L' => ($request['size_L'] !== NULL) ? $request['size_L'] : $dataChart->size_L,
-            'XL' => ($request['size_XL'] !== NULL) ? $request['size_XL'] : $dataChart->size_XL,
-            'XXL' => ($request['size_XXL'] !== NULL) ? $request['size_XXL'] : $dataChart->size_XXL,
-            'XXXL' => ($request['size_XXXL'] !== NULL) ? $request['size_XXXL'] : $dataChart->size_XXXL,
-            '2' => ($request['size_2'] !== NULL) ? $request['size_2'] : $dataChart->size_2,
-            '4' => ($request['size_4'] !== NULL) ? $request['size_4'] : $dataChart->size_4,
-            '6' => ($request['size_6'] !== NULL) ? $request['size_6'] : $dataChart->size_6,
-            '8' => ($request['size_8'] !== NULL) ? $request['size_8'] : $dataChart->size_8,
-            '10' => ($request['size_10'] !== NULL) ? $request['size_10'] : $dataChart->size_10,
-            '12' => ($request['size_12'] !== NULL) ? $request['size_12'] : $dataChart->size_12,
-            '27' => ($request['size_27'] !== NULL) ? $request['size_27'] : $dataChart->size_27,
-            '28' => ($request['size_28'] !== NULL) ? $request['size_28'] : $dataChart->size_28,
-            '29' => ($request['size_29'] !== NULL) ? $request['size_29'] : $dataChart->size_29,
-            '30' => ($request['size_30'] !== NULL) ? $request['size_30'] : $dataChart->size_30,
-            '31' => ($request['size_31'] !== NULL) ? $request['size_31'] : $dataChart->size_31,
-            '32' => ($request['size_32'] !== NULL) ? $request['size_32'] : $dataChart->size_32,
-            '33' => ($request['size_33'] !== NULL) ? $request['size_33'] : $dataChart->size_33,
-            '34' => ($request['size_34'] !== NULL) ? $request['size_34'] : $dataChart->size_34,
-            '35' => ($request['size_35'] !== NULL) ? $request['size_35'] : $dataChart->size_35,
-            '36' => ($request['size_36'] !== NULL) ? $request['size_36'] : $dataChart->size_36,
-            '37' => ($request['size_37'] !== NULL) ? $request['size_37'] : $dataChart->size_37,
-            '38' => ($request['size_38'] !== NULL) ? $request['size_38'] : $dataChart->size_38,
-            '39' => ($request['size_39'] !== NULL) ? $request['size_39'] : $dataChart->size_39,
-            '40' => ($request['size_40'] !== NULL) ? $request['size_40'] : $dataChart->size_40,
-            '41' => ($request['size_41'] !== NULL) ? $request['size_41'] : $dataChart->size_41,
-            '42' => ($request['size_42'] !== NULL) ? $request['size_42'] : $dataChart->size_42,
-            'other' => ($request['size_other'] !== NULL) ? $request['size_other'] : $dataChart->size_other
+            'size_S' => (array_key_exists('size_S', $request)) ? ($request['size_S'] !== NULL) ? $request['size_S'] : $dataChart->size_S : $dataChart->size_S,
+            'size_M' => (array_key_exists('size_M', $request)) ? ($request['size_M'] !== NULL) ? $request['size_M'] : $dataChart->size_M : $dataChart->size_M,
+            'size_L' => (array_key_exists('size_L', $request)) ? ($request['size_L'] !== NULL) ? $request['size_L'] : $dataChart->size_L : $dataChart->size_L,
+            'size_XL' => (array_key_exists('size_XL', $request)) ? ($request['size_XL'] !== NULL) ? $request['size_XL'] : $dataChart->size_XL : $dataChart->size_XL,
+            'size_XXL' => (array_key_exists('size_XXL', $request)) ? ($request['size_XXL'] !== NULL) ? $request['size_XXL'] : $dataChart->size_XXL : $dataChart->size_XXL,
+            'size_XXXL' => (array_key_exists('size_XXXL', $request)) ? ($request['size_XXXL'] !== NULL) ? $request['size_XXXL'] : $dataChart->size_XXXL : $dataChart->size_XXXL,
+            'size_2' => (array_key_exists('size_2', $request)) ? ($request['size_2'] !== NULL) ? $request['size_2'] : $dataChart->size_2 : $dataChart->size_2,
+            'size_4' => (array_key_exists('size_4', $request)) ? ($request['size_4'] !== NULL) ? $request['size_4'] : $dataChart->size_4 : $dataChart->size_4,
+            'size_6' => (array_key_exists('size_6', $request)) ? ($request['size_6'] !== NULL) ? $request['size_6'] : $dataChart->size_6 : $dataChart->size_6,
+            'size_8' => (array_key_exists('size_8', $request)) ? ($request['size_8'] !== NULL) ? $request['size_8'] : $dataChart->size_8 : $dataChart->size_8,
+            'size_10' => (array_key_exists('size_10', $request)) ? ($request['size_10'] !== NULL) ? $request['size_10'] : $dataChart->size_10 : $dataChart->size_10,
+            'size_12' => (array_key_exists('size_12', $request)) ? ($request['size_12'] !== NULL) ? $request['size_12'] : $dataChart->size_12 : $dataChart->size_12,
+            'size_27' => (array_key_exists('size_27', $request)) ? ($request['size_27'] !== NULL) ? $request['size_27'] : $dataChart->size_27 : $dataChart->size_27,
+            'size_28' => (array_key_exists('size_28', $request)) ? ($request['size_28'] !== NULL) ? $request['size_28'] : $dataChart->size_28 : $dataChart->size_28,
+            'size_29' => (array_key_exists('size_29', $request)) ? ($request['size_29'] !== NULL) ? $request['size_29'] : $dataChart->size_29 : $dataChart->size_29,
+            'size_30' => (array_key_exists('size_30', $request)) ? ($request['size_30'] !== NULL) ? $request['size_30'] : $dataChart->size_30 : $dataChart->size_30,
+            'size_31' => (array_key_exists('size_31', $request)) ? ($request['size_31'] !== NULL) ? $request['size_31'] : $dataChart->size_31 : $dataChart->size_31,
+            'size_32' => (array_key_exists('size_32', $request)) ? ($request['size_32'] !== NULL) ? $request['size_32'] : $dataChart->size_32 : $dataChart->size_32,
+            'size_33' => (array_key_exists('size_33', $request)) ? ($request['size_33'] !== NULL) ? $request['size_33'] : $dataChart->size_33 : $dataChart->size_33,
+            'size_34' => (array_key_exists('size_34', $request)) ? ($request['size_34'] !== NULL) ? $request['size_34'] : $dataChart->size_34 : $dataChart->size_34,
+            'size_35' => (array_key_exists('size_35', $request)) ? ($request['size_35'] !== NULL) ? $request['size_35'] : $dataChart->size_35 : $dataChart->size_35,
+            'size_36' => (array_key_exists('size_36', $request)) ? ($request['size_36'] !== NULL) ? $request['size_36'] : $dataChart->size_36 : $dataChart->size_36,
+            'size_37' => (array_key_exists('size_37', $request)) ? ($request['size_37'] !== NULL) ? $request['size_37'] : $dataChart->size_37 : $dataChart->size_37,
+            'size_38' => (array_key_exists('size_38', $request)) ? ($request['size_38'] !== NULL) ? $request['size_38'] : $dataChart->size_38 : $dataChart->size_38,
+            'size_39' => (array_key_exists('size_39', $request)) ? ($request['size_39'] !== NULL) ? $request['size_39'] : $dataChart->size_39 : $dataChart->size_39,
+            'size_40' => (array_key_exists('size_40', $request)) ? ($request['size_40'] !== NULL) ? $request['size_40'] : $dataChart->size_40 : $dataChart->size_40,
+            'size_41' => (array_key_exists('size_41', $request)) ? ($request['size_41'] !== NULL) ? $request['size_41'] : $dataChart->size_41 : $dataChart->size_41,
+            'size_42' => (array_key_exists('size_42', $request)) ? ($request['size_42'] !== NULL) ? $request['size_42'] : $dataChart->size_42 : $dataChart->size_42,
+            'size_other' => (array_key_exists('size_other', $request)) ? ($request['size_other'] !== NULL) ? $request['size_other'] : $dataChart->size_other : $dataChart->size_other
         ];
     }
 

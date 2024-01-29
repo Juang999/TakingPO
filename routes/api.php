@@ -159,7 +159,7 @@ Route::prefix('client')->group( function () {
     });
 
     Route::prefix('SB')->middleware('client-check', 'check-event')->group(function () {
-        Route::get('product', 'Api\Client\Event\OrderController@getProduct');
+        Route::get('/{eventId}/product', 'Api\Client\Event\OrderController@getProduct');
         Route::delete('/{id}/delete-chart', 'Api\Client\Event\OrderController@deleteDataChart');
         Route::post('chart-input', 'Api\Client\Event\OrderController@inputIntoChart');
         Route::post('/{eventId}/order', 'Api\Client\Event\OrderController@createOrder');
