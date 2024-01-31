@@ -29,12 +29,7 @@ class OrderController extends Controller
                                 'description',
                                 'price'
                             )->leftJoin('types', 'types.id', '=', 'products.type_id')
-                            ->where('products.group_article', '=', function ($query) {
-                                $query->select('id')
-                                    ->from('events')
-                                    ->where('is_active', '=', true)
-                                    ->first();
-                            })
+                            ->where('products.group_article', '=', $eventId)
                             ->whereNotIn('products.id', function ($query) use ($eventId) {
                                 $phoneNumber = request()->header('phone');
 
@@ -134,6 +129,9 @@ class OrderController extends Controller
     public function getDataChart($eventId)
     {
         try {
+            $phoneNumber = request()->header('phone');
+            $statusOrder = $this->getStatusOrder($eventId, $phoneNumber);
+
             $searchProduct = request()->searchproduct;
 
             $dataChart = Chart::select(
@@ -197,6 +195,7 @@ class OrderController extends Controller
 
             return response()->json([
                 'status' => 'success',
+                'order_status' => $statusOrder,
                 'data' => $dataChart,
                 'error' => null
             ], 200);
@@ -393,9 +392,82 @@ class OrderController extends Controller
         }
     }
 
-    public function historyOrder()
+    public function historyOrder($eventId)
     {
+        try {
+            $searchProduct = request()->searchproduct;
 
+            $dataOrder = Order::select(
+                'orders.id',
+                'orders.product_id',
+                'products.entity_name',
+                'products.article_name',
+                'products.color',
+                'products.combo',
+                'products.material',
+                'products.keyword',
+                'products.type_id',
+                'types.type',
+                'products.description',
+                'products.price',
+                'orders.size_S',
+                'orders.size_M',
+                'orders.size_L',
+                'orders.size_XL',
+                'orders.size_XXL',
+                'orders.size_XXXL',
+                'orders.size_2',
+                'orders.size_4',
+                'orders.size_6',
+                'orders.size_8',
+                'orders.size_10',
+                'orders.size_12',
+                'orders.size_27',
+                'orders.size_28',
+                'orders.size_29',
+                'orders.size_30',
+                'orders.size_31',
+                'orders.size_32',
+                'orders.size_33',
+                'orders.size_34',
+                'orders.size_35',
+                'orders.size_36',
+                'orders.size_37',
+                'orders.size_38',
+                'orders.size_39',
+                'orders.size_40',
+                'orders.size_41',
+                'orders.size_42',
+                'orders.created_at'
+
+            )->join('products', 'products.id', '=', 'orders.product_id')
+            ->join('types', 'types.id', '=', 'products.type_id')
+            ->where('orders.client_id', '=', function($query) {
+                $phoneNumber = request()->header('phone');
+                $query->select('id')
+                    ->from('distributors')
+                    ->where('phone', '=', $phoneNumber)
+                    ->first();
+            })->where('event_id', '=', $eventId)
+            ->when($searchProduct, function ($query) use ($searchProduct) {
+                $query->where('products.article_name', 'LIKE', "%$searchProduct%");
+            })->with(['Photo' => function ($query) {
+                $query->select('photo');
+            }])
+            ->get();
+
+            return response()->json([
+                'status' => 'success',
+                'data' => $dataOrder,
+                'error' => null
+            ], 200);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'status' => 'failed',
+                'data' => null,
+                'error' => $th->getMessage()
+            ], 400);
+        }
     }
 
     private function checkRequestCreate($request, $headerPhone)
@@ -590,5 +662,20 @@ class OrderController extends Controller
         $distributor = Distributor::where('phone', '=', $clientPhoneNumber)->first();
 
         return $distributor;
+    }
+
+    private function getStatusOrder($eventId, $phoneNumber)
+    {
+        $dataOrder = Order::where([
+            ['event_id', '=', $eventId],
+            ['client_id', '=', function ($query) use ($phoneNumber) {
+                $query->select('id')
+                    ->from('distributors')
+                    ->where('phone', '=', $phoneNumber)
+                    ->first();
+            }]
+        ])->count();
+
+        return ($dataOrder > 0) ? true : false;
     }
 }

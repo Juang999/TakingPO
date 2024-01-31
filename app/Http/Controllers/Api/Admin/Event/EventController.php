@@ -35,6 +35,25 @@ class EventController extends Controller
         }
     }
 
+    public function getListEvent()
+    {
+        try {
+            $event = Event::select('id', 'event_name')->get();
+
+            return response()->json([
+                'status' => 'success',
+                'data' => $event,
+                'error' => null
+            ], 200);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'status' => 'failed',
+                'data' => null,
+                'error' => $th->getMessage()
+            ], 400);
+        }
+    }
+
     public function createEvent(CreateEventRequest $request)
     {
         try {

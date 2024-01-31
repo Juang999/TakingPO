@@ -71,6 +71,7 @@ Route::middleware('jwt.verify')->group(function () {
 
         Route::prefix('event')->group(function () {
             Route::get('/', 'Api\Admin\Event\EventController@getEvent');
+            Route::get('/list-event', 'Api\Admin\Event\EventController@getListEvent');
             Route::post('/', 'Api\Admin\Event\EventController@createEvent');
             Route::delete('/{id}/delete-event', 'Api\Admin\Event\EventController@deleteEvent');
             Route::delete('/{id}/delete-session', 'Api\Admin\Event\EventController@deleteSession');
@@ -80,6 +81,10 @@ Route::middleware('jwt.verify')->group(function () {
             Route::patch('/{id}/activate-event', 'Api\Admin\Event\EventController@activateEvent');
             Route::delete('/{id}/delete-detail-session', 'Api\Admin\Event\EventController@deleteDetailSession');
             Route::post('/input-detail-session', 'Api\Admin\Event\EventController@inputDetailSession');
+        });
+
+        Route::prefix('report')->group(function () {
+            Route::get('/{eventId}/highest-order', 'Api\Admin\Event\ReportController@highestOrder');
         });
     });
 
@@ -159,13 +164,15 @@ Route::prefix('client')->group( function () {
     });
 
     Route::prefix('SB')->middleware('client-check', 'check-event')->group(function () {
-        Route::get('/{eventId}/product', 'Api\Client\Event\OrderController@getProduct');
         Route::delete('/{id}/delete-chart', 'Api\Client\Event\OrderController@deleteDataChart');
         Route::post('chart-input', 'Api\Client\Event\OrderController@inputIntoChart');
+        Route::get('/{eventId}/product', 'Api\Client\Event\OrderController@getProduct');
         Route::post('/{eventId}/order', 'Api\Client\Event\OrderController@createOrder');
         Route::get('/{eventId}/data-chart', 'Api\Client\Event\OrderController@getDataChart');
+        Route::put('/{id}/update-chart', 'Api\Client\Event\OrderController@updateDataChart');
         Route::get('/{eventId}/count-data-chart', 'Api\Client\Event\OrderController@countDataChart');
-        Route::patch('/{id}/update-chart', 'Api\Client\Event\OrderController@updateDataChart');
+        Route::get('/{eventId}/history', 'Api\Client\Event\OrderController@historyOrder');
+
     });
 
     Route::post('verification', 'Api\Client\Event\ClientController@verification');
