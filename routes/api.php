@@ -46,6 +46,7 @@ Route::middleware('jwt.verify')->group(function () {
             Route::post('/', 'Api\Admin\Event\AgentController@store');
             Route::get('/{id}/detail', 'Api\Admin\Event\AgentController@show');
             Route::put('/{id}/update', 'Api\Admin\Event\AgentController@update');
+            Route::get('/list-client', 'Api\Admin\Event\AgentController@getClient');
         });
 
         Route::prefix('distributor')->group(function () {

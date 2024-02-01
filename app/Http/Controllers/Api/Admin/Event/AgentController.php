@@ -90,6 +90,31 @@ class AgentController extends Controller
         }
     }
 
+    public function getClient()
+    {
+        try {
+            $isDistributor = (request()->is_distributor) ? request()->is_distributor : 'Y';
+
+            if ($isDistributor == 'Y') {
+                $dataClient = $this->getListDistributor();
+            } else {
+                $dataClient = $this->getLIstAgent();
+            }
+
+            return response()->json([
+                'status' => 'success',
+                'data' => $dataClient,
+                'error' => null
+            ], 200);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'status' => 'failed',
+                'data' => null,
+                'error' => $th->getMessage()
+            ], 400);
+        }
+    }
+
     public function show($id)
     {
         try {
@@ -294,5 +319,19 @@ class AgentController extends Controller
             'zip' => $req['requestMutifStoreAddress']['zip'],
             'comment' => $req['requestMutifStoreAddress']['comment']
         ]);
+    }
+
+    private function getListDistributor()
+    {
+        $dataDistributor = Distributor::select('id', 'name')->where('partner_group_id', '=', 1)->get();
+
+        return $dataDistributor;
+    }
+
+    private function getListAgent()
+    {
+        $dataAgent = Distributor::select('id', 'name')->where('partner_group_id', '<>', 1)->get();
+
+        return $dataAgent;
     }
 }
