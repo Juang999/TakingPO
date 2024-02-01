@@ -36,29 +36,29 @@ Route::middleware('jwt.verify')->group(function () {
     ]);
 
     Route::prefix('partnumber')->group(function () {
-        Route::post('/', 'Api\Admin\PartnumberController@store');
+        Route::post('/create', 'Api\Admin\PartnumberController@store');
         Route::delete('/{partnumber}/delete', 'Api\Admin\PartnumberController@destroy');
     });
 
     Route::prefix('v2')->group(function () {
         Route::prefix('agent')->group(function () {
-            Route::get('/', 'Api\Admin\Event\AgentController@index');
-            Route::post('/', 'Api\Admin\Event\AgentController@store');
+            Route::get('/get', 'Api\Admin\Event\AgentController@index');
+            Route::post('/create', 'Api\Admin\Event\AgentController@store');
             Route::get('/{id}/detail', 'Api\Admin\Event\AgentController@show');
             Route::put('/{id}/update', 'Api\Admin\Event\AgentController@update');
             Route::get('/list-client', 'Api\Admin\Event\AgentController@getClient');
         });
 
         Route::prefix('distributor')->group(function () {
-            Route::get('/', 'Api\Admin\Event\DistributorController@index');
-            Route::post('/', 'Api\Admin\Event\DistributorController@store');
+            Route::get('/get', 'Api\Admin\Event\DistributorController@index');
+            Route::post('/create', 'Api\Admin\Event\DistributorController@store');
             Route::get('/{id}/detail', 'Api\Admin\Event\DistributorController@show');
             Route::put('/{id}/update', 'Api\Admin\Event\DistributorController@update');
             Route::get('/list', 'Api\Admin\Event\DistributorController@getListDistributor');
         });
 
         Route::prefix('product')->group(function () {
-            Route::get('/', 'Api\Admin\Event\ProductController@getAllProduct');
+            Route::get('/get', 'Api\Admin\Event\ProductController@getAllProduct');
             Route::post('/create', 'Api\Admin\Event\ProductController@storeProduct');
             Route::post('/input-photo', 'Api\Admin\Event\ProductController@inputImage');
             Route::put('/{id}/update', 'Api\Admin\Event\ProductController@updateProduct');
@@ -71,9 +71,9 @@ Route::middleware('jwt.verify')->group(function () {
         });
 
         Route::prefix('event')->group(function () {
-            Route::get('/', 'Api\Admin\Event\EventController@getEvent');
+            Route::get('/get', 'Api\Admin\Event\EventController@getEvent');
             Route::get('/list-event', 'Api\Admin\Event\EventController@getListEvent');
-            Route::post('/', 'Api\Admin\Event\EventController@createEvent');
+            Route::post('/create', 'Api\Admin\Event\EventController@createEvent');
             Route::delete('/{id}/delete-event', 'Api\Admin\Event\EventController@deleteEvent');
             Route::delete('/{id}/delete-session', 'Api\Admin\Event\EventController@deleteSession');
             Route::get('/{id}/detail', 'Api\Admin\Event\EventController@getDetailEvent');
