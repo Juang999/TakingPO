@@ -273,6 +273,25 @@ class EventController extends Controller
         }
     }
 
+    public function currentEvent()
+    {
+        try {
+            $dataEvent = Event::select('id', 'event_name')->where('is_active', '=', true)->first();
+
+            return response()->json([
+                'status' => 'success',
+                'data' => $dataEvent,
+                'error' => null
+            ], 200);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'status' => 'failed',
+                'data' => null,
+                'error' => $th->getMessage()
+            ], 400);
+        }
+    }
+
     private function inactiveEvent()
     {
         Event::where('is_active', '=', true)
