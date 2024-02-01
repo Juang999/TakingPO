@@ -15,6 +15,8 @@ class OrderController extends Controller
     {
         try {
             $searchName = request()->search_name;
+            $phoneNumber = request()->header('phone');
+            $statusOrder = $this->getStatusOrder($eventId, $phoneNumber);
 
             $products = Product::select(
                                 'products.id',
@@ -58,7 +60,8 @@ class OrderController extends Controller
 
             return response()->json([
                 'status' => 'success',
-                'data' => $products,
+                'data' => ($statusOrder == false) ? $products : [],
+                'status_order' => $statusOrder,
                 'error' => null
             ], 200);
         } catch (\Throwable $th) {
