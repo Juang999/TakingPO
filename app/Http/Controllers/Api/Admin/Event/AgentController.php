@@ -249,7 +249,7 @@ class AgentController extends Controller
                     'phone_1' => $request->ms_phone,
                     'phone_2' => ($request->ms_phone_2) ? $request->ms_phone_2 : 0,
                     'fax_1' => $request->fax_1,
-                    'addr_type' => $request->addr_type,
+                    'addr_type' => 'billTo',
                     'comment' => $request->comment,
                     'zip' => $request->zip
                 ]);
