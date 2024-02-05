@@ -30,6 +30,11 @@ class Distributor extends Model
 
     // protected $hidden = ['created_at', 'updated_at'];
 
+    public function Order()
+    {
+        return $this->hasMany(Order::class, 'client_id', 'id');
+    }
+
     // public function Transaction()
     // {
     //     return $this->hasMany(Transaction::class);
