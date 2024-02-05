@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Api\Admin\Event;
 
 use App\Http\Controllers\Controller;
-use App\Models\Order;
+use App\Models\{Order, Distributor};
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -26,6 +26,75 @@ class ReportController extends Controller
             return response()->json([
                 'status' => 'success',
                 'data' => $dataOrder,
+                'error' => null
+            ], 200);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'status' => 'failed',
+                'data' => null,
+                'error' => $th->getMessage()
+            ], 400);
+        }
+    }
+
+    public function detailOrder($eventId, $clientId)
+    {
+        try {
+            $detailOrder = Distributor::select(
+                                        DB::raw('distributors.id'),
+                                        DB::raw('distributors.name AS agent_name'),
+                                        DB::raw('partner_groups.prtnr_name'),
+                                        DB::raw('distributor.name AS distributor_name')
+                    )->rightJoin('partner_groups', 'partner_groups.id', '=', 'distributors.partner_group_id')
+                    ->leftJoin('distributors AS distributor', 'distributor.id', '=', 'distributors.distributor_id')
+                    ->where('distributors.id', '=', $clientId)
+                    ->with(['Order' => function ($query) use ($eventId) {
+                        $query->select(
+                                'orders.id',
+                                'orders.client_id',
+                                'products.article_name',
+                                'events.event_name',
+                                'events.event_desc',
+                                'orders.size_S',
+                                'orders.size_M',
+                                'orders.size_L',
+                                'orders.size_XL',
+                                'orders.size_XXL',
+                                'orders.size_XXXL',
+                                'orders.size_2',
+                                'orders.size_4',
+                                'orders.size_6',
+                                'orders.size_8',
+                                'orders.size_10',
+                                'orders.size_12',
+                                'orders.size_27',
+                                'orders.size_28',
+                                'orders.size_29',
+                                'orders.size_30',
+                                'orders.size_31',
+                                'orders.size_32',
+                                'orders.size_33',
+                                'orders.size_34',
+                                'orders.size_35',
+                                'orders.size_36',
+                                'orders.size_37',
+                                'orders.size_38',
+                                'orders.size_39',
+                                'orders.size_40',
+                                'orders.size_41',
+                                'orders.size_42',
+                                'orders.size_other',
+                                DB::raw('CAST(orders.created_at AS DATE) AS created_at'),
+                                DB::raw('CAST(orders.updated_at AS DATE) AS updated_at'),
+                            )->leftJoin('products', 'products.id', '=', 'orders.product_id')
+                            ->leftJoin('events', 'events.id', '=', 'orders.event_id')
+                            ->where('orders.event_id', '=', $eventId);
+                    }])
+                    ->first();
+
+            return response()->json([
+                'status' => 'success',
+                'data' => $detailOrder,
                 'error' => null
             ], 200);
         } catch (\Throwable $th) {

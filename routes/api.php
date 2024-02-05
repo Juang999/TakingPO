@@ -87,6 +87,7 @@ Route::middleware('jwt.verify')->group(function () {
 
         Route::prefix('report')->group(function () {
             Route::get('/{eventId}/highest-order', 'Api\Admin\Event\ReportController@highestOrder');
+            Route::get('/{evetnId}/client/{clientId}/detail', 'Api\Admin\Event\ReportController@detailOrder');
         });
     });
 
