@@ -1,14 +1,12 @@
 <?php
 
-namespace App\Http\Controllers\Api;
+namespace App\Http\Controllers\Api\Client;
 
-use App\Clothes;
+use App\Area;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\PhotoRequest;
-use App\Image;
 use Illuminate\Http\Request;
 
-class UploadPhoto extends Controller
+class getArea extends Controller
 {
     /**
      * Handle the incoming request.
@@ -16,25 +14,22 @@ class UploadPhoto extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function __invoke(PhotoRequest $request, $id)
+    public function __invoke()
     {
         try {
-            Image::create([
-                'clothes_id' => $id,
-                'photo' => $request->photo
-            ]);
+            $data = Area::get();
 
             return response()->json([
                 'status' => 'success',
-                'message' => 'photo added!'
-            ]);
-
+                'message' => 'success to get data',
+                'area' => $data
+            ], 200);
         } catch (\Throwable $th) {
             return response()->json([
                 'status' => 'failed',
-                'message' => 'failed to upload photo!',
+                'message' => 'failed to get data',
                 'error' => $th->getMessage()
-            ]);
+            ], 400);
         }
     }
 }

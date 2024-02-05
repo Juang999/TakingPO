@@ -40,7 +40,7 @@ class Kernel extends HttpKernel
         ],
 
         'api' => [
-            'throttle:200,1',
+            'throttle:500,1',
             \Illuminate\Routing\Middleware\SubstituteBindings::class,
         ],
     ];
@@ -64,6 +64,8 @@ class Kernel extends HttpKernel
         'throttle' => \Illuminate\Routing\Middleware\ThrottleRequests::class,
         'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
         'jwt.verify' => \App\Http\Middleware\JwtMiddleware::class,
-        'Logger' => \App\Http\Middleware\Logger::class
+        'Logger' => \App\Http\Middleware\Logger::class,
+        'client-check' => \App\Http\Middleware\ClientCheckMIddleware::class,
+        'check-event' => \App\Http\Middleware\CheckEventMiddleware::class,
     ];
 }

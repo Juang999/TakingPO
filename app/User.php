@@ -27,7 +27,7 @@ class User extends Authenticatable implements JWTSubject
      * @var array
      */
     protected $fillable = [
-        'name', 'email', 'password',
+        'name', 'email', 'password', 'partner_id'
     ];
 
     /**
@@ -58,8 +58,8 @@ class User extends Authenticatable implements JWTSubject
         return [];
     }
 
-    public function PartnerGroup()
+    public function Partner()
     {
-
+        return $this->belongsTo(Distributor::class, 'partner_id', 'id');
     }
 }

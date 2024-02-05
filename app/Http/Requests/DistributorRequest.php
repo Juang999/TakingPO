@@ -25,12 +25,12 @@ class DistributorRequest extends FormRequest
     {
         return [
             'name' => 'required',
-            'level' => 'required',
-            'phone' => 'required',
             'address' => 'required',
-            'district' => 'required',
-            'regency' => 'required',
+            'phone' => 'required',
+            'level' => 'required',
             'province' => 'required',
+            'regency' => 'required',
+            'district' => 'required',
             'addr_type' => 'required',
             'zip' => 'required'
         ];

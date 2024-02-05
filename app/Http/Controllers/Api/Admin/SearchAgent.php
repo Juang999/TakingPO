@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\Api\Admin;
 
-use App\Distributor;
+use App\{Distributor, MutifStoreMaster};
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 
@@ -17,10 +17,14 @@ class SearchAgent extends Controller
     public function __invoke($search)
     {
         try {
-            $agents = Distributor::where([
-                ['partner_group_id', '!=', 1],
-                ['name', 'LIKE', '%'.$search.'%']
-            ])->with('MutifStoreMaster.MutifStoreAddress')->get();
+            $agents = MutifStoreMaster::where('mutif_store_name', 'LIKE', '%'.$search.'%')->get();
+            foreach ($agents as $data) {
+                $data['agent'] = Distributor::where('id', $data->distributor_id)->first();
+                $data['distributor'] = Distributor::where('id', $data['agent']->distributor_id)->first();
+                $data->makeHidden(['ms_add_by', 'ms_upd_by', 'group_code', 'msdp', 'partner_group_id', 'url', 'remarks', 'created_at', 'updated_at', 'distributor_id']);
+                $data->agent->makeHidden(['distributor_id', 'group_code', 'group_code', 'partner_group_id', 'level', 'training_level', 'prtnr_add_by', 'prtnr_upd_by', 'deleted_at']);
+                $data->distributor->makeHidden(['distributor_id', 'group_code', 'group_code', 'partner_group_id', 'level', 'training_level', 'prtnr_add_by', 'prtnr_upd_by', 'deleted_at', 'phone']);
+            }
 
             return response()->json([
                 'status' => 'success',

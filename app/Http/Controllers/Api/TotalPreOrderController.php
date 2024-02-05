@@ -29,7 +29,10 @@ class TotalPreOrderController extends Controller
             // $table_name['total_preorder'] = $total_preorder[0]->total;
 
             // $distributor['total_transaction'] = Transaction::where('distributor_id', $distributor->id)->count();
-            $agents = Distributor::where('distributor_id', $distributor->id)->with('MutifStoreMaster')->get();
+            $agents = Distributor::where('distributor_id', $distributor->id)
+                                ->orWhere('id', $distributor->id)
+                                ->with('MutifStoreMaster')
+                                ->get();
 
             foreach ($agents as $agent) {
                 $agent['total_transaction'] = Transaction::where('distributor_id', $agent->id)->count();

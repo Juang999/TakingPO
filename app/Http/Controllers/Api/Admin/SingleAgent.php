@@ -2,10 +2,9 @@
 
 namespace App\Http\Controllers\Api\Admin;
 
-use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
 use App\Distributor;
-use App\MutifStoreMaster;
+use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
 
 class SingleAgent extends Controller
 {
@@ -18,13 +17,11 @@ class SingleAgent extends Controller
     public function __invoke()
     {
         try {
-            $MutifStoreMaster = MutifStoreMaster::get()->toArray();
-
-            $distributor_id = array_column($MutifStoreMaster, 'distributor_id');
-
-            $distributor_hasNot_MS = Distributor::whereNotIn('id', $distributor_id)->where('partner_group_id', '!=', 1)->with('MutifStoreMaster')->get();
-
-            // dd($distributor_hasNot_MS);
+            $distributor_hasNot_MS = Distributor::whereNotIn('id', function ($query) {
+                $query->select('distributor_id')
+                    ->from('mutif_store_masters')
+                    ->get()->toArray();
+            })->with('MutifStoreMaster')->get();
 
             return response()->json([
                 'status' => 'success',

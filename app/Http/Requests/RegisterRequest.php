@@ -27,7 +27,8 @@ class RegisterRequest extends FormRequest
             'name' => 'required',
             'phone' => 'required',
             'distributor_id' => 'required',
-            'partner_group_id' => 'required'
+            'partner_group_id' => 'required',
+            'area_id' => 'required'
         ];
     }
 }

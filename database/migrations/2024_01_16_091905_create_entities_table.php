@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateAddColumnTable extends Migration
+class CreateEntitiesTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,8 +13,11 @@ class CreateAddColumnTable extends Migration
      */
     public function up()
     {
-        Schema::table('clothes', function (Blueprint $table) {
-            $table->string('category');
+        Schema::create('entities', function (Blueprint $table) {
+            $table->id();
+            $table->string('entity_name');
+            $table->index(['entity_name']);
+            $table->timestamps();
         });
     }
 
@@ -25,6 +28,6 @@ class CreateAddColumnTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('clothes');
+        Schema::dropIfExists('entities');
     }
 }

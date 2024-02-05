@@ -171,7 +171,8 @@ class StoreAll extends Controller
                             'size_41' => $data->size_41,
                             'size_42' => $data->size_42,
                             'other' => $data->other,
-                            'total' => $data->total
+                            'total' => $data->total,
+                            'created_at' => Carbon::translateTimeString(now())
                         ]
                     ]);
                 }

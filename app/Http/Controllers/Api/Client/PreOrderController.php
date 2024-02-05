@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\PreOrderRequest;
 use App\Http\Controllers\Api\Client\Order;
-use App\{IsActive, MutifStoreMaster, TemporaryStorage, Distributor, Clothes, BufferProduct};
+use App\{IsActive, MutifStoreMaster, TemporaryStorage, Distributor, Clothes, BufferProduct, TableName, PartnerGroup};
 
 class PreOrderController extends Controller
 {
@@ -25,7 +25,7 @@ class PreOrderController extends Controller
         if ($activate->name == 'DONE') {
             return response()->json([
                 'status' => 'closed',
-                'message' => 'ISMAIL BURIQUE',
+                'message' => 'sesi berakhir',
                 'data' => []
             ], 300);
         }
@@ -518,6 +518,47 @@ class PreOrderController extends Controller
                 'message' => 'failed to delete data',
                 'error' => $th->getMessage()
             ], 200);
+        }
+    }
+
+    public function history($phone) {
+        $user = Distributor::where('phone', $phone)->first();
+
+        if (!$user) {
+            return response()->json([
+                'status' => 'rejected',
+                'message' => 'user not found!'
+            ], 404);
+        }
+
+        try {
+            $tableName = TableName::where('distributor_id', $user->id)->first();
+
+            if (!$tableName) {
+                return response()->json([
+                    'status' => 'rejected',
+                    'message' => "kamu belum pernah melakukan transaksi"
+                ], 300);
+            }
+
+            $discount = PartnerGroup::where('id', $user->partner_group_id)->first();
+            $data = DB::table($tableName->table_name)->selectRaw('clothes.entity_name, clothes.article_name, clothes.color, clothes.material, clothes.combo, clothes.special_feature, clothes.keyword, clothes.description, clothes.slug, clothes.group_article, clothes.type_id, clothes.is_active, clothes.size_s AS price_size_s, clothes.size_m AS price_size_m, clothes.size_l AS price_size_l, clothes.size_xl AS price_size_xl, clothes.size_xxl AS price_size_xxl, clothes.size_xxxl AS price_size_xxxl, clothes.size_2 AS price_size_2, clothes.size_4 AS price_size_4, clothes.size_6 AS price_size_6, clothes.size_8 AS price_size_8, clothes.size_10 AS price_size_10, clothes.size_12 AS price_size_12, clothes.size_27 AS price_size_27, clothes.size_28 AS price_size_28, clothes.size_29 AS price_size_29, clothes.size_30 AS price_size_30, clothes.size_31 AS price_size_31, clothes.size_32 AS price_size_32, clothes.size_33 AS price_size_33, clothes.size_34 AS price_size_34, clothes.size_35 AS price_size_35, clothes.size_36 AS price_size_36, clothes.size_37 AS price_size_37, clothes.size_38 AS price_size_38, clothes.size_39 AS price_size_39, clothes.size_40 AS price_size_40, clothes.size_41 AS price_size_41, clothes.size_42 AS price_size_42, clothes.other AS price_other, '.$tableName->table_name.'.*')
+            ->leftJoin('clothes', 'clothes.id', '=', $tableName->table_name.'.clothes_id')->get();
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'berhasil mengambil hasil history',
+                'discount' => $discount->discount,
+                'data' => $data
+            ], 200);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'status' => 'gagal',
+                'message' => 'gagal mengambil data history',
+                'error' => $th->getMessage(),
+                'line' => $th->getLine(),
+                'file' => $th->getFile()
+            ], 400);
         }
     }
 }
