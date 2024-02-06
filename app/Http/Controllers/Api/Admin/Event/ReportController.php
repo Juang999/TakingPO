@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers\Api\Admin\Event;
 
-use App\Http\Controllers\Controller;
-use App\Models\{Order, Distributor, Entity};
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use App\Http\Controllers\Controller;
+use App\Models\{Order, Distributor, Entity};
 
 class ReportController extends Controller
 {
@@ -56,6 +56,7 @@ class ReportController extends Controller
                                 'products.article_name',
                                 'events.event_name',
                                 'events.event_desc',
+                                'types.type',
                                 'orders.size_S',
                                 'orders.size_M',
                                 'orders.size_L',
@@ -89,6 +90,7 @@ class ReportController extends Controller
                                 DB::raw('CAST(orders.updated_at AS DATE) AS updated_at'),
                             )->leftJoin('products', 'products.id', '=', 'orders.product_id')
                             ->leftJoin('events', 'events.id', '=', 'orders.event_id')
+                            ->leftJoin('types', 'types.id', '=', 'products.type_id')
                             ->where('orders.event_id', '=', $eventId);
                     }])
                     ->first();
