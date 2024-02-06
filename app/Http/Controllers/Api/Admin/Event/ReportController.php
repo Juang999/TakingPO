@@ -157,7 +157,7 @@ class ReportController extends Controller
                                         ->leftJoin('entities', 'entities.entity_name', '=', 'products.entity_name')
                                         ->where('orders.event_id', '=', $eventId)
                                         ->whereIn('products.entity_name', $entity)
-                                        ->groupBy('products.id', 'products.article_name', 'events.event_name')
+                                        ->groupBy('products.id', 'products.article_name', 'entities.entity_name', 'events.event_name')
                                         ->orderByDesc('total_order')
                                         ->get();
 
