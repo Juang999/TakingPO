@@ -159,6 +159,7 @@ class ReportController extends Controller
                                         ->whereIn('products.entity_name', $entity)
                                         ->groupBy('products.id', 'products.article_name', 'entities.entity_name', 'events.event_name')
                                         ->orderByDesc('total_order')
+                                        ->limit(3)
                                         ->get();
 
             return response()->json([
