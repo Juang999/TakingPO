@@ -123,7 +123,7 @@ class ReportController extends Controller
                                         ->leftJoin('distributors AS distributor', 'distributor.id', '=', 'client.distributor_id')
                                         ->leftJoin('events', 'events.id', '=', 'orders.event_id')
                                         ->where('orders.event_id', '=', $eventId)
-                                        ->groupBy('distributor_id', 'distributor.name', 'events.event_name')
+                                        ->groupBy('distributor_id', 'distributor.name', 'distributor.partner_group_id', 'events.event_name')
                                         ->orderByDesc('total_order')
                                         ->get();
 
