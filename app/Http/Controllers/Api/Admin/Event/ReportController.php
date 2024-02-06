@@ -56,6 +56,7 @@ class ReportController extends Controller
                                 'products.article_name',
                                 'events.event_name',
                                 'events.event_desc',
+                                'products.type_id',
                                 'types.type',
                                 'orders.size_S',
                                 'orders.size_M',
