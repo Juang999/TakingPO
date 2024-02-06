@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Api\Admin\Event;
 
 use App\Http\Controllers\Controller;
-use App\Models\{Order, Distributor};
+use App\Models\{Order, Distributor, Entity};
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -105,5 +105,77 @@ class ReportController extends Controller
                 'error' => $th->getMessage()
             ], 400);
         }
+    }
+
+    public function highestOrderDistributor($eventId)
+    {
+        try {
+            $dataOrderDistributor = Order::select(
+                                            DB::raw('distributor.id AS distributor_id'),
+                                            'distributor.name',
+                                            'distributor.partner_group_id',
+                                            'events.event_name',
+                                            DB::raw('sum(size_S + size_M + size_L + size_XL + size_XXL + size_XXXL + size_2 + size_4 + size_6 + size_8 + size_10 + size_12 + size_27 + size_28 + size_29 + size_30 + size_31 + size_32 + size_33 + size_34 + size_35 + size_36 + size_37 + size_38 + size_39 + size_40 + size_41 + size_42 + size_other) as total_order')
+                                        )->leftJoin('distributors AS client', 'client.id', '=', 'orders.client_id')
+                                        ->leftJoin('distributors AS distributor', 'distributor.id', '=', 'client.distributor_id')
+                                        ->leftJoin('events', 'events.id', '=', 'orders.event_id')
+                                        ->where('orders.event_id', '=', $eventId)
+                                        ->groupBy('distributor_id', 'distributor.name', 'events.event_name')
+                                        ->orderByDesc('total_order')
+                                        ->get();
+
+            return response()->json([
+                'status' => 'success',
+                'data' => $dataOrderDistributor,
+                'error' => null
+            ], 200);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'status' => 'failed',
+                'data' => null,
+                'error' => $th->getMessage()
+            ], 400);
+        }
+    }
+
+    public function highestOrderProduct($eventId)
+    {
+        try {
+            $entity = (request()->entity) ? [request()->entity] : $this->getEntity();
+
+            $dataOrderProduct = Order::select(
+                                            'products.id',
+                                            'products.article_name',
+                                            'events.event_name',
+                                            'entities.entity_name',
+                                            DB::raw('sum(size_S + size_M + size_L + size_XL + size_XXL + size_XXXL + size_2 + size_4 + size_6 + size_8 + size_10 + size_12 + size_27 + size_28 + size_29 + size_30 + size_31 + size_32 + size_33 + size_34 + size_35 + size_36 + size_37 + size_38 + size_39 + size_40 + size_41 + size_42 + size_other) as total_order')
+                                        )->leftJoin('products', 'products.id', '=', 'orders.product_id')
+                                        ->leftJoin('events', 'events.id', '=', 'orders.event_id')
+                                        ->leftJoin('entities', 'entities.entity_name', '=', 'products.entity_name')
+                                        ->where('orders.event_id', '=', $eventId)
+                                        ->whereIn('products.entity_name', $entity)
+                                        ->groupBy('products.id', 'products.article_name', 'events.event_name')
+                                        ->orderByDesc('total_order')
+                                        ->get();
+
+            return response()->json([
+                'status' => 'success',
+                'data' => $dataOrderProduct,
+                'error' => null
+            ], 200);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'status' => 'failed',
+                'data' => null,
+                'error' => $th->getMessage()
+            ], 400);
+        }
+    }
+
+    private function getEntity()
+    {
+        $entity = Entity::select('entity_name')->pluck('entity_name')->toArray();
+
+        return $entity;
     }
 }
