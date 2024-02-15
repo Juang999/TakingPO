@@ -323,6 +323,65 @@ class ReportController extends Controller
         }
     }
 
+    public function getAllReport()
+    {
+        try {
+            $order = Order::select(
+                'orders.id',
+                'distributors.name AS agent_name',
+                'db.name AS distributor_name',
+                'events.event_name',
+                'products.article_name',
+                'orders.size_S',
+                'orders.size_M',
+                'orders.size_L',
+                'orders.size_XL',
+                'orders.size_XXL',
+                'orders.size_XXXL',
+                'orders.size_2',
+                'orders.size_4',
+                'orders.size_6',
+                'orders.size_8',
+                'orders.size_10',
+                'orders.size_12',
+                'orders.size_27',
+                'orders.size_28',
+                'orders.size_29',
+                'orders.size_30',
+                'orders.size_31',
+                'orders.size_32',
+                'orders.size_33',
+                'orders.size_34',
+                'orders.size_35',
+                'orders.size_36',
+                'orders.size_37',
+                'orders.size_38',
+                'orders.size_39',
+                'orders.size_40',
+                'orders.size_41',
+                'orders.size_42',
+                'orders.size_other'
+            )->leftJoin('products', 'products.id', '=', 'orders.product_id')
+            ->leftJoin('events', 'events.id', '=', 'orders.event_id')
+            ->leftJoin('distributors', 'distributors.id', '=', 'orders.client_id')
+            ->leftJoin('distributors AS db', 'db.id', '=', 'distributors.distributor_id')
+            ->orderBy('orders.event_id', 'ASC')
+            ->get();
+
+            return response()->json([
+                'status' => 'success',
+                'data' => $order,
+                'error' => null
+            ], 200);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'status' => 'failed',
+                'data' => null,
+                'error' => $th->getMessage()
+            ], 400);
+        }
+    }
+
     private function getEntity()
     {
         $entity = Entity::select('entity_name')->pluck('entity_name')->toArray();
