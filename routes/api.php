@@ -92,6 +92,7 @@ Route::middleware('jwt.verify')->group(function () {
             Route::get('/{eventId}/highest-order-distributor', 'Api\Admin\Event\ReportController@highestOrderDistributor');
             Route::get('/{eventId}/highest-order-product', 'Api\Admin\Event\ReportController@highestOrderProduct');
             Route::get('/{id}/detail-order', 'Api\Admin\Event\ReportController@ReportPerProduct');
+            Route::get('/{eventId}/ordered-product', 'Api\Admin\Event\ReportController@getOrderedProduct');
         });
     });
 

@@ -283,6 +283,46 @@ class ReportController extends Controller
         }
     }
 
+    public function getOrderedProduct($eventId)
+    {
+        try {
+            $product_article = request()->search;
+
+            $product = Product::select(
+                                    'products.id',
+                                    'products.article_name',
+                                    'products.entity_name',
+                                    'events.event_name',
+                                    DB::raw('SUM(size_S + size_M + size_L + size_XL + size_XXL + size_XXXL + size_2 + size_4 + size_6 + size_8 + size_10 + size_12 + size_27 + size_28 + size_29 + size_30 + size_31 + size_32 + size_33 + size_34 + size_35 + size_36 + size_37 + size_38 + size_39 + size_40 + size_41 + size_42 + size_other) AS total_order')
+                        )->leftJoin('orders', 'orders.product_id', '=', 'products.id')
+                        ->leftJoin('events', 'events.id', '=', 'orders.event_id')
+                        ->whereIn('products.id', function ($query) use ($eventId) {
+                            $query->select('product_id')
+                                ->from('orders')
+                                ->where('event_id', $eventId)
+                                ->get();
+                        })
+                        ->when($product_article, function ($query) use ($product_article) {
+                            $query->where('article_name', 'LIKE', "%$product_article%");
+                        })
+                        ->groupBy('products.id','products.article_name','products.entity_name','events.event_name')
+                        ->orderByDesc('total_order')
+                        ->get();
+
+            return response()->json([
+                'status' => 'success',
+                'data' => $product,
+                'error' => null
+            ], 200);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'status' => 'failed',
+                'data' => null,
+                'error' => $th->getMessage()
+            ], 400);
+        }
+    }
+
     private function getEntity()
     {
         $entity = Entity::select('entity_name')->pluck('entity_name')->toArray();
