@@ -191,6 +191,7 @@ class ReportController extends Controller
                 $query->select(
                         'orders.client_id',
                         'orders.product_id',
+                        'products.type_id',
                         DB::raw('distributors.name AS agent_name'),
                         DB::raw('db.name AS distributor_name'),
                         DB::raw('events.event_name'),
@@ -228,6 +229,7 @@ class ReportController extends Controller
                     ->leftJoin('distributors', 'distributors.id', '=', 'orders.client_id')
                     ->leftJoin('distributors AS db', 'db.id', '=', 'distributors.distributor_id')
                     ->leftJoin('events', 'events.id', '=', 'orders.event_id')
+                    ->leftJoin('products', 'products.id', '=', 'orders.product_id')
                     ->groupBy(
                         'orders.client_id',
                         'orders.product_id',
@@ -267,7 +269,7 @@ class ReportController extends Controller
                     )
                     ;
             }])
-            ->groupBy('products.id','products.entity_name','products.article_name')
+            ->groupBy('products.id','products.entity_name','products.article_name', 'products.type_id')
             ->first();
 
             return response()->json([
