@@ -176,7 +176,7 @@ class ReportController extends Controller
         }
     }
 
-    public function ReportPerProduct($eventId, $id)
+    public function ReportPerProduct($id)
     {
         try {
             $product = Product::select(
