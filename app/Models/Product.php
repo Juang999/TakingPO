@@ -22,4 +22,9 @@ class Product extends Model
     {
         return $this->hasMany(DetailSession::class, 'product_id', 'id');
     }
+
+    public function DetailOrder()
+    {
+        return $this->hasMany(Order::class, 'product_id', 'id');
+    }
 }
