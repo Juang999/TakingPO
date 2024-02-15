@@ -333,6 +333,7 @@ class ReportController extends Controller
                 'orders.id',
                 'entities.entity_name',
                 'orders.created_at',
+                'products.type_id',
                 'distributors.name AS agent_name',
                 'db.name AS distributor_name',
                 'events.event_name',
