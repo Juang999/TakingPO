@@ -234,7 +234,7 @@ class ReportController extends Controller
                         'distributors.name',
                         'db.name',
                         'events.event_name',
-
+                        'products.type_id',
                         'orders.size_S',
                         'orders.size_M',
                         'orders.size_L',
