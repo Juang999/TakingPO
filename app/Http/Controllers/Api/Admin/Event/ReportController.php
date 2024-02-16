@@ -432,6 +432,37 @@ class ReportController extends Controller
         }
     }
 
+    public function getReportDistributor($id)
+    {
+        try {
+            $dataOrder = Distributor::select(
+                'distributors.id',
+                'distributors.name',
+                'partner_groups.prtnr_name',
+                DB::raw("(SELECT SUM(size_S + size_M + size_L + size_XL + size_XXL + size_XXXL + size_2 + size_4 + size_6 + size_8 + size_10 + size_12 + size_27 + size_28 + size_29 + size_30 + size_31 + size_32 + size_33 + size_34 + size_35 + size_36 + size_37 + size_38 + size_39 + size_40 + size_41 + size_42 + size_other) FROM orders WHERE client_id = distributors.id AND product_id IN (SELECT id FROM products WHERE entity_name = 'MUTIF')) AS MUTIF"),
+                DB::raw("(SELECT SUM(size_S + size_M + size_L + size_XL + size_XXL + size_XXXL + size_2 + size_4 + size_6 + size_8 + size_10 + size_12 + size_27 + size_28 + size_29 + size_30 + size_31 + size_32 + size_33 + size_34 + size_35 + size_36 + size_37 + size_38 + size_39 + size_40 + size_41 + size_42 + size_other) FROM orders WHERE client_id = distributors.id AND product_id IN (SELECT id FROM products WHERE entity_name = 'DAMOZA')) AS DAMOZA"),
+                DB::raw("(SELECT SUM(size_S + size_M + size_L + size_XL + size_XXL + size_XXXL + size_2 + size_4 + size_6 + size_8 + size_10 + size_12 + size_27 + size_28 + size_29 + size_30 + size_31 + size_32 + size_33 + size_34 + size_35 + size_36 + size_37 + size_38 + size_39 + size_40 + size_41 + size_42 + size_other) FROM orders WHERE client_id = distributors.id AND product_id IN (SELECT id FROM products WHERE entity_name = 'UPMORE')) AS UPMORE"),
+                DB::raw("(SELECT SUM(size_S + size_M + size_L + size_XL + size_XXL + size_XXXL + size_2 + size_4 + size_6 + size_8 + size_10 + size_12 + size_27 + size_28 + size_29 + size_30 + size_31 + size_32 + size_33 + size_34 + size_35 + size_36 + size_37 + size_38 + size_39 + size_40 + size_41 + size_42 + size_other) FROM orders WHERE client_id = distributors.id AND product_id) AS TOTAL")
+            )->join('partner_groups', 'partner_groups.id', '=', 'distributors.partner_group_id')
+            ->where('distributors.id', '=', $id)
+            ->orWhere('distributor_id', '=', $id)
+            ->orderByDesc('TOTAL')
+            ->get();
+
+            return response()->json([
+                'status' => 'success',
+                'data' => $dataOrder,
+                'error' => null
+            ], 200);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'status' => 'failed',
+                'data' => null,
+                'error' => $th->getMessage()
+            ], 400);
+        }
+    }
+
     private function getEntity()
     {
         $entity = Entity::select('entity_name')->pluck('entity_name')->toArray();
