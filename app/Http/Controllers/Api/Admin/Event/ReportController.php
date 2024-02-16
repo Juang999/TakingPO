@@ -463,6 +463,62 @@ class ReportController extends Controller
         }
     }
 
+    public function sumOrderedProduct()
+    {
+        try {
+            $dataOrder = Order::select(
+                'products.entity_name',
+                'products.article_name',
+                DB::raw('SUM(size_S) AS size_S'),
+                DB::raw('SUM(size_M) AS size_M'),
+                DB::raw('SUM(size_L) AS size_L'),
+                DB::raw('SUM(size_XL) AS size_XL'),
+                DB::raw('SUM(size_XXL) AS size_XXL'),
+                DB::raw('SUM(size_XXXL) AS size_XXXL'),
+                DB::raw('SUM(size_2) AS size_2'),
+                DB::raw('SUM(size_4) AS size_4'),
+                DB::raw('SUM(size_6) AS size_6'),
+                DB::raw('SUM(size_8) AS size_8'),
+                DB::raw('SUM(size_10) AS size_10'),
+                DB::raw('SUM(size_12) AS size_12'),
+                DB::raw('SUM(size_27) AS size_27'),
+                DB::raw('SUM(size_28) AS size_28'),
+                DB::raw('SUM(size_29) AS size_29'),
+                DB::raw('SUM(size_30) AS size_30'),
+                DB::raw('SUM(size_31) AS size_31'),
+                DB::raw('SUM(size_32) AS size_32'),
+                DB::raw('SUM(size_33) AS size_33'),
+                DB::raw('SUM(size_34) AS size_34'),
+                DB::raw('SUM(size_35) AS size_35'),
+                DB::raw('SUM(size_36) AS size_36'),
+                DB::raw('SUM(size_37) AS size_37'),
+                DB::raw('SUM(size_38) AS size_38'),
+                DB::raw('SUM(size_39) AS size_39'),
+                DB::raw('SUM(size_40) AS size_40'),
+                DB::raw('SUM(size_41) AS size_41'),
+                DB::raw('SUM(size_42) AS size_42'),
+                DB::raw('SUM(size_other) AS size_other'),
+                DB::raw("SUM(size_S + size_M + size_L + size_XL + size_XXL + size_XXXL + size_2 + size_4 + size_6 + size_8 + size_10 + size_12 + size_27 + size_28 + size_29 + size_30 + size_31 + size_32 + size_33 + size_34 + size_35 + size_36 + size_37 + size_38 + size_39 + size_40 + size_41 + size_42 + size_other) AS TOTAL")
+            )->leftJoin('products', 'products.id', '=', 'orders.product_id')
+            ->leftJoin('entities', 'entities.entity_name', '=', 'products.entity_name')
+            ->groupBy('products.entity_name', 'products.article_name', 'entities.id')
+            ->orderBy('entities.id')
+            ->get();
+
+            return response()->json([
+                'status' => 'success',
+                'data' => $dataOrder,
+                'error' => null
+            ], 200);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'status' => 'failed',
+                'data' => null,
+                'error' => $th->getMessage()
+            ], 400);
+        }
+    }
+
     private function getEntity()
     {
         $entity = Entity::select('entity_name')->pluck('entity_name')->toArray();
