@@ -469,7 +469,7 @@ class ReportController extends Controller
             $dataOrder = Order::select(
                 'products.entity_name',
                 'products.article_name',
-                'product.type_id',
+                'products.type_id',
                 DB::raw('SUM(size_S) AS size_S'),
                 DB::raw('SUM(size_M) AS size_M'),
                 DB::raw('SUM(size_L) AS size_L'),
@@ -546,8 +546,18 @@ class ReportController extends Controller
             ->groupBy('distributor_id', 'distributor.name', 'distributor.partner_group_id', 'events.event_name')
             ->orderByDesc('total_order')
             ->first();
+
+            return response()->json([
+                'status' => 'success',
+                'data' => $dataOrderDistributor,
+                'error' => null
+            ], 200);
         } catch (\Throwable $th) {
-            //throw $th;
+            return response()->json([
+                'status' => 'failed',
+                'data' => null,
+                'error' => $th->getMessage()
+            ], 400);
         }
     }
 
