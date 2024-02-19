@@ -94,8 +94,9 @@ Route::middleware('jwt.verify')->group(function () {
             Route::get('/{id}/detail-order', 'Api\Admin\Event\ReportController@ReportPerProduct');
             Route::get('/{eventId}/ordered-product', 'Api\Admin\Event\ReportController@getOrderedProduct');
             Route::get('/all-report', 'Api\Admin\Event\ReportController@getAllReport');
-            Route::get('/{id}/report-per-distributor', 'Api\Admin\Event\ReportController@getReportDistributor');
+            Route::get('/report-per-distributor', 'Api\Admin\Event\ReportController@getReportDistributor');
             Route::get('/sum-ordered-article', 'Api\Admin\Event\ReportController@sumOrderedProduct');
+            Route::get('/{id}/detail-order-distributor', 'Api\Admin\Event\ReportController@getDetailOrderDistributor');
         });
     });
 
