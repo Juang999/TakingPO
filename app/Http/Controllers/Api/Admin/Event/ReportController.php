@@ -526,23 +526,15 @@ class ReportController extends Controller
         try {
             $dataBuyer = Distributor::select(
                                         'distributors.id',
-                                        DB::raw('distributors.name AS agent_name'),
-                                        DB::raw("CASE WHEN db.name IS NULL THEN '-' ELSE db.name END AS distributor_name"),
-                                        DB::raw('partner_groups.prtnr_name AS group_name')
-                                    )->leftJoin('partner_groups', 'partner_groups.id', '=', 'distributors.partner_group_id')
-                                    ->leftJoin('distributors AS db', 'db.id', '=', 'distributors.distributor_id')
-                                    ->whereIn('distributors.id', function ($query) {
-                                        $query->select(DB::raw('DISTINCT(client_id)'))
-                                                ->from('orders');
-                                    })->orderBy('distributors.name', 'ASC')
+                                        DB::raw('distributors.name'),
+                                    )->where('partner_group_id', '=', 1)
+                                    ->orderBy('distributors.name', 'ASC')
                                     ->get();
 
             $useCollectionForDataBuyer = collect($dataBuyer)->map(function ($data) {
                 return [
                     'id' => $data->id,
-                    'agent_name' => $data->agent_name,
-                    'distributor_name' => $data->distributor_name,
-                    'group_name' => $data->group_name,
+                    'name' => $data->name,
                     'ordered_product' => $this->orderedProduct($data->id)
                 ];
             });
@@ -570,7 +562,7 @@ class ReportController extends Controller
         $data = Product::select(
             'products.id',
             'products.article_name',
-            DB::raw("(SELECT CASE WHEN $sum IS NULL THEN 0 ELSE $sum END FROM orders WHERE client_id = $client_id AND product_id = products.id) AS TOTAL")
+            DB::raw("(SELECT CASE WHEN $sum IS NULL THEN 0 ELSE $sum END FROM orders WHERE client_id IN (SELECT id FROM distributors WHERE distributor_id = $client_id) AND product_id = products.id) AS TOTAL")
         )->orderBy('products.article_name', 'ASC')
         ->get();
 
