@@ -435,18 +435,19 @@ class ReportController extends Controller
     public function getReportDistributor()
     {
         try {
-            $dataOrder = Distributor::select(
-                DB::raw('distributors.id AS db_id'),
-                'distributors.name',
-                'partner_groups.prtnr_name',
-                DB::raw("(SELECT SUM(size_S + size_M + size_L + size_XL + size_XXL + size_XXXL + size_2 + size_4 + size_6 + size_8 + size_10 + size_12 + size_27 + size_28 + size_29 + size_30 + size_31 + size_32 + size_33 + size_34 + size_35 + size_36 + size_37 + size_38 + size_39 + size_40 + size_41 + size_42 + size_other) FROM orders WHERE client_id IN (SELECT id FROM distributors WHERE distributor_id = db_id) AND product_id IN (SELECT id FROM products WHERE entity_name = 'MUTIF')) AS MUTIF"),
-                DB::raw("(SELECT SUM(size_S + size_M + size_L + size_XL + size_XXL + size_XXXL + size_2 + size_4 + size_6 + size_8 + size_10 + size_12 + size_27 + size_28 + size_29 + size_30 + size_31 + size_32 + size_33 + size_34 + size_35 + size_36 + size_37 + size_38 + size_39 + size_40 + size_41 + size_42 + size_other) FROM orders WHERE client_id IN (SELECT id FROM distributors WHERE distributor_id = db_id) AND product_id IN (SELECT id FROM products WHERE entity_name = 'DAMOZA')) AS DAMOZA"),
-                DB::raw("(SELECT SUM(size_S + size_M + size_L + size_XL + size_XXL + size_XXXL + size_2 + size_4 + size_6 + size_8 + size_10 + size_12 + size_27 + size_28 + size_29 + size_30 + size_31 + size_32 + size_33 + size_34 + size_35 + size_36 + size_37 + size_38 + size_39 + size_40 + size_41 + size_42 + size_other) FROM orders WHERE client_id IN (SELECT id FROM distributors WHERE distributor_id = db_id) AND product_id IN (SELECT id FROM products WHERE entity_name = 'UPMORE')) AS UPMORE"),
-                DB::raw("(SELECT SUM(size_S + size_M + size_L + size_XL + size_XXL + size_XXXL + size_2 + size_4 + size_6 + size_8 + size_10 + size_12 + size_27 + size_28 + size_29 + size_30 + size_31 + size_32 + size_33 + size_34 + size_35 + size_36 + size_37 + size_38 + size_39 + size_40 + size_41 + size_42 + size_other) FROM orders WHERE client_id IN (SELECT id FROM distributors WHERE distributor_id = db_id)) AS TOTAL")
-            )->join('partner_groups', 'partner_groups.id', '=', 'distributors.partner_group_id')
-            ->where('distributors.partner_group_id', '=', 1)
-            ->orderByDesc('TOTAL')
-            ->get();
+            $dataOrder = Order::select(
+                    DB::raw('distributor.id AS db_id'),
+                    'distributor.name',
+                    DB::raw("(SELECT SUM(size_S + size_M + size_L + size_XL + size_XXL + size_XXXL + size_2 + size_4 + size_6 + size_8 + size_10 + size_12 + size_27 + size_28 + size_29 + size_30 + size_31 + size_32 + size_33 + size_34 + size_35 + size_36 + size_37 + size_38 + size_39 + size_40 + size_41 + size_42 + size_other) FROM orders WHERE client_id IN (SELECT id FROM distributors WHERE distributor_id = db_id) AND product_id IN (SELECT id FROM products WHERE entity_name = 'MUTIF')) AS MUTIF"),
+                    DB::raw("(SELECT SUM(size_S + size_M + size_L + size_XL + size_XXL + size_XXXL + size_2 + size_4 + size_6 + size_8 + size_10 + size_12 + size_27 + size_28 + size_29 + size_30 + size_31 + size_32 + size_33 + size_34 + size_35 + size_36 + size_37 + size_38 + size_39 + size_40 + size_41 + size_42 + size_other) FROM orders WHERE client_id IN (SELECT id FROM distributors WHERE distributor_id = db_id) AND product_id IN (SELECT id FROM products WHERE entity_name = 'DAMOZA')) AS DAMOZA"),
+                    DB::raw("(SELECT SUM(size_S + size_M + size_L + size_XL + size_XXL + size_XXXL + size_2 + size_4 + size_6 + size_8 + size_10 + size_12 + size_27 + size_28 + size_29 + size_30 + size_31 + size_32 + size_33 + size_34 + size_35 + size_36 + size_37 + size_38 + size_39 + size_40 + size_41 + size_42 + size_other) FROM orders WHERE client_id IN (SELECT id FROM distributors WHERE distributor_id = db_id) AND product_id IN (SELECT id FROM products WHERE entity_name = 'UPMORE')) AS UPMORE"),
+                    DB::raw('sum(size_S + size_M + size_L + size_XL + size_XXL + size_XXXL + size_2 + size_4 + size_6 + size_8 + size_10 + size_12 + size_27 + size_28 + size_29 + size_30 + size_31 + size_32 + size_33 + size_34 + size_35 + size_36 + size_37 + size_38 + size_39 + size_40 + size_41 + size_42 + size_other) as TOTAL')
+                )->leftJoin('distributors AS client', 'client.id', '=', 'orders.client_id')
+                ->leftJoin('distributors AS distributor', 'distributor.id', '=', 'client.distributor_id')
+                ->where('distributor.partner_group_id', '=', 1)
+                ->groupBy('db_id', 'distributor.name', 'distributor.partner_group_id')
+                ->orderByDesc('TOTAL')
+                ->get();
 
             return response()->json([
                 'status' => 'success',
@@ -536,30 +537,21 @@ class ReportController extends Controller
                                     })->orderBy('distributors.name', 'ASC')
                                     ->get();
 
-            $dataOrderedArticle = Product::select('id', 'article_name', 'type_id')
-                                    ->with(['DetailOrder' => function ($query) {
-                                        $query->select(
-                                            'product_id',
-                                            'client_id',
-                                            'distributors.name',
-                                            DB::raw('SUM(size_S + size_M + size_L + size_XL + size_XXL + size_XXXL + size_2 + size_4 + size_6 + size_8 + size_10 + size_12 + size_27 + size_28 + size_29 + size_30 + size_31 + size_32 + size_33 + size_34 + size_35 + size_36 + size_37 + size_38 + size_39 + size_40 + size_41 + size_42 + size_other) AS total')
-                                        )->rightJoin('distributors', 'distributors.id', '=', 'orders.client_id')
-                                        ->whereIn('distributors.id', function ($query) {
-                                            $query->select(DB::raw('DISTINCT(client_id)'))
-                                                ->from('orders');
-                                        })
-                                        ->groupBy('product_id', 'client_id', 'distributors.name')
-                                        ->orderBy('distributors.id', 'ASC');
-                                    }])
-                                    ->whereIn('id', function ($query) {
-                                        $query->select(DB::raw('DISTINCT(product_id)'))
-                                            ->from('orders');
-                                    })->orderBy('article_name', 'ASC')
-                                    ->get();
+            $useCollectionForDataBuyer = collect($dataBuyer)->map(function ($data) {
+                return [
+                    'id' => $data->id,
+                    'agent_name' => $data->agent_name,
+                    'distributor_name' => $data->distributor_name,
+                    'group_name' => $data->group_name,
+                    'ordered_product' => $this->orderedProduct($data->id)
+                ];
+            });
+
+            $dataProduct = $this->getDataProduct();
 
             return response()->json([
                 'status' => 'success',
-                'data' => ['buyer' => $dataBuyer, 'ordered_article' => $dataOrderedArticle],
+                'data' => ['buyer' => $useCollectionForDataBuyer, 'data_product' => $dataProduct],
                 'error' => null
             ], 200);
         } catch (\Throwable $th) {
@@ -569,6 +561,27 @@ class ReportController extends Controller
                 'error' => $th->getMessage()
             ], 400);
         }
+    }
+
+    private function orderedProduct($client_id)
+    {
+        $sum = "SUM(orders.size_S + orders.size_M + orders.size_L + orders.size_XL + orders.size_XXL + orders.size_XXXL + orders.size_2 + orders.size_4 + orders.size_6 + orders.size_8 + orders.size_10 + orders.size_12 + orders.size_27 + orders.size_28 + orders.size_29 + orders.size_30 + orders.size_31 + orders.size_32 + orders.size_33 + orders.size_34 + orders.size_35 + orders.size_36 + orders.size_37 + orders.size_38 + orders.size_39 + orders.size_40 + orders.size_41 + orders.size_42 + orders.size_other)";
+
+        $data = Product::select(
+            'products.id',
+            'products.article_name',
+            DB::raw("(SELECT CASE WHEN $sum IS NULL THEN 0 ELSE $sum END FROM orders WHERE client_id = $client_id AND product_id = products.id) AS TOTAL")
+        )->orderBy('products.article_name', 'ASC')
+        ->get();
+
+        return $data;
+    }
+
+    private function getDataProduct()
+    {
+        $dataProduct = Product::select('id', 'article_name')->orderBy('article_name', 'ASC')->get();
+
+        return $dataProduct;
     }
 
     private function getEntity()
