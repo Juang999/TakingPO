@@ -415,7 +415,7 @@ class ReportController extends Controller
                 'orders.size_42',
                 'orders.size_other'
             )
-            ->orderBy('orders.event_id', 'ASC')
+            ->orderBy('distributors.name', 'ASC')
             ->get();
 
             return response()->json([
@@ -504,6 +504,7 @@ class ReportController extends Controller
             ->leftJoin('entities', 'entities.entity_name', '=', 'products.entity_name')
             ->groupBy('products.entity_name', 'products.type_id', 'products.article_name', 'entities.id')
             ->orderBy('entities.id')
+            ->orderByDesc('TOTAL')
             ->get();
 
             return response()->json([
@@ -523,28 +524,27 @@ class ReportController extends Controller
     public function getDetailOrderDistributor($id)
     {
         try {
-            $dataOrderDistributor = Order::select(
-                DB::raw('distributor.id AS distributor_id'),
-                'distributor.name',
-                'distributor.partner_group_id',
-                'events.event_name',
-                DB::raw('sum(size_S + size_M + size_L + size_XL + size_XXL + size_XXXL + size_2 + size_4 + size_6 + size_8 + size_10 + size_12 + size_27 + size_28 + size_29 + size_30 + size_31 + size_32 + size_33 + size_34 + size_35 + size_36 + size_37 + size_38 + size_39 + size_40 + size_41 + size_42 + size_other) as total_order')
-            )->leftJoin('distributors AS client', 'client.id', '=', 'orders.client_id')
-            ->leftJoin('distributors AS distributor', 'distributor.id', '=', 'client.distributor_id')
-            ->leftJoin('events', 'events.id', '=', 'orders.event_id')
-            ->where('distributor.id', '=', $id)
+            $dataOrderDistributor = Distributor::select(
+                'distributors.id',
+                'distributors.name',
+                'distributors.partner_group_id',
+                DB::raw('sum(orders.size_S + orders.size_M + orders.size_L + orders.size_XL + orders.size_XXL + orders.size_XXXL + orders.size_2 + orders.size_4 + orders.size_6 + orders.size_8 + orders.size_10 + orders.size_12 + orders.size_27 + orders.size_28 + orders.size_29 + orders.size_30 + orders.size_31 + orders.size_32 + orders.size_33 + orders.size_34 + orders.size_35 + orders.size_36 + orders.size_37 + orders.size_38 + orders.size_39 + orders.size_40 + orders.size_41 + orders.size_42 + orders.size_other) as total_order')
+            )->leftJoin('distributors AS client', 'client.distributor_id', '=', 'distributors.id')
+            ->leftJoin('orders', 'orders.client_id', '=', 'client.id')
+            ->where('distributors.id', '=', $id)
             ->with(['Agent' => function ($query) {
                 $query->select(
+                        'distributors.distributor_id',
                         'distributors.name',
                         'products.article_name',
                         DB::raw("SUM(orders.size_S + orders.size_M + orders.size_L + orders.size_XL + orders.size_XXL + orders.size_XXXL + orders.size_2 + orders.size_4 + orders.size_6 + orders.size_8 + orders.size_10 + orders.size_12 + orders.size_27 + orders.size_28 + orders.size_29 + orders.size_30 + orders.size_31 + orders.size_32 + orders.size_33 + orders.size_34 + orders.size_35 + orders.size_36 + orders.size_37 + orders.size_38 + orders.size_39 + orders.size_40 + orders.size_41 + orders.size_42 + orders.size_other) AS TOTAL")
                     )->leftJoin('orders', 'orders.client_id', '=', 'distributors.id')
                     ->leftJoin('products', 'products.id', '=', 'orders.product_id')
                     ->groupBy('distributors.name', 'products.article_name')
+                    ->orderByDesc('TOTAL')
                     ->get();
             }])
-            ->groupBy('distributor_id', 'distributor.name', 'distributor.partner_group_id', 'events.event_name')
-            ->orderByDesc('total_order')
+            ->groupBy('distributors.id', 'distributors.name', 'distributors.partner_group_id')
             ->first();
 
             return response()->json([
