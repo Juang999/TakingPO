@@ -525,17 +525,55 @@ class ReportController extends Controller
     {
         try {
             $dataBuyer = Distributor::select(
-                                        'distributors.id',
+                                        DB::raw('distributors.id AS db_id'),
                                         DB::raw('distributors.name'),
+                                        DB::raw('(SELECT
+                                                    SUM(
+                                                        orders.size_S +
+                                                        orders.size_M +
+                                                        orders.size_L +
+                                                        orders.size_XL +
+                                                        orders.size_XXL +
+                                                        orders.size_XXXL +
+                                                        orders.size_2 +
+                                                        orders.size_4 +
+                                                        orders.size_6 +
+                                                        orders.size_8 +
+                                                        orders.size_10 +
+                                                        orders.size_12 +
+                                                        orders.size_27 +
+                                                        orders.size_28 +
+                                                        orders.size_29 +
+                                                        orders.size_30 +
+                                                        orders.size_31 +
+                                                        orders.size_32 +
+                                                        orders.size_33 +
+                                                        orders.size_34 +
+                                                        orders.size_35 +
+                                                        orders.size_36 +
+                                                        orders.size_37 +
+                                                        orders.size_38 +
+                                                        orders.size_39 +
+                                                        orders.size_40 +
+                                                        orders.size_41 +
+                                                        orders.size_42 +
+                                                        orders.size_other
+                                                    ) FROM orders
+                                                    WHERE
+                                                        client_id IN (SELECT id FROM distributors WHERE distributor_id = db_id)
+                                                    OR
+                                                        client_Id = db_id) AS total_order')
                                     )->where('partner_group_id', '=', 1)
-                                    ->orderBy('distributors.name', 'ASC')
+                                    ->orderByDesc('total_order')
                                     ->get();
 
             $useCollectionForDataBuyer = collect($dataBuyer)->map(function ($data) {
                 return [
-                    'id' => $data->id,
+                    'id' => $data->db_id,
                     'name' => $data->name,
-                    'ordered_product' => $this->orderedProduct($data->id)
+                    'total_order' => $data->total_order,
+
+                    'ordered_product' => $this->orderedProduct($data->db_id)
                 ];
             });
 
@@ -562,7 +600,7 @@ class ReportController extends Controller
         $data = Product::select(
             'products.id',
             'products.article_name',
-            DB::raw("(SELECT CASE WHEN $sum IS NULL THEN 0 ELSE $sum END FROM orders WHERE (client_id IN (SELECT id FROM distributors WHERE distributor_id = $client_id) OR client_id = $client_id) AND product_id = products.id) AS TOTAL")
+            DB::raw("(SELECT CASE WHEN $sum IS NULL THEN 0 ELSE $sum END FROM orders WHERE (client_id IN (SELECT id FROM distributors WHERE distributor_id = $client_id) OR client_id = $client_id ) AND product_id = products.id) AS TOTAL")
         )->orderBy('products.article_name', 'ASC')
         ->get();
 
