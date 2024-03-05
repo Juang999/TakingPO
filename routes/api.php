@@ -100,6 +100,16 @@ Route::middleware('jwt.verify')->group(function () {
         });
     });
 
+    Route::prefix('resource-and-development')->group(function () {
+        Route::prefix('sample')->group(function () {
+            Route::get('/', 'Api\Admin\ResourceAndDevelopment\SampleProductController@index');
+            Route::post('/', 'Api\Admin\ResourceAndDevelopment\SampleProductController@store');
+            Route::get('/{id}/detail', 'Api\Admin\ResourceAndDevelopment\SampleProductController@show');
+            Route::put('/{id}/update', 'Api\Admin\ResourceAndDevelopment\SampleProductController@update');
+
+        });
+    });
+
     // route with exception
     Route::apiResource('entity', 'Api\Admin\EntityController')
     ->parameters(['entity' => 'entity'])
