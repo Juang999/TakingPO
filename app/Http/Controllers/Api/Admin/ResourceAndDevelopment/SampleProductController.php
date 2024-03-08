@@ -2,12 +2,11 @@
 
 namespace App\Http\Controllers\Api\Admin\ResourceAndDevelopment;
 
-use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
-use App\Models\{SampleProduct, SampleProductPhoto};
-use Illuminate\Support\Facades\DB;
-use App\Http\Requests\Admin\SampleProduct\{SampleProductRequest, UpdateSampleProductRequest};
 use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
+use App\Http\Controllers\Controller;
+use App\Models\{SampleProduct, SampleProductPhoto};
+use App\Http\Requests\Admin\SampleProduct\{SampleProductRequest, UpdateSampleProductRequest, InsertSamplePhotoRequest};
 
 class SampleProductController extends Controller
 {
@@ -27,8 +26,8 @@ class SampleProductController extends Controller
                 'date',
                 'article_name',
                 'entity_name',
-            )->with(['PhotoSampleProduct' => function ($query) {
-                $query->select('sample_product_id', 'sequence', 'photo')->first();
+            )->with(['SinglePhotoProduct' => function ($query) {
+                $query->select('sample_product_id', 'sequence', 'photo');
             }])->when($requestArticle, function ($query) use ($requestArticle) {
                 $query->where('article_name', 'like', "%$requestArticle%");
             })->when($requestEntity, function ($query) use ($requestEntity) {
@@ -72,7 +71,7 @@ class SampleProductController extends Controller
                     'leader_designer_id' => $request->leader_designer_id,
                 ]);
 
-                $this->inputSamplePhoto(['sp_id' => 1, 'photo' => $request->photo]);
+                $this->inputSamplePhoto(['sp_id' => $sampleProduct->id, 'photo' => $request->photo]);
 
             DB::commit();
 
@@ -113,7 +112,7 @@ class SampleProductController extends Controller
                 'md',
                 'leader_designer'
             )->with(['PhotoSampleProduct' => function ($query) {
-                $query->select('sample_product_id', 'sequence', 'photo')
+                $query->select('id', 'sample_product_id', 'sequence', 'photo')
                     ->orderBy('sequence', 'ASC');
             }])->find($id);
 
@@ -186,10 +185,34 @@ class SampleProductController extends Controller
     public function deletePhoto($id, $sampleProductId)
     {
         try {
-            SampleProductPhoto::where([['id', '=', $id], ['sample_product_id', '=', $sampleProductId]])->destroy();
+            DB::beginTransaction();
+                $this->loggerDeletePhoto($id);
+
+                SampleProductPhoto::where([['id', '=', $id], ['sample_product_id', '=', $sampleProductId]])->delete();
+            DB::commit();
 
             return response()->json([
                 'status' => 'successs',
+                'data' => true,
+                'error' => null
+            ], 200);
+        } catch (\Throwable $th) {
+            DB::rollBack();
+            return response()->json([
+                'status' => 'failed',
+                'data' => null,
+                'error' => $th->getMessage()
+            ], 400);
+        }
+    }
+
+    public function insertSamplePhoto(InsertSamplePhotoRequest $request)
+    {
+        try {
+            $this->inputSamplePhoto(['sp_id' => $request->sample_product_id, 'photo' => $request->photo]);
+
+            return response()->json([
+                'status' => 'success',
                 'data' => true,
                 'error' => null
             ], 200);
@@ -207,21 +230,15 @@ class SampleProductController extends Controller
         $photos = explode(',', $request['photo']);
         $sequence = $this->getSequencePhoto($request['sp_id']) + 1;
 
-        $array = [];
-
         foreach ($photos as $photo) {
-            array_push($array, [
+            SampleProductPhoto::create([
                 'sample_product_id' => $request['sp_id'],
                 'sequence' => $sequence,
-                'photo' => $photo,
-                'created_at' => Carbon::now()->format('Y-m-d H:m:s'),
-                'updated_at' => Carbon::now()->format('Y-m-d H:m:s')
+                'photo' => $photo
             ]);
 
             $sequence += 1;
         }
-
-        DB::table('sample_product_photos')->insert($array);
     }
 
     private function getSequencePhoto($sp_id)
@@ -255,5 +272,30 @@ class SampleProductController extends Controller
         $data = compact('sampleProduct', 'requests');
 
         return $data;
+    }
+
+    private function loggerFunction($log, $activity, $performedOn, $causedBy)
+    {
+        DB::table('activity_log')->insert([
+            'log_name' => 'system',
+            'description' => $activity,
+            'subject_type' => 'App\Models\SampleProductPhoto',
+            'subject_id' => $performedOn->id,
+            'causer_type' => 'App\User',
+            'causer_id' => $causedBy->id,
+            'properties' => json_encode($log),
+            'created_at' => Carbon::now()->format('Y-m-d H:m:s'),
+            'updated_at' => Carbon::now()->format('Y-m-d H:m:s')
+        ]);
+    }
+
+    private function loggerDeletePhoto($id)
+    {
+        $modelSampleProductPhoto = new SampleProductPhoto();
+        $data = $modelSampleProductPhoto->where('id', '=', $id)->first();
+        $performedOn = $data;
+        $causerBy = auth()->user();
+
+        $this->loggerFunction(['attributes' => $data], 'deleted', $performedOn, $causerBy);
     }
 }
