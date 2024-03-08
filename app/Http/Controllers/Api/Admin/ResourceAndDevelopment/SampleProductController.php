@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Api\Admin\ResourceAndDevelopment;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
-use App\Models\{SampleProduct, SampleProductPhoto};
+use App\Models\{SampleProduct, SampleProductPhoto, FabricTexture};
 use App\Http\Requests\Admin\SampleProduct\{SampleProductRequest, UpdateSampleProductRequest, InsertSamplePhotoRequest};
 
 class SampleProductController extends Controller
@@ -58,7 +58,6 @@ class SampleProductController extends Controller
     {
         try {
             DB::beginTransaction();
-
                 $sampleProduct = SampleProduct::create([
                     'date' => $request->date,
                     'article_name' => $request->article_name,
@@ -67,13 +66,14 @@ class SampleProductController extends Controller
                     'material' => $request->material,
                     'size' => $request->size,
                     'accessories' => $request->accessories,
+                    'note_and_description' => $request->note_description,
                     'designer_id' => $request->designer_id,
                     'md_id' => $request->md_id,
                     'leader_designer_id' => $request->leader_designer_id,
                 ]);
 
                 $this->inputSamplePhoto(['sp_id' => $sampleProduct->id, 'photo' => $request->photo]);
-
+                $this->inputFabricPhoto(['sample_product_id' => $sampleProduct->id, 'description_fabric' => $request->description_fabric, 'photo_fabric' => $request->photo_fabric]);
             DB::commit();
 
             return response()->json([
@@ -154,6 +154,7 @@ class SampleProductController extends Controller
                 'material' => $requests['material'],
                 'size' => $requests['size'],
                 'accessories' => $requests['accessories'],
+                'note_and_description' => $requests['note_and_description'],
                 'designer_id' => $requests['designer_id'],
                 'md_id' => $requests['md_id'],
                 'leader_designer_id' => $requests['leader_designer_id'],
@@ -181,7 +182,7 @@ class SampleProductController extends Controller
      */
     public function destroy($id)
     {
-        //
+        // 
     }
 
     public function deletePhoto($id, $sampleProductId)
@@ -255,7 +256,7 @@ class SampleProductController extends Controller
 
     private function requestUpdateSampelProduct($request, $id)
     {
-        $sampleProduct = SampleProduct::select('id','date','article_name', 'style_id', 'entity_name', 'material', 'size', 'accessories', 'designer_id', 'md_id', 'leader_designer_id')
+        $sampleProduct = SampleProduct::select('id','date','article_name', 'style_id', 'entity_name', 'material', 'size', 'accessories', 'note_and_description', 'designer_id', 'md_id', 'leader_designer_id')
                                     ->where('id', '=', $id)
                                     ->first();
 
@@ -267,6 +268,7 @@ class SampleProductController extends Controller
             'material' => ($request->material) ? $request->material : $sampleProduct->material,
             'size' => ($request->size) ? $request->size : $sampleProduct->size,
             'accessories' => ($request->accessories) ? $request->accessories : $sampleProduct->accessories,
+            'note_and_description' => ($request->note_description) ? $request->note_description : $sampleProduct->note_and_description,
             'designer_id' => ($request->designer_id) ? $request->designer_id : $sampleProduct->designer_id,
             'md_id' => ($request->md_id) ? $request->md_id : $sampleProduct->md_id,
             'leader_designer_id' => ($request->leader_designer_id) ? $request->leader_designer_id : $sampleProduct->leader_designer_id,
@@ -300,5 +302,21 @@ class SampleProductController extends Controller
         $causerBy = auth()->user();
 
         $this->loggerFunction(['attributes' => $data], 'deleted', $performedOn, $causerBy);
+    }
+
+    private function inputFabricPhoto($request)
+    {
+        $fabricDescription = explode(',', $request['description_fabric']);
+        $fabricPhoto = explode(',', $request['photo_fabric']);
+        $sampleProductId = $request['sample_product_id'];
+
+        collect($fabricPhoto)->each(function ($item, $index) use ($fabricDescription, $sampleProductId) {
+            FabricTexture::create([
+                'sample_product_id' => $sampleProductId,
+                'description' => $fabricDescription[$index],
+                'photo' => $item,
+                'sequence' => $index + 1,
+            ]);
+        });
     }
 }

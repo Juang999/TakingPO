@@ -31,10 +31,13 @@ class SampleProductRequest extends FormRequest
             'material' => 'required|string',
             'size' => 'required|string',
             'accessories' => 'required|string',
+            'note_description' => 'nullable|string',
             'designer_id' => 'nullable|integer',
             'md_id' => 'nullable|integer',
             'leader_designer_id' => 'nullable|integer',
-            'photo' => 'required|string'
+            'photo' => 'required|string',
+            'description_fabric' => 'required|string',
+            'photo_fabric' => 'required|string'
         ];
     }
 }
