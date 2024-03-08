@@ -106,7 +106,8 @@ Route::middleware('jwt.verify')->group(function () {
             Route::post('/', 'Api\Admin\ResourceAndDevelopment\SampleProductController@store');
             Route::get('/{id}/detail', 'Api\Admin\ResourceAndDevelopment\SampleProductController@show');
             Route::put('/{id}/update', 'Api\Admin\ResourceAndDevelopment\SampleProductController@update');
-
+            Route::post('/input-photo', 'Api\Admin\ResourceAndDevelopment\SampleProductController@insertSamplePhoto');
+            Route::delete('/{id}/{sampleProductId}/delete-photo', 'Api\Admin\ResourceAndDevelopment\SampleProductController@deletePhoto');
         });
     });
 
