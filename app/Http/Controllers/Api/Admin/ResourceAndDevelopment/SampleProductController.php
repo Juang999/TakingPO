@@ -62,6 +62,7 @@ class SampleProductController extends Controller
                 $sampleProduct = SampleProduct::create([
                     'date' => $request->date,
                     'article_name' => $request->article_name,
+                    'style_id' => $request->style_id,
                     'entity_name' => $request->entity_name,
                     'material' => $request->material,
                     'size' => $request->size,
@@ -148,6 +149,7 @@ class SampleProductController extends Controller
             $sampleProduct->update([
                 'date' => $requests['date'],
                 'article_name' => $requests['article_name'],
+                'style_id' => $requests['style_id'],
                 'entity_name' => $requests['entity_name'],
                 'material' => $requests['material'],
                 'size' => $requests['size'],
@@ -253,13 +255,14 @@ class SampleProductController extends Controller
 
     private function requestUpdateSampelProduct($request, $id)
     {
-        $sampleProduct = SampleProduct::select('id','date','article_name', 'entity_name','material','size','accessories','designer_id','md_id','leader_designer_id',)
+        $sampleProduct = SampleProduct::select('id','date','article_name', 'style_id', 'entity_name', 'material', 'size', 'accessories', 'designer_id', 'md_id', 'leader_designer_id')
                                     ->where('id', '=', $id)
                                     ->first();
 
         $requests = [
             'date' => ($request->date) ? $request->date : $sampleProduct->date,
             'article_name' => ($request->article_name) ? $request->article_name : $sampleProduct->article_name,
+            'style_id' => ($request->style_id) ? $request->style_id : $sampleProduct->style_id,
             'entity_name' => ($request->entity_name) ? $request->entity_name : $sampleProduct->entity_name,
             'material' => ($request->material) ? $request->material : $sampleProduct->material,
             'size' => ($request->size) ? $request->size : $sampleProduct->size,
