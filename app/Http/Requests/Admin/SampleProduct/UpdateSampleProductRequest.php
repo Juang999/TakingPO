@@ -26,14 +26,14 @@ class UpdateSampleProductRequest extends FormRequest
         return [
             'date' => 'nullable|date',
             'article_name' => 'nullable|string',
+            'style_id' => 'nullable|integer',
             'entity_name' => 'nullable|string',
             'material' => 'nullable|string',
             'size' => 'nullable|string',
             'accessories' => 'nullable|string',
             'designer_id' => 'nullable|integer',
             'md_id' => 'nullable|integer',
-            'leader_designer_id' => 'nullable|integer',
-            'photo' => 'nullable|string'
+            'leader_designer_id' => 'nullable|integer'
         ];
     }
 }

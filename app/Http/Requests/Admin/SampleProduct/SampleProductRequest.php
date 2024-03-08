@@ -27,6 +27,7 @@ class SampleProductRequest extends FormRequest
             'date' => 'required|date',
             'article_name' => 'required|string',
             'entity_name' => 'required|string',
+            'style_id' => 'required|integer',
             'material' => 'required|string',
             'size' => 'required|string',
             'accessories' => 'required|string',
