@@ -2,11 +2,12 @@
 
 namespace App\Http\Controllers\Api\Admin\Event;
 
+use App\User;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\{DB, Auth, Hash};
 use App\Http\Requests\{Admin\Agent\UpdateAgentRequest};
-use App\{MutifStoreAddress, Distributor, MutifStoreMaster, PartnerGroup, User};
+use App\Models\{MutifStoreAddress, Distributor, MutifStoreMaster, PartnerGroup};
 
 class AgentController extends Controller
 {

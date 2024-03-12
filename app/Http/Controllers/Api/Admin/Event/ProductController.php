@@ -2,12 +2,12 @@
 
 namespace App\Http\Controllers\Api\Admin\Event;
 
-use App\Models\{Product, PartnumberProduct, BufferProduct, Photo};
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
+use App\Models\{Product, PartnumberProduct, BufferProduct, Photo};
 use App\Http\Requests\Admin\Clothes\{CreateClothesRequest, UpdateClothesRequest};
-use Carbon\Carbon;
 
 class ProductController extends Controller
 {

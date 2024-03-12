@@ -5,8 +5,8 @@ namespace App\Http\Controllers\Api\Admin\Event;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\{Auth, DB};
-use App\{PartnerGroup, Distributor, PartnerAddress, MutifStoreMaster};
-use App\Http\Requests\{Admin\Distributor\DistributorRequest, UpdateDistributorRequest};
+use App\Models\{Distributor, PartnerAddress};
+use App\Http\Requests\{Admin\Distributor\DistributorRequest};
 
 class DistributorController extends Controller
 {

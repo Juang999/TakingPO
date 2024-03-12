@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers\Api\Admin\Event;
 
-use Illuminate\Http\Request;
-use App\Http\Controllers\Controller;
-use App\Models\{Product, Event, Session, DetailSession};
 use Carbon\Carbon;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use App\Http\Controllers\Controller;
+use App\Models\{Event, Session, DetailSession};
 use App\Http\Requests\Admin\Event\{CreateEventRequest, UpdateEventRequest, CreateSessionRequest, CreateDetailSessionRequest};
 
 class EventController extends Controller
