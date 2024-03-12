@@ -58,9 +58,7 @@ class ClothesController extends Controller
     public function store(ClothesRequest $request)
     {
         try {
-            $type = Type::firstOrCreate([
-                'type' => $request->type
-            ]);
+            $type = $this->getTypeId($request->type);
 
             DB::beginTransaction();
                 $clothes = Clothes::create([
@@ -78,17 +76,7 @@ class ClothesController extends Controller
                     'is_active' => 1
                 ]);
 
-                $dataPartnumbers = explode(', ', $request->partnumber);
-
-                $bulkPartnumber = collect($dataPartnumbers)->map(function ($query) use ($request, $clothes) {
-                    return [
-                        "clothes_id" => $clothes->id,
-                        "image_id" => $request->image_id,
-                        "partnumber" => $query
-                    ];
-                })->toArray();
-
-                DB::table('partnumbers')->insert($bulkPartnumber);
+                $this->insertPartnumber($request->partnumber, $request->image_id, $clothes->id);
 
             DB::commit();
 
@@ -246,5 +234,29 @@ class ClothesController extends Controller
         ];
 
         return $req;
+    }
+
+    private function insertPartnumber($partnumbers, $imageId, $clothesId)
+    {
+        $dataPartnumbers = explode(', ', $partnumbers);
+
+                $bulkPartnumber = collect($dataPartnumbers)->map(function ($query) use ($imageId, $clothesId) {
+                    return [
+                        "clothes_id" => $clothesId,
+                        "image_id" => $imageId,
+                        "partnumber" => $query
+                    ];
+                })->toArray();
+
+                DB::table('partnumbers')->insert($bulkPartnumber);
+    }
+
+    private function getTypeId($type)
+    {
+        $type = Type::firstOrCreate([
+            'type' => $type
+        ]);
+
+        return $type;
     }
 }
