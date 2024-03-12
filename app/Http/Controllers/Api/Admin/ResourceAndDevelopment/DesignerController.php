@@ -14,7 +14,8 @@ class DesignerController extends Controller
             $requestName = request()->searchName;
 
             $designer = UserSIP::select('id', 'username', 'attendance_id', 'seksi', 'sub_section_id')
-                                ->where('seksi', '=', 'Mutif Design Staff')
+                                ->where('sub_section_id', '=', 10021)
+                                ->whereIn('power_lvl', [4, 6])
                                 ->when($requestName, fn ($query) =>
                                     $query->where('username', 'like', "%$requestName%")
                                 )->get();
@@ -39,7 +40,8 @@ class DesignerController extends Controller
             $requestName = request()->searchName;
 
             $merchandiser = UserSIP::select('id', 'username', 'attendance_id', 'seksi', 'sub_section_id')
-                                    ->where('seksi', '=', 'Mutif Merchandiser Staff')
+                                    ->where('sub_section_id', 3141)
+                                    ->whereIn('power_lvl', [4, 6])
                                     ->when($requestName, fn ($query) =>
                                         $query->where('username', 'like', "%$requestName%")
                                     )->get();
@@ -64,7 +66,8 @@ class DesignerController extends Controller
             $requestName = request()->searchName;
 
             $leaderDesigner = UserSIP::select('id', 'username', 'attendance_id', 'seksi', 'sub_section_id')
-                                    ->where('seksi', '=', 'Research and Development Leading Head')
+                                    ->where('sub_section_id', '=', 10021)
+                                    ->whereNotIn('power_lvl', [4,6])
                                     ->when($requestName, fn ($query) =>
                                         $query->where('username', 'like', "%$requestName%")
                                     )->get();
