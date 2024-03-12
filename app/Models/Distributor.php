@@ -17,11 +17,6 @@ class Distributor extends Model
 
     protected static $logAttributes = ['name', 'phone'];
 
-    public function MutifStoreMaster()
-    {
-        return $this->hasMany(MutifStoreMaster::class);
-    }
-
     public function getActivitylogOptions()
     {
         return LogOptions::defaults()
@@ -35,40 +30,30 @@ class Distributor extends Model
         return $this->hasMany(Order::class, 'client_id', 'id');
     }
 
-    // public function Transaction()
-    // {
-    //     return $this->hasMany(Transaction::class);
-    // }
-
-    // public function TemporaryStorage()
-    // {
-    //     return $this->hasMany(TemporaryStorage::class);
-    // }
-
-    // public function PartnerAddress()
-    // {
-    //     return $this->hasOne(PartnerAddress::class);
-    // }
+    public function PartnerAddress()
+    {
+        return $this->hasOne(PartnerAddress::class);
+    }
 
     // public function Agent()
     // {
     //     return $this->hasMany(Agent::class);
     // }
 
-    // public function PartnerGroup()
-    // {
-    //     return $this->belongsTo(PartnerGroup::class);
-    // }
+    public function PartnerGroup()
+    {
+        return $this->belongsTo(PartnerGroup::class);
+    }
 
-    // public function Phone()
-    // {
-    //     return $this->hasMany(Phone::class);
-    // }
+    public function MutifStoreMaster()
+    {
+        return $this->hasMany(MutifStoreMaster::class, 'distributor_id', 'id');
+    }
 
-    // public function Area()
-    // {
-    //     return $this->belongsTo(Area::class);
-    // }
+    public function Agent()
+    {
+        return $this->hasMany('App\Models\Distributor', 'distributor_id', 'id');
+    }
 
     // public function User()
     // {
