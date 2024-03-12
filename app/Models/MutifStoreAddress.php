@@ -10,6 +10,6 @@ class MutifStoreAddress extends Model
 
     public function MutifStoreMaster()
     {
-        return $this->belongsTo(MutifStoreMaster::class);
+        return $this->belongsTo(MutifStoreMaster::class, 'mutif_store_master_id', 'id');
     }
 }
