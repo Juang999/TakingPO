@@ -3,9 +3,9 @@
 namespace App\Http\Controllers\Api\Admin\ResourceAndDevelopment;
 
 use Carbon\Carbon;
-use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
-use App\Models\{SampleProduct, SampleProductPhoto, FabricTexture};
+use Illuminate\Support\Facades\{Hash, DB};
+use App\{User, Models\SampleProduct, Models\SampleProductPhoto, Models\FabricTexture, Models\SIP\UserSIP};
 use App\Http\Requests\Admin\SampleProduct\{SampleProductRequest, UpdateSampleProductRequest, InsertSamplePhotoRequest};
 
 class SampleProductController extends Controller
@@ -58,6 +58,10 @@ class SampleProductController extends Controller
     {
         try {
             DB::beginTransaction();
+                $designerId = $this->createUserStaffDesigner($request->designer_id);
+                $merchandiserId = $this->createUserStaffDesigner($request->md_id);
+                $leaderDesignerId = $this->createUserStaffDesigner($request->leader_designer_id);
+
                 $sampleProduct = SampleProduct::create([
                     'date' => $request->date,
                     'article_name' => $request->article_name,
@@ -66,10 +70,10 @@ class SampleProductController extends Controller
                     'material' => $request->material,
                     'size' => $request->size,
                     'accessories' => $request->accessories,
-                    'note_and_description' => $request->note_description,
-                    'designer_id' => $request->designer_id,
-                    'md_id' => $request->md_id,
-                    'leader_designer_id' => $request->leader_designer_id,
+                    'note_and_description' => ($request->note_description) ? $request->note_description : '-',
+                    'designer_id' => $designerId,
+                    'md_id' => $merchandiserId,
+                    'leader_designer_id' => $leaderDesignerId,
                 ]);
 
                 $this->inputSamplePhoto(['sp_id' => $sampleProduct->id, 'photo' => $request->photo]);
@@ -260,6 +264,10 @@ class SampleProductController extends Controller
                                     ->where('id', '=', $id)
                                     ->first();
 
+        $merchandiserId = ($request->md_id) ? $this->createUserStaffDesigner($request->md_id) : $sampleProduct->md_id;
+        $designerId = ($request->designer_id) ? $this->createUserStaffDesigner($request->designer_id) : $sampleProduct->designer_id;
+        $leaderDesignerId = ($request->leader_designer_id) ? $this->createUserStaffDesigner($request->leader_designer_id) : $sampleProduct->leader_designer_id;
+
         $requests = [
             'date' => ($request->date) ? $request->date : $sampleProduct->date,
             'article_name' => ($request->article_name) ? $request->article_name : $sampleProduct->article_name,
@@ -269,9 +277,9 @@ class SampleProductController extends Controller
             'size' => ($request->size) ? $request->size : $sampleProduct->size,
             'accessories' => ($request->accessories) ? $request->accessories : $sampleProduct->accessories,
             'note_and_description' => ($request->note_description) ? $request->note_description : $sampleProduct->note_and_description,
-            'designer_id' => ($request->designer_id) ? $request->designer_id : $sampleProduct->designer_id,
-            'md_id' => ($request->md_id) ? $request->md_id : $sampleProduct->md_id,
-            'leader_designer_id' => ($request->leader_designer_id) ? $request->leader_designer_id : $sampleProduct->leader_designer_id,
+            'designer_id' => $designerId,
+            'md_id' => $merchandiserId,
+            'leader_designer_id' => $leaderDesignerId,
         ];
 
         $data = compact('sampleProduct', 'requests');
@@ -318,5 +326,30 @@ class SampleProductController extends Controller
                 'sequence' => $index + 1,
             ]);
         });
+    }
+
+    private function createUserStaffDesigner($attendanceId)
+    {
+        $checkUser = User::select('name')->where('attendance_id', '=', $attendanceId)->first();
+
+        if($checkUser == null) {
+            $userSIP = UserSIP::select('username', 'attendance_id', 'sub_section_id', 'seksi', 'data_karyawans.nip')
+                                ->leftJoin('detail_users', 'detail_users.id', '=', 'users.detail_user_id')
+                                ->leftJoin('data_karyawans', 'data_karyawans.id', '=', 'detail_users.data_karyawan_id')
+                                ->where('users.attendance_id', '=', $attendanceId)
+                                ->first();
+
+            User::create([
+                'name' => $userSIP->username,
+                'email' => "$userSIP->username@mutif.atpo",
+                'password' => Hash::make($userSIP->username),
+                'attendance_id' => $userSIP->attendance_id,
+                'sub_section_id' => $userSIP->sub_section_id,
+                'sub_section' => $userSIP->seksi,
+                'nip' => $userSIP->nip
+            ]);
+        }
+
+        return $attendanceId;
     }
 }

@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class AddColumnsSampleProductsTable extends Migration
+class AdditionalColumnsUsersTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,9 +13,10 @@ class AddColumnsSampleProductsTable extends Migration
      */
     public function up()
     {
-        Schema::table('sample_products', function (Blueprint $column) {
-            $column->unsignedBigInteger('style_id')->after('article_name');
-            $column->foreign('style_id')->references('id')->on('types');
+        Schema::table('users', function (Blueprint $table) {
+            $table->unsignedBigInteger('attendance_id')->after('partner_id');
+            $table->unsignedBigInteger('sub_section_id')->after('attendance_id');
+            $table->string('sub_section')->after('sub_section_id');
         });
     }
 

@@ -111,6 +111,12 @@ Route::middleware('jwt.verify')->group(function () {
             Route::post('/input-photo', 'Api\Admin\ResourceAndDevelopment\SampleProductController@insertSamplePhoto');
             Route::delete('/{id}/{sampleProductId}/delete-photo', 'Api\Admin\ResourceAndDevelopment\SampleProductController@deletePhoto');
         });
+
+        Route::prefix('staff-rnd')->group(function () {
+            Route::get('/designer', 'Api\Admin\ResourceAndDevelopment\DesignerController@getDesigner');
+            Route::get('/merchandiser', 'Api\Admin\ResourceAndDevelopment\DesignerController@getMerchandiser');
+            Route::get('/leader-designer', 'Api\Admin\ResourceAndDevelopment\DesignerController@getLeaderDesigner');
+        });
     });
 
     // route with exception
@@ -133,8 +139,8 @@ Route::middleware('jwt.verify')->group(function () {
 
     // single route
     Route::get('/logs', 'Api\Admin\Logger');
-    Route::get('/status', 'Api\Admin\SessionStatus');
     Route::post('logout', 'Api\UserController@logout');
+    Route::get('/status', 'Api\Admin\SessionStatus');
     Route::get('get-new-member', 'Api\AccRegistration');
     Route::get('/highest-order', 'Api\Admin\HighestOrder');
     Route::put('/is-active/{clothes}', 'Api\ActivateClothes');
@@ -153,26 +159,6 @@ Route::middleware('jwt.verify')->group(function () {
     Route::get('detailTotalAgent/{id}', 'Api\Admin\TotalController@detailTotalAgentWithD');
 
 });
-
-// group pre-order route
-// Route::apiResource('pre-order/{phone}', 'Api\Client\PreOrderController');
-// Route::prefix('pre-order')->group( function () {
-//     // CRUD for Taking PO from client
-//     Route::get('/{phone}', 'Api\Client\PreOrderController@index');
-//     Route::post('/{phone}', 'Api\Client\PreOrderController@store');
-//     Route::delete('/{phone}/clothes/{id}', 'Api\Client\PreOrderController@destroy');
-//     Route::put('/{phone}/cart/{id}', 'Api\Client\PreOrderController@update');
-//     Route::get('/{phone}/clothes/{id}', 'Api\Client\PreOrderController@show');
-
-//     // cart
-//     Route::get('cart/{phone}', 'Api\Client\Cart');
-
-//     // Store all clothes
-//     Route::post('/store-all/{phone}', 'Api\Client\StoreAll');
-
-//     // getHistory
-//     Route::get('/{phone}/history', 'Api\Client\PreOrderController@history');
-// });
 
 // group registration route
 Route::prefix('client')->group( function () {
@@ -197,43 +183,10 @@ Route::prefix('client')->group( function () {
         Route::put('/{id}/update-chart', 'Api\Client\Event\OrderController@updateDataChart');
         Route::get('/{eventId}/count-data-chart', 'Api\Client\Event\OrderController@countDataChart');
         Route::get('/{eventId}/history', 'Api\Client\Event\OrderController@historyOrder');
-
     });
 
     Route::post('verification', 'Api\Client\Event\ClientController@verification');
-
-    // Route::prefix('SB')->mid
-    // Login & Register
-    // Route::get('login/{phone}', 'Api\Client\ClientController@login');
-    // Route::post('register', 'Api\Client\ClientController@register');
-    // Route::put('update-p/hone/{phone}', 'Api\Client\ClientController@UpdatePhone');
-
-    // Get list group & distributor
-    // Route::get('/get-list-group', 'Api\Client\ClientController@PartnerGroup');
-    // Route::get('/get-list-distributor', 'Api\Client\ClientController@distributor');
-
-    // route for address agent
-    // Route::get('area-client', 'Api\Client\getArea');
-    // Route::post('/create-address/{phone}', 'Api\Client\PartnerAddressController@store');
-    // Route::put('/update-address/{phone}', 'Api\Client\PartnerAddressController@update');
 });
-
-// Route::prefix('product')->group(function () {
-//     Route::get('/', 'Api\ClothesController@getProduct');
-//     Route::get('/{id}', 'Api\ClothesController@getDetailProduct');
-//     Route::get('/find/{name}', 'Api\ClothesController@findProduct');
-//     Route::get('type', 'Api\ClothesController@getType');
-//     Route::get('/firstPhoto/{photoId}', 'Api\ClothesController@getFirstPhoto');
-//     Route::post('/storeProduct', 'Api\ClothesController@Product');
-// });
-
-// Route::prefix('mutif-store')->group( function () {
-//     Route::get('/{phone}', 'Api\Client\MutifStoreAddressController@index');
-//     Route::post('/{phone}', 'Api\Client\MutifStoreAddressController@store');
-//     Route::get('/{phone}/store/{id}', 'Api\Client\MutifStoreAddressController@show');
-//     Route::put('/{phone}/store/{id}', 'Api\Client\MutifStoreAddressController@update');
-//     Route::delete('/{phone}/store/{id}', 'Api\Client\MutifStoreAddressController@destroy');
-// });
 
 Route::prefix('exapro')->group(function () {
     Route::get('/{partnumber}/image', 'Api\Client\ImageController@show');
