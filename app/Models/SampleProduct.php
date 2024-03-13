@@ -20,7 +20,7 @@ class SampleProduct extends Model
         return $this->hasMany(SampleProductPhoto::class, 'sample_product_id', 'id');
     }
 
-    public function SinglePhotoProduct()
+    public function Thumbnail()
     {
         return $this->hasOne(SampleProductPhoto::class, 'sample_product_id', 'id');
     }
