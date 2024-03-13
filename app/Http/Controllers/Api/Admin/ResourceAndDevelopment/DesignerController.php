@@ -40,7 +40,7 @@ class DesignerController extends Controller
             $requestName = request()->searchName;
 
             $merchandiser = UserSIP::select('id', 'username', 'attendance_id', 'seksi', 'sub_section_id')
-                                    ->where('sub_section_id', 3141)
+                                    ->where('sub_section_id', 10022)
                                     ->whereIn('power_lvl', [4, 6])
                                     ->when($requestName, fn ($query) =>
                                         $query->where('username', 'like', "%$requestName%")
