@@ -26,13 +26,13 @@ class SampleProductController extends Controller
                 'date',
                 'article_name',
                 'entity_name',
-            )->with(['SinglePhotoProduct' => function ($query) {
+            )->with(['Thumbnail' => function ($query) {
                 $query->select('sample_product_id', 'sequence', 'photo');
             }])->when($requestArticle, function ($query) use ($requestArticle) {
                 $query->where('article_name', 'like', "%$requestArticle%");
             })->when($requestEntity, function ($query) use ($requestEntity) {
                 $query->where('entity_name', '=', $requestEntity);
-            })->get();
+            })->paginate(10);
 
             return response()->json([
                 'status' => 'success',
@@ -186,7 +186,7 @@ class SampleProductController extends Controller
      */
     public function destroy($id)
     {
-        // 
+        //
     }
 
     public function deletePhoto($id, $sampleProductId)
