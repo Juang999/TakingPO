@@ -24,4 +24,19 @@ class SampleProduct extends Model
     {
         return $this->hasOne(SampleProductPhoto::class, 'sample_product_id', 'id');
     }
+
+    public function Designer()
+    {
+        return $this->belongsTo('App\User', 'designer_id', 'attendance_id');
+    }
+
+    public function Merchandiser()
+    {
+        return $this->belongsTo('App\User', 'md_id', 'attendance_id');
+    }
+
+    public function LeaderDesigner()
+    {
+        return $this->belongsTo('App\User', 'leader_designer_id', 'attendance_id');
+    }
 }

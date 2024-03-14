@@ -106,20 +106,22 @@ class SampleProductController extends Controller
     {
         try {
             $sampleProduct = SampleProduct::select(
-                'id',
+                'sample_products.id',
                 'date',
                 'article_name',
                 'entity_name',
                 'material',
                 'size',
                 'accessories',
-                'designer',
-                'md',
-                'leader_designer'
-            )->with(['PhotoSampleProduct' => function ($query) {
-                $query->select('id', 'sample_product_id', 'sequence', 'photo')
-                    ->orderBy('sequence', 'ASC');
-            }])->find($id);
+                DB::raw('designer.name AS designer_name'),
+                DB::raw('merchandiser.name AS merchandiser_name'),
+                DB::raw('designer_leader.name AS designer_leader_name'),
+            )->leftJoin(DB::raw('users AS designer'), 'designer.attendance_id', '=', 'sample_products.designer_id')
+            ->leftJoin(DB::raw('users AS merchandiser'), 'merchandiser.attendance_id', '=', 'sample_products.md_id')
+            ->leftJoin(DB::raw('users AS designer_leader'), 'designer_leader.attendance_id', '=', 'sample_products.leader_designer_id')
+            ->with([
+                    'PhotoSampleProduct' => fn ($query) => $query->select('id', 'sample_product_id', 'sequence', 'photo')->orderBy('sequence', 'ASC')
+                ])->find($id);
 
             return response()->json([
                 'status' => 'success',
