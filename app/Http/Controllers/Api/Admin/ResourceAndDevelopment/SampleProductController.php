@@ -110,17 +110,21 @@ class SampleProductController extends Controller
                 'date',
                 'article_name',
                 'entity_name',
+                DB::raw('styles.style_name AS style_name'),
                 'material',
                 'size',
                 'accessories',
+                'note_and_description',
                 DB::raw('designer.name AS designer_name'),
                 DB::raw('merchandiser.name AS merchandiser_name'),
                 DB::raw('designer_leader.name AS designer_leader_name'),
             )->leftJoin(DB::raw('users AS designer'), 'designer.attendance_id', '=', 'sample_products.designer_id')
             ->leftJoin(DB::raw('users AS merchandiser'), 'merchandiser.attendance_id', '=', 'sample_products.md_id')
             ->leftJoin(DB::raw('users AS designer_leader'), 'designer_leader.attendance_id', '=', 'sample_products.leader_designer_id')
+            ->leftJoin('styles', 'styles.id', '=', 'sample_products.style_id')
             ->with([
-                    'PhotoSampleProduct' => fn ($query) => $query->select('id', 'sample_product_id', 'sequence', 'photo')->orderBy('sequence', 'ASC')
+                    'PhotoSampleProduct' => fn ($query) => $query->select('id', 'sample_product_id', 'sequence', 'photo')->orderBy('sequence', 'ASC'),
+                    'FabricTexture' => fn ($query) => $query->select('id', 'sample_product_id', 'description', 'photo')->orderBy('sequence', 'ASC')
                 ])->find($id);
 
             return response()->json([
