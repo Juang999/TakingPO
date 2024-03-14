@@ -5,8 +5,8 @@ namespace App\Http\Controllers\Api\Admin\ResourceAndDevelopment;
 use Carbon\Carbon;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\{Hash, DB};
-use App\{User, Models\SampleProduct, Models\SampleProductPhoto, Models\FabricTexture, Models\SIP\UserSIP};
 use App\Http\Requests\Admin\SampleProduct\{SampleProductRequest, UpdateSampleProductRequest, InsertSamplePhotoRequest};
+use App\{User, Models\SampleProduct, Models\SampleProductPhoto, Models\FabricTexture, Models\HistorySampleProduct, Models\HistorySampleProductPhoto, Models\SIP\UserSIP};
 
 class SampleProductController extends Controller
 {
@@ -76,6 +76,7 @@ class SampleProductController extends Controller
                     'leader_designer_id' => $leaderDesignerId,
                 ]);
 
+                $this->inputHistory($sampleProduct, 'created!');
                 $this->inputSamplePhoto(['sp_id' => $sampleProduct->id, 'photo' => $request->photo]);
                 $this->inputFabricPhoto(['sample_product_id' => $sampleProduct->id, 'description_fabric' => $request->description_fabric, 'photo_fabric' => $request->photo_fabric]);
             DB::commit();
@@ -124,7 +125,8 @@ class SampleProductController extends Controller
             ->leftJoin('styles', 'styles.id', '=', 'sample_products.style_id')
             ->with([
                     'PhotoSampleProduct' => fn ($query) => $query->select('id', 'sample_product_id', 'sequence', 'photo')->orderBy('sequence', 'ASC'),
-                    'FabricTexture' => fn ($query) => $query->select('id', 'sample_product_id', 'description', 'photo')->orderBy('sequence', 'ASC')
+                    'FabricTexture' => fn ($query) => $query->select('id', 'sample_product_id', 'description', 'photo')->orderBy('sequence', 'ASC'),
+                    'HistorySampleProduct' => fn ($query) => $query->select('sample_product_id', 'article_name', 'status', 'updated_at')->orderByDesc('created_at')
                 ])->find($id);
 
             return response()->json([
@@ -156,19 +158,24 @@ class SampleProductController extends Controller
             $requests = $requestSampleProduct['requests'];
             $sampleProduct = $requestSampleProduct['sampleProduct'];
 
-            $sampleProduct->update([
-                'date' => $requests['date'],
-                'article_name' => $requests['article_name'],
-                'style_id' => $requests['style_id'],
-                'entity_name' => $requests['entity_name'],
-                'material' => $requests['material'],
-                'size' => $requests['size'],
-                'accessories' => $requests['accessories'],
-                'note_and_description' => $requests['note_and_description'],
-                'designer_id' => $requests['designer_id'],
-                'md_id' => $requests['md_id'],
-                'leader_designer_id' => $requests['leader_designer_id'],
-            ]);
+            DB::beginTransaction();
+                $sampleProduct->update([
+                    'date' => $requests['date'],
+                    'article_name' => $requests['article_name'],
+                    'style_id' => $requests['style_id'],
+                    'entity_name' => $requests['entity_name'],
+                    'material' => $requests['material'],
+                    'size' => $requests['size'],
+                    'accessories' => $requests['accessories'],
+                    'note_and_description' => $requests['note_and_description'],
+                    'designer_id' => $requests['designer_id'],
+                    'md_id' => $requests['md_id'],
+                    'leader_designer_id' => $requests['leader_designer_id'],
+                ]);
+
+                $dataSampleProduct = SampleProduct::find($sampleProduct->id);
+                $this->inputHistory($dataSampleProduct, 'updated!');
+            DB::commit();
 
             return response()->json([
                 'status' => 'success',
@@ -176,6 +183,8 @@ class SampleProductController extends Controller
                 'error' => null
             ], 200);
         } catch (\Throwable $th) {
+            DB::rollBack();
+
             return response()->json([
                 'status' => 'failed',
                 'data' => null,
@@ -244,11 +253,13 @@ class SampleProductController extends Controller
         $sequence = $this->getSequencePhoto($request['sp_id']) + 1;
 
         foreach ($photos as $photo) {
-            SampleProductPhoto::create([
-                'sample_product_id' => $request['sp_id'],
-                'sequence' => $sequence,
-                'photo' => $photo
-            ]);
+            $dataPhoto = SampleProductPhoto::create([
+                            'sample_product_id' => $request['sp_id'],
+                            'sequence' => $sequence,
+                            'photo' => $photo
+                        ]);
+
+            $this->inputHistoryPhoto($dataPhoto, 'added!');
 
             $sequence += 1;
         }
@@ -315,6 +326,7 @@ class SampleProductController extends Controller
         $performedOn = $data;
         $causerBy = auth()->user();
 
+        $this->updateHistoryPhoto($data, 'deleted!');
         $this->loggerFunction(['attributes' => $data], 'deleted', $performedOn, $causerBy);
     }
 
@@ -357,5 +369,40 @@ class SampleProductController extends Controller
         }
 
         return $attendanceId;
+    }
+
+    private function inputHistory($data, $status)
+    {
+        HistorySampleProduct::create([
+            'date' => $data->date,
+            'sample_product_id' => $data->id,
+            'status' => $status,
+            'article_name' => $data->article_name,
+            'material' => $data->material,
+            'size' => $data->size,
+            'accessories' => $data->accessories,
+            'designer_id' => $data->designer_id,
+            'md_id' => $data->md_id,
+            'leader_designer_id' => $data->leader_designer_id
+        ]);
+    }
+
+    private function inputHistoryPhoto($data, $status)
+    {
+        HistorySampleProductPhoto::create([
+            'sample_product_id' => $data->sample_product_id,
+            'hs_photo_id' => $data->id,
+            'status' => $status,
+            'sequence' => $data->sequence,
+            'photo' => $data->photo,
+        ]);
+    }
+
+    private function updateHistoryPhoto($data, $status)
+    {
+        HistorySampleProductPhoto::where('hs_photo_id', '=', $data->id)
+                                ->update([
+                                    'status' => $status
+                                ]);
     }
 }
