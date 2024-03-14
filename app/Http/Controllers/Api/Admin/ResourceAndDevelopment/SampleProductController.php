@@ -116,8 +116,11 @@ class SampleProductController extends Controller
                 'size',
                 'accessories',
                 'note_and_description',
+                'designer_id',
                 DB::raw('designer.name AS designer_name'),
+                'md_id',
                 DB::raw('merchandiser.name AS merchandiser_name'),
+                'leader_designer_id',
                 DB::raw('designer_leader.name AS designer_leader_name'),
             )->leftJoin(DB::raw('users AS designer'), 'designer.attendance_id', '=', 'sample_products.designer_id')
             ->leftJoin(DB::raw('users AS merchandiser'), 'merchandiser.attendance_id', '=', 'sample_products.md_id')
