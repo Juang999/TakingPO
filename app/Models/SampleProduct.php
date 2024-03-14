@@ -39,4 +39,14 @@ class SampleProduct extends Model
     {
         return $this->belongsTo('App\User', 'leader_designer_id', 'attendance_id');
     }
+
+    public function HistorySampleProduct()
+    {
+        return $this->hasMany(HistorySampleProduct::class, 'sample_product_id', 'id');
+    }
+
+    public function FabricTexture()
+    {
+        return $this->hasMany(FabricTexture::class, 'sample_product_id', 'id');
+    }
 }
