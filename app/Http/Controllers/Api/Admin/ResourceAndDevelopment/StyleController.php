@@ -45,7 +45,7 @@ class StyleController extends Controller
 
             if ($checkExistanceData == false) {
                 $style = Style::create([
-                    'style_name' => $request->style_name
+                    'style_name' => ucwords($request->style_name)
                 ]);
             }
 
