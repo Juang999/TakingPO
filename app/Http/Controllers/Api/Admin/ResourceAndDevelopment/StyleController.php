@@ -41,13 +41,17 @@ class StyleController extends Controller
     public function store(Request $request)
     {
         try {
-            $style = Style::create([
-                'style_name' => $request->style_name
-            ]);
+            $checkExistanceData = $this->checkStyleName($request->style_name);
+
+            if ($checkExistanceData == false) {
+                $style = Style::create([
+                    'style_name' => $request->style_name
+                ]);
+            }
 
             return response()->json([
                 'status' => 'success',
-                'data' => $style,
+                'data' => ($checkExistanceData == false) ? $style : $checkExistanceData,
                 'error' => null
             ], 200);
         } catch (\Throwable $th) {
@@ -91,5 +95,15 @@ class StyleController extends Controller
     public function destroy($id)
     {
         //
+    }
+
+    private function checkStyleName($styleName)
+    {
+        $explode = explode(' ', $styleName);
+        $implode = implode(' ', $explode);
+
+        $style = Style::where('style_name', '=', ucwords($implode))->first();
+
+        return ($style) ? $style : false;
     }
 }
