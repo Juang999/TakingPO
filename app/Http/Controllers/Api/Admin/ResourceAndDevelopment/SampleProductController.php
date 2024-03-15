@@ -5,8 +5,22 @@ namespace App\Http\Controllers\Api\Admin\ResourceAndDevelopment;
 use Carbon\Carbon;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\{Hash, DB};
-use App\Http\Requests\Admin\SampleProduct\{SampleProductRequest, UpdateSampleProductRequest, InsertSamplePhotoRequest};
-use App\{User, Models\SampleProduct, Models\SampleProductPhoto, Models\FabricTexture, Models\HistorySampleProduct, Models\HistorySampleProductPhoto, Models\SIP\UserSIP};
+use App\Http\Requests\Admin\SampleProduct\{
+    SampleProductRequest,
+    InsertSamplePhotoRequest,
+    InputFabricTextureRequest,
+    UpdateSampleProductRequest,
+};
+use App\{
+    User,
+    Models\SIP\UserSIP,
+    Models\SampleProduct,
+    Models\FabricTexture,
+    Models\SampleProductPhoto,
+    Models\HistorySampleProduct,
+    Models\HistoryFabricTexture,
+    Models\HistorySampleProductPhoto,
+};
 
 class SampleProductController extends Controller
 {
@@ -250,6 +264,54 @@ class SampleProductController extends Controller
         }
     }
 
+    public function deleteFabricTexture($id)
+    {
+        try {
+            DB::beginTransaction();
+                $this->updateStatusHistoryFabric($id, 'deleted!');
+
+                FabricTexture::where('id', $id)->delete();
+            DB::commit();
+
+            return response()->json([
+                'status' => 'success',
+                'data' => true,
+                'error' => null
+            ], 200);
+        } catch (\Throwable $th) {
+            DB::rollBack();
+
+            return response()->json([
+                'status' => 'failed',
+                'data' => null,
+                'error' => $th->getMessage()
+            ], 400);
+        }
+    }
+
+    public function inputFabricTexture(InputFabricTextureRequest $request)
+    {
+        try {
+            $this->inputFabricPhoto([
+                'photo_fabric' => $request->fabric_photo,
+                'sample_product_id' => $request->sample_product_id,
+                'description_fabric' => $request->fabric_description,
+            ]);
+
+            return response()->json([
+                'status' => 'success',
+                'data' => true,
+                'error' => null
+            ], 200);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'status' => 'failed',
+                'data' => null,
+                'error' => $th->getMessage()
+            ], 400);
+        }
+    }
+
     private function inputSamplePhoto(array $request)
     {
         $photos = explode(',', $request['photo']);
@@ -307,12 +369,12 @@ class SampleProductController extends Controller
         return $data;
     }
 
-    private function loggerFunction($log, $activity, $performedOn, $causedBy)
+    private function loggerFunction($log, $model, $activity, $performedOn, $causedBy)
     {
         DB::table('activity_log')->insert([
             'log_name' => 'system',
             'description' => $activity,
-            'subject_type' => 'App\Models\SampleProductPhoto',
+            'subject_type' => $model,
             'subject_id' => $performedOn->id,
             'causer_type' => 'App\User',
             'causer_id' => $causedBy->id,
@@ -330,7 +392,7 @@ class SampleProductController extends Controller
         $causerBy = auth()->user();
 
         $this->updateHistoryPhoto($data, 'deleted!');
-        $this->loggerFunction(['attributes' => $data], 'deleted', $performedOn, $causerBy);
+        $this->loggerFunction(['attributes' => $data], 'App\Models\SampleProductPhoto', 'deleted', $performedOn, $causerBy);
     }
 
     private function inputFabricPhoto($request)
@@ -340,12 +402,14 @@ class SampleProductController extends Controller
         $sampleProductId = $request['sample_product_id'];
 
         collect($fabricPhoto)->each(function ($item, $index) use ($fabricDescription, $sampleProductId) {
-            FabricTexture::create([
+            $dataFabricTexture = FabricTexture::create([
                 'sample_product_id' => $sampleProductId,
                 'description' => $fabricDescription[$index],
                 'photo' => $item,
                 'sequence' => $index + 1,
             ]);
+
+            $this->inputHistoryFabric($dataFabricTexture, 'added!');
         });
     }
 
@@ -407,5 +471,25 @@ class SampleProductController extends Controller
                                 ->update([
                                     'status' => $status
                                 ]);
+    }
+
+    private function inputHistoryFabric($data, $status)
+    {
+        HistoryFabricTexture::create([
+            'sample_product_id' => $data->sample_product_id,
+            'fabric_texture_id' => $data->id,
+            'status' => $status,
+            'sequence' => $data->sequence,
+            'description' => $data->description,
+            'photo' => $data->photo,
+        ]);
+    }
+
+    private function updateStatusHistoryFabric($fabricId, $status)
+    {
+        HistoryFabricTexture::where('fabric_texture_id', '=', $fabricId)
+                            ->update([
+                                'status' => $status
+                            ]);
     }
 }
