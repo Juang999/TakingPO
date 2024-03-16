@@ -21,6 +21,7 @@ use App\{
     Models\HistoryFabricTexture,
     Models\HistorySampleProductPhoto,
 };
+use Spatie\Activitylog\Models\Activity;
 
 class SampleProductController extends Controller
 {
@@ -189,9 +190,6 @@ class SampleProductController extends Controller
                     'md_id' => $requests['md_id'],
                     'leader_designer_id' => $requests['leader_designer_id'],
                 ]);
-
-                $dataSampleProduct = SampleProduct::find($sampleProduct->id);
-                $this->inputHistory($dataSampleProduct, 'updated!');
             DB::commit();
 
             return response()->json([
@@ -221,14 +219,47 @@ class SampleProductController extends Controller
         //
     }
 
+    public function getHistorySample($id)
+    {
+        try {
+            $historySample = Activity::query()->select([
+                                'activity_log.id',
+                                'subject_id',
+                                'log_name',
+                                'description',
+                                DB::raw('causer.name AS causer_name'),
+                                'activity_log.created_at',
+                                'properties'
+                            ])->leftJoin(DB::raw('users AS causer'), 'causer.id', '=', 'activity_log.causer_id')
+                            ->where(function ($query) use ($id) {
+                                $query->where('subject_type', '=',  'App\Models\SampleProduct')
+                                    ->where('subject_id', '=', $id);
+                            })
+                            ->orWhere(function ($query) use ($id) {
+                                $query->whereIn('subject_type', ['App\Models\SampleProductPhoto', 'App\Models\FabricTexture'])
+                                    ->where('properties->attributes->sample_product_id', '=', $id);
+                            })
+                            ->orderByDesc('activity_log.created_at')
+                            ->get();
+
+            return response()->json([
+                'status' => 'success',
+                'data' => $historySample,
+                'error' => null
+            ], 200);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'status' => 'failed',
+                'data' => null,
+                'error' => $th->getMessage()
+            ], 400);
+        }
+    }
+
     public function deletePhoto($id, $sampleProductId)
     {
         try {
-            DB::beginTransaction();
-                $this->loggerDeletePhoto($id);
-
-                SampleProductPhoto::where([['id', '=', $id], ['sample_product_id', '=', $sampleProductId]])->delete();
-            DB::commit();
+            SampleProductPhoto::where([['id', '=', $id], ['sample_product_id', '=', $sampleProductId]])->delete();
 
             return response()->json([
                 'status' => 'successs',
