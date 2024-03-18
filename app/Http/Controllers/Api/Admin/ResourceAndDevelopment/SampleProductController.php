@@ -328,7 +328,7 @@ class SampleProductController extends Controller
             $endDate = (request()->end_date) ? Carbon::now()->endOfMonth()->format('Y-m-d 23:59:59') : Carbon::parse(request()->end_date)->format('Y-m-d 23:59:59');
 
 
-            $dataHistory = Activity::select('activity_log.id', 'activity_log.subject_id', DB::raw('users.name'), 'properties')
+            $dataHistory = Activity::select('activity_log.id', 'activity_log.subject_id', DB::raw('users.name'), 'properties', 'activity_log.created_at')
             ->where([['subject_type', '=', 'App\Models\SampleProduct'], ['description', '=', 'deleted']])
             ->whereBetween('activity_log.created_at', [$startDate, $endDate])
             ->leftJoin('users', 'users.id', '=', 'activity_log.causer_id')

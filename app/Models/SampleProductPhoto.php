@@ -2,12 +2,12 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\{Model, SoftDeletes};
 use Spatie\Activitylog\Traits\LogsActivity;
 
 class SampleProductPhoto extends Model
 {
-    use LogsActivity;
+    use LogsActivity, SoftDeletes;
 
     protected $guarded = ['id'];
 

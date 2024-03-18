@@ -7,7 +7,7 @@ use Spatie\Activitylog\Traits\LogsActivity;
 
 class FabricTexture extends Model
 {
-    use LogsActivity;
+    use LogsActivity, SoftDeletes;
 
     protected static $logUnguarded = true;
 
