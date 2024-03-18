@@ -139,6 +139,9 @@ Route::middleware('jwt.verify')->group(function () {
         Route::prefix('voting')->group(function () {
             Route::get('/data', 'Api\Admin\ResourceAndDevelopment\VotingController@getAllEvent');
             Route::post('/create', 'Api\Admin\ResourceAndDevelopment\VotingController@createEvent');
+            Route::post('/add-sample', 'Api\Admin\ResourceAndDevelopment\VotingController@addNewSample');
+            Route::get('/{id}/detail', 'Api\Admin\ResourceAndDevelopment\VotingController@getDetailEvent');
+            Route::post('/invite-member', 'Api\Admin\ResourceAndDevelopment\VotingController@inviteMember');
         });
     });
 

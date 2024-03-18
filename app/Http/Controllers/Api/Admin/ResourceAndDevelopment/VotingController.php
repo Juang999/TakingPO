@@ -7,7 +7,7 @@ use Illuminate\Http\Request;
 use App\{User, Models\SIP\UserSIP};
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\{Hash, DB};
-use App\Http\Requests\Admin\Voting\CreateVotingEventRequest;
+use App\Http\Requests\Admin\Voting\{CreateVotingEventRequest, InviteMemberRequest, AddSampleRequest};
 use App\Models\{VotingEvent, VotingMember, VotingSample, VotingScore};
 
 class VotingController extends Controller
@@ -37,6 +37,29 @@ class VotingController extends Controller
         }
     }
 
+    public function getDetailEvent($id)
+    {
+        try {
+            $event = VotingEvent::query()->select('voting_events.id', 'start_date', 'title', 'description', 'voting_events.created_at')
+                                ->with([
+                                    'Member' => fn ($query) => $query->select('voting_event_id', DB::raw('users.attendance_id'), DB::raw('users.name'))->leftJoin('users', 'users.attendance_id', '=', 'voting_members.attendance_id'),
+                                    'Sample' => fn ($query) => $query->select('voting_event_id', 'sample_product_id', DB::raw('sample_products.article_name'), DB::raw('sample_products.entity_name'))->leftJoin('sample_products', 'sample_products.id', '=', 'voting_samples.sample_product_id')
+                                ])->find($id);
+
+            return response()->json([
+                'status' => 'success',
+                'data' => $event,
+                'error' => null
+            ], 200);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'status' => 'failed',
+                'data' => null,
+                'error' => $th->getMessage()
+            ], 400);
+        }
+    }
+
     public function createEvent(CreateVotingEventRequest $request)
     {
         try {
@@ -48,12 +71,50 @@ class VotingController extends Controller
                 ]);
 
                 $this->inputSample($request->sample_id, $dataEventVoting->id);
-                $this->inviteMember($request->member_attendance_id, $dataEventVoting->id);
+                $this->inputMember($request->member_attendance_id, $dataEventVoting->id);
             DB::commit();
 
             return response()->json([
                 'status' => 'success',
                 'data' => $dataEventVoting,
+                'error' => null
+            ], 200);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'status' => 'failed',
+                'data' => null,
+                'error' => $th->getMessage()
+            ], 400);
+        }
+    }
+
+    public function inviteMember(InviteMemberRequest $request)
+    {
+        try {
+            $this->inputMember($request->attendance_id, $request->event_id);
+
+            return response()->json([
+                'status' => 'success',
+                'data' => true,
+                'error' => null
+            ], 200);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'status' => 'failed',
+                'data' => null,
+                'error' => $th->getMessage()
+            ], 400);
+        }
+    }
+
+    public function addNewSample(AddSampleRequest $request)
+    {
+        try {
+            $this->inputSample($request->sample_id, $request->event_id);
+
+            return response()->json([
+                'status' => 'success',
+                'data' => true,
                 'error' => null
             ], 200);
         } catch (\Throwable $th) {
@@ -78,12 +139,12 @@ class VotingController extends Controller
         });
     }
 
-    private function inviteMember($memberAttendanceId, $eventId)
+    private function inputMember($memberAttendanceId, $eventId)
     {
         $explodeMemberAttendanceId = explode(',', $memberAttendanceId);
 
         collect($explodeMemberAttendanceId)->map(function ($item) use ($eventId) {
-            $attendanceId = $this->createUser($item);
+            $attendanceId = $this->checkUser($item);
 
             VotingMember::create([
                 'voting_event_id' => $eventId,
@@ -92,7 +153,7 @@ class VotingController extends Controller
         });
     }
 
-    private function createUser($attendanceId)
+    private function checkUser($attendanceId)
     {
         $dataUser = User::select('name')->where('attendance_id', '=', $attendanceId)->first();
 
