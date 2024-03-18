@@ -107,7 +107,9 @@ Route::middleware('jwt.verify')->group(function () {
             Route::get('/', 'Api\Admin\ResourceAndDevelopment\SampleProductController@index');
             Route::get('/{id}/detail', 'Api\Admin\ResourceAndDevelopment\SampleProductController@show');
             Route::put('/{id}/update', 'Api\Admin\ResourceAndDevelopment\SampleProductController@update');
+            Route::delete('/{id}/delete', 'Api\Admin\ResourceAndDevelopment\SampleProductController@destroy');
             Route::get('/{id}/history', 'Api\Admin\ResourceAndDevelopment\SampleProductController@getHistorySample');
+            Route::get('/all-history', 'Api\Admin\ResourceAndDevelopment\SampleProductController@getAllHistory');
 
             // Photo's Route
             Route::post('/input-photo', 'Api\Admin\ResourceAndDevelopment\SampleProductController@insertSamplePhoto');

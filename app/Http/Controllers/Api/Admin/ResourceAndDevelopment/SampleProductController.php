@@ -215,7 +215,28 @@ class SampleProductController extends Controller
      */
     public function destroy($id)
     {
-        //
+        try {
+            DB::beginTransaction();
+                $this->deleteFabric($id);
+                $this->deleteSamplePhoto($id);
+
+                $dataSampleProduct = SampleProduct::where('id', '=', $id)->first();
+                $dataSampleProduct->delete();
+            DB::commit();
+                return response()->json([
+                    'status' => 'success',
+                    'data' => true,
+                    'error' => null
+                ], 200);
+        } catch (\Throwable $th) {
+            DB::rollBack();
+
+            return response()->json([
+                'status' => 'failed',
+                'data' => null,
+                'error' => $th->getMessage()
+            ], 400);
+        }
     }
 
     public function getHistorySample($id)
@@ -294,14 +315,40 @@ class SampleProductController extends Controller
         }
     }
 
-    public function deleteFabricTexture($id)
+    public function getAllHistory()
     {
         try {
-            DB::beginTransaction();
-                $this->updateStatusHistoryFabric($id, 'deleted!');
+            $startDate = (request()->start_date) ? Carbon::now()->startOfMonth()->format('Y-m-d 00:00:00') : Carbon::parse(request()->start_date)->format('Y-m-d 00:00:00');
+            $endDate = (request()->end_date) ? Carbon::now()->endOfMonth()->format('Y-m-d 23:59:59') : Carbon::parse(request()->end_date)->format('Y-m-d 23:59:59');
 
-                FabricTexture::where('id', $id)->delete();
-            DB::commit();
+
+            $dataHistory = Activity::select('activity_log.id', 'activity_log.subject_id', DB::raw('users.name'), 'properties')
+            ->where([['subject_type', '=', 'App\Models\SampleProduct'], ['description', '=', 'deleted']])
+            ->whereBetween('activity_log.created_at', [$startDate, $endDate])
+            ->leftJoin('users', 'users.id', '=', 'activity_log.causer_id')
+            ->orderByDesc('activity_log.created_at')
+            ->get();
+
+            return response()->json([
+                'status' => 'success',
+                'data' => $dataHistory,
+                'error' => null
+            ], 200);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'status' => 'failed',
+                'data' => null,
+                'error' => $th->getMessage()
+            ], 400);
+        }
+    }
+
+    public function deleteFabricTexture($id, $sampleProductId)
+    {
+        try {
+            $dataFabric = FabricTexture::where([['id', '=', $id], ['sample_product_id', '=', $sampleProductId]])->first();
+
+            $dataFabric->delete();
 
             return response()->json([
                 'status' => 'success',
