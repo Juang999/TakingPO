@@ -30,6 +30,8 @@ class User extends Authenticatable implements JWTSubject
         'name', 'email', 'password', 'partner_id', 'attendance_id', 'sub_section_id', 'sub_section', 'nip'
     ];
 
+    protected static $logFillable = true;
+
     /**
      * The attributes that should be hidden for arrays.
      *

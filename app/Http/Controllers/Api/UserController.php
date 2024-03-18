@@ -3,10 +3,11 @@
 namespace App\Http\Controllers\Api;
 
 use JWTAuth;
-use App\User;
 use Illuminate\Http\Request;
+use App\{User, Models\SIP\UserSIP};
 use App\Http\Controllers\Controller;
 use Tymon\JWTAuth\Exceptions\JWTException;
+use App\Http\Requests\User\CreateUserRequest;
 use Illuminate\Support\Facades\{DB, Auth, Hash, Validator};
 
 class UserController extends Controller
@@ -113,6 +114,81 @@ class UserController extends Controller
             return response()->json([
                 'status' => 'failed',
                 'message' => 'failed to get data',
+                'error' => $th->getMessage()
+            ], 400);
+        }
+    }
+
+    public function createUser(CreateUserRequest $request)
+    {
+        try {
+            $user = User::create([
+                'name' => $request->username,
+                'email' => $request->email,
+                'password' => Hash::make($request->password),
+                'attendance_id' => $request->attendance_id,
+                'sub_section_id' => $request->sub_section_id,
+                'sub_section' => $request->seksi,
+                'nip' => $request->nip
+            ]);
+
+            return response()->json([
+                'status' => 'success',
+                'data' => $user,
+                'error' => null
+            ], 200);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'status' => 'failed',
+                'data' => null,
+                'error' => $th->getMessage()
+            ], 400);
+        }
+    }
+
+    public function getUserSIP()
+    {
+        try {
+            $searchName = request()->name;
+
+            $userSIP = UserSIP::select('users.id', 'username', 'attendance_id', 'sub_section_id', 'seksi', 'data_karyawans.nip')
+                                ->leftJoin('detail_users', 'detail_users.id', '=', 'users.detail_user_id')
+                                ->leftJoin('data_karyawans', 'data_karyawans.id', '=', 'detail_users.data_karyawan_id')
+                                ->where('attendance_id', '<>', 0)
+                                ->when($searchName, fn ($query) =>
+                                    $query->where('username', 'LIKE', "%$searchName%")
+                                )->get();
+
+            return response()->json([
+                'status' => 'success',
+                'data' => $userSIP,
+                'error' => null
+            ], 200);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'status' => 'failed',
+                'data' => null,
+                'error' => $th->getMessage()
+            ], 400);
+        }
+    }
+
+    public function checkUser($attendanceId)
+    {
+        try {
+            $user = User::select('name', 'email', 'attendance_id')
+                        ->where('attendance_id', '=', $attendanceId)
+                        ->first();
+
+            return response()->json([
+                'status' => 'success',
+                'data' => $user,
+                'error' => null
+            ], 200);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'status' => 'failed',
+                'data' => null,
                 'error' => $th->getMessage()
             ], 400);
         }
