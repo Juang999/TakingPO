@@ -40,6 +40,12 @@ Route::middleware('jwt.verify')->group(function () {
         Route::delete('/{partnumber}/delete', 'Api\Admin\PartnumberController@destroy');
     });
 
+    Route::prefix('users')->group(function () {
+        Route::post('/create', 'Api\UserController@createUser');
+        Route::get('/user-sip', 'Api\UserController@getUserSIP');
+        Route::get('/{attendanceId}/check', 'Api\UserController@checkUser');
+    });
+
     // route atpo v2
     Route::prefix('v2')->group(function () {
         Route::prefix('agent')->group(function () {
@@ -128,6 +134,11 @@ Route::middleware('jwt.verify')->group(function () {
             Route::get('/designer', 'Api\Admin\ResourceAndDevelopment\DesignerController@getDesigner');
             Route::get('/merchandiser', 'Api\Admin\ResourceAndDevelopment\DesignerController@getMerchandiser');
             Route::get('/leader-designer', 'Api\Admin\ResourceAndDevelopment\DesignerController@getLeaderDesigner');
+        });
+
+        Route::prefix('voting')->group(function () {
+            Route::get('/data', 'Api\Admin\ResourceAndDevelopment\VotingController@getAllEvent');
+            Route::post('/create', 'Api\Admin\ResourceAndDevelopment\VotingController@createEvent');
         });
     });
 
