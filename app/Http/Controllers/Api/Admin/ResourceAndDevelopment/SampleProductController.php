@@ -91,7 +91,6 @@ class SampleProductController extends Controller
                     'leader_designer_id' => $leaderDesignerId,
                 ]);
 
-                $this->inputHistory($sampleProduct, 'created!');
                 $this->inputSamplePhoto(['sp_id' => $sampleProduct->id, 'photo' => $request->photo]);
                 $this->inputFabricPhoto(['sample_product_id' => $sampleProduct->id, 'description_fabric' => $request->description_fabric, 'photo_fabric' => $request->photo_fabric]);
             DB::commit();
@@ -247,6 +246,11 @@ class SampleProductController extends Controller
                                 'subject_id',
                                 'log_name',
                                 'description',
+                                DB::raw("CASE
+                                    WHEN subject_type LIKE '%SampleProductPhoto' THEN 'photo'
+                                    WHEN subject_type LIKE '%FabricTexture' THEN 'fabric-texture'
+                                    ELSE 'sample-product'
+                                END AS log_type"),
                                 DB::raw('causer.name AS causer_name'),
                                 'activity_log.created_at',
                                 'properties'
@@ -279,7 +283,9 @@ class SampleProductController extends Controller
     public function deletePhoto($id, $sampleProductId)
     {
         try {
-            SampleProductPhoto::where([['id', '=', $id], ['sample_product_id', '=', $sampleProductId]])->delete();
+            $data = SampleProductPhoto::where([['id', '=', $id], ['sample_product_id', '=', $sampleProductId]])->first();
+
+            $data->delete();
 
             return response()->json([
                 'status' => 'successs',
@@ -366,6 +372,32 @@ class SampleProductController extends Controller
         }
     }
 
+    private function deleteFabric($sampleProductId)
+    {
+        $dataFabric = FabricTexture::select('id')->where('sample_product_id', '=', $sampleProductId)->get();
+
+        if ($dataFabric != null) {
+            collect($dataFabric)->map(function ($item) {
+                $data = FabricTexture::where('id', '=', $item->id)->first();
+
+                $data->delete();
+            });
+        }
+    }
+
+    private function deleteSamplePhoto($sampleProductId)
+    {
+        $dataSamplePhoto = SampleProductPhoto::select('id')->where('sample_product_id', '=', $sampleProductId)->get();
+
+        if ($dataSamplePhoto != null) {
+            collect($dataSamplePhoto)->map(function ($item) {
+                $data = SampleProductPhoto::where('id', '=', $item->id)->first();
+
+                $data->delete();
+            });
+        }
+    }
+
     public function inputFabricTexture(InputFabricTextureRequest $request)
     {
         try {
@@ -395,13 +427,11 @@ class SampleProductController extends Controller
         $sequence = $this->getSequencePhoto($request['sp_id']) + 1;
 
         foreach ($photos as $photo) {
-            $dataPhoto = SampleProductPhoto::create([
+            SampleProductPhoto::create([
                             'sample_product_id' => $request['sp_id'],
                             'sequence' => $sequence,
                             'photo' => $photo
                         ]);
-
-            $this->inputHistoryPhoto($dataPhoto, 'added!');
 
             $sequence += 1;
         }
@@ -446,32 +476,6 @@ class SampleProductController extends Controller
         return $data;
     }
 
-    private function loggerFunction($log, $model, $activity, $performedOn, $causedBy)
-    {
-        DB::table('activity_log')->insert([
-            'log_name' => 'system',
-            'description' => $activity,
-            'subject_type' => $model,
-            'subject_id' => $performedOn->id,
-            'causer_type' => 'App\User',
-            'causer_id' => $causedBy->id,
-            'properties' => json_encode($log),
-            'created_at' => Carbon::now()->format('Y-m-d H:m:s'),
-            'updated_at' => Carbon::now()->format('Y-m-d H:m:s')
-        ]);
-    }
-
-    private function loggerDeletePhoto($id)
-    {
-        $modelSampleProductPhoto = new SampleProductPhoto();
-        $data = $modelSampleProductPhoto->where('id', '=', $id)->first();
-        $performedOn = $data;
-        $causerBy = auth()->user();
-
-        $this->updateHistoryPhoto($data, 'deleted!');
-        $this->loggerFunction(['attributes' => $data], 'App\Models\SampleProductPhoto', 'deleted', $performedOn, $causerBy);
-    }
-
     private function inputFabricPhoto($request)
     {
         $fabricDescription = explode(',', $request['description_fabric']);
@@ -479,14 +483,12 @@ class SampleProductController extends Controller
         $sampleProductId = $request['sample_product_id'];
 
         collect($fabricPhoto)->each(function ($item, $index) use ($fabricDescription, $sampleProductId) {
-            $dataFabricTexture = FabricTexture::create([
+            FabricTexture::create([
                 'sample_product_id' => $sampleProductId,
                 'description' => $fabricDescription[$index],
                 'photo' => $item,
                 'sequence' => $index + 1,
             ]);
-
-            $this->inputHistoryFabric($dataFabricTexture, 'added!');
         });
     }
 
@@ -513,60 +515,5 @@ class SampleProductController extends Controller
         }
 
         return $attendanceId;
-    }
-
-    private function inputHistory($data, $status)
-    {
-        HistorySampleProduct::create([
-            'date' => $data->date,
-            'sample_product_id' => $data->id,
-            'status' => $status,
-            'article_name' => $data->article_name,
-            'material' => $data->material,
-            'size' => $data->size,
-            'accessories' => $data->accessories,
-            'designer_id' => $data->designer_id,
-            'md_id' => $data->md_id,
-            'leader_designer_id' => $data->leader_designer_id
-        ]);
-    }
-
-    private function inputHistoryPhoto($data, $status)
-    {
-        HistorySampleProductPhoto::create([
-            'sample_product_id' => $data->sample_product_id,
-            'hs_photo_id' => $data->id,
-            'status' => $status,
-            'sequence' => $data->sequence,
-            'photo' => $data->photo,
-        ]);
-    }
-
-    private function updateHistoryPhoto($data, $status)
-    {
-        HistorySampleProductPhoto::where('hs_photo_id', '=', $data->id)
-                                ->update([
-                                    'status' => $status
-                                ]);
-    }
-
-    private function inputHistoryFabric($data, $status)
-    {
-        HistoryFabricTexture::create([
-            'sample_product_id' => $data->sample_product_id,
-            'fabric_texture_id' => $data->id,
-            'status' => $status,
-            'sequence' => $data->sequence,
-            'description' => $data->description,
-            'photo' => $data->photo,
-        ]);
-    }
-
-    private function updateStatusHistoryFabric($fabricId, $status)
-    {
-        HistoryFabricTexture::where('fabric_texture_id', '=', $fabricId)
-                            ->update([
-                                'status' => $status
-                            ]);
     }
 }
