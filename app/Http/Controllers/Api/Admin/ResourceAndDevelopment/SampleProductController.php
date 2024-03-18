@@ -143,8 +143,7 @@ class SampleProductController extends Controller
             ->leftJoin('styles', 'styles.id', '=', 'sample_products.style_id')
             ->with([
                     'PhotoSampleProduct' => fn ($query) => $query->select('id', 'sample_product_id', 'sequence', 'photo')->orderBy('sequence', 'ASC'),
-                    'FabricTexture' => fn ($query) => $query->select('id', 'sample_product_id', 'description', 'photo')->orderBy('sequence', 'ASC'),
-                    'HistorySampleProduct' => fn ($query) => $query->select('sample_product_id', 'article_name', 'status', 'updated_at')->orderByDesc('created_at')
+                    'FabricTexture' => fn ($query) => $query->select('id', 'sample_product_id', 'description', 'photo')->orderBy('sequence', 'ASC')
                 ])->find($id);
 
             return response()->json([
