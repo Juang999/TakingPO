@@ -14,4 +14,14 @@ class VotingEvent extends Model
     protected static $logUnguarded = true;
 
     protected static $logName = 'system';
+
+    public function Member()
+    {
+        return $this->hasMany(VotingMember::class, 'voting_event_id', 'id');
+    }
+
+    public function Sample()
+    {
+        return $this->hasMany(VotingSample::class, 'voting_event_id', 'id');
+    }
 }
