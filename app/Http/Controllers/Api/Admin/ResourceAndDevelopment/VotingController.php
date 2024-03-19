@@ -21,7 +21,7 @@ class VotingController extends Controller
                                     ->when($searchName, function ($query) use ($searchName) {
                                         $query->where('title', 'like', "%$searchName%");
                                     })
-                                    ->get();
+                                    ->paginate(10);
 
             return response()->json([
                 'status' => 'success',
