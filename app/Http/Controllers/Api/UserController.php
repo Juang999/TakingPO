@@ -151,7 +151,7 @@ class UserController extends Controller
         try {
             $searchName = request()->name;
 
-            $userSIP = UserSIP::select('users.id', 'username', 'attendance_id', 'sub_section_id', 'seksi', 'data_karyawans.nip')
+            $userSIP = UserSIP::select('users.id', 'username', 'attendance_id', 'sub_section_id', 'seksi', 'data_karyawans.nip', 'img_karyawan')
                                 ->leftJoin('detail_users', 'detail_users.id', '=', 'users.detail_user_id')
                                 ->leftJoin('data_karyawans', 'data_karyawans.id', '=', 'detail_users.data_karyawan_id')
                                 ->where('attendance_id', '<>', 0)
