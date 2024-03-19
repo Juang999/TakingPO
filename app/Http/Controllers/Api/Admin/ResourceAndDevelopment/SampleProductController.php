@@ -253,8 +253,14 @@ class SampleProductController extends Controller
                                 END AS log_type"),
                                 DB::raw('causer.name AS causer_name'),
                                 'activity_log.created_at',
+                                DB::raw('designer.name AS designer_name'),
+                                DB::raw('merchandiser.name AS merchandiser_name'),
+                                DB::raw('leader_designer.name AS leader_designer_name'),
                                 'properties'
                             ])->leftJoin(DB::raw('users AS causer'), 'causer.id', '=', 'activity_log.causer_id')
+                            ->leftJoin(DB::raw('users AS designer'), 'designer.attendance_id', '=', 'properties->attributes->designer_id')
+                            ->leftJoin(DB::raw('users AS merchandiser'), 'merchandiser.attendance_id', '=', 'properties->attributes->md_id')
+                            ->leftJoin(DB::raw('users AS leader_designer'), 'leader_designer.attendance_id', '=', 'properties->attributes->leader_designer_id')
                             ->where(function ($query) use ($id) {
                                 $query->where('subject_type', '=',  'App\Models\SampleProduct')
                                     ->where('subject_id', '=', $id);
@@ -508,7 +514,7 @@ class SampleProductController extends Controller
         $checkUser = User::select('name')->where('attendance_id', '=', $attendanceId)->first();
 
         if($checkUser == null) {
-            $userSIP = UserSIP::select('username', 'attendance_id', 'sub_section_id', 'seksi', 'data_karyawans.nip')
+            $userSIP = UserSIP::select('username', 'attendance_id', 'sub_section_id', 'seksi', 'data_karyawans.nip', 'data_karyawans.img_karyawan')
                                 ->leftJoin('detail_users', 'detail_users.id', '=', 'users.detail_user_id')
                                 ->leftJoin('data_karyawans', 'data_karyawans.id', '=', 'detail_users.data_karyawan_id')
                                 ->where('users.attendance_id', '=', $attendanceId)
@@ -521,7 +527,8 @@ class SampleProductController extends Controller
                 'attendance_id' => $userSIP->attendance_id,
                 'sub_section_id' => $userSIP->sub_section_id,
                 'sub_section' => $userSIP->seksi,
-                'nip' => $userSIP->nip
+                'nip' => $userSIP->nip,
+                'photo' => $userSIP->img_karyawan
             ]);
         }
 

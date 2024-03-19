@@ -7,8 +7,21 @@ use Illuminate\Http\Request;
 use App\{User, Models\SIP\UserSIP};
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\{Hash, DB};
-use App\Http\Requests\Admin\Voting\{CreateVotingEventRequest, InviteMemberRequest, AddSampleRequest, LoginVotingRequest};
-use App\Models\{VotingEvent, VotingMember, VotingSample, VotingScore, SampleProduct};
+use App\Http\Requests\Admin\Voting\{
+    CreateVotingEventRequest,
+    InviteMemberRequest,
+    AddSampleRequest,
+    LoginVotingRequest,
+    VoteSampleRequest,
+    UpdateEventRequest
+};
+use App\Models\{
+    VotingEvent,
+    VotingMember,
+    VotingSample,
+    VotingScore,
+    SampleProduct
+};
 
 class VotingController extends Controller
 {
@@ -172,6 +185,78 @@ class VotingController extends Controller
         }
     }
 
+    public function voteSample(VoteSampleRequest $request)
+    {
+        try {
+            $dataVoting = VotingScore::create([
+                'voting_event_id' => $request->voting_event_id,
+                'sample_product_id' => $request->sample_product_id,
+                'attendance_id' => $request->attendance_id,
+                'score' => $request->score,
+                'note' => $request->note,
+            ]);
+
+            return response()->json([
+                'status' => 'success',
+                'data' => $dataVoting,
+                'error' => null
+            ], 200);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'status' => 'failed',
+                'data' => null,
+                'error' => $th->getMessage()
+            ], 400);
+        }
+    }
+
+    public function updateEvent($id)
+    {
+
+    }
+
+    public function removeInvitation($id)
+    {
+        try {
+            $dataInvitation = VotingMember::find($id);
+
+            $dataInvitation->delete();
+
+            return response()->json([
+                'status' => 'success',
+                'data' => true,
+                'error' => null
+            ], 200);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'status' => 'failed',
+                'data' => null,
+                'error' => $th->getMessage()
+            ], 400);
+        }
+    }
+
+    public function removeSample($id)
+    {
+        try {
+            $dataSample = VotingSample::find($id);
+
+            $dataSample->delete();
+
+            return response()->json([
+                'status' => 'success',
+                'data' => true,
+                'error' => null
+            ], 200);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'status' => 'failed',
+                'data' => null,
+                'error' => $th->getMessage()
+            ], 400);
+        }
+    }
+
     private function inputSample($sampleId, $eventId)
     {
         $explodeSampleId = explode(',', $sampleId);
@@ -204,7 +289,7 @@ class VotingController extends Controller
         $dataUser = User::select('name')->where('attendance_id', '=', $attendanceId)->first();
 
         if($dataUser == null) {
-            $userSIP = UserSIP::select('username', 'attendance_id', 'sub_section_id', 'seksi', 'data_karyawans.nip')
+            $userSIP = UserSIP::select('username', 'attendance_id', 'sub_section_id', 'seksi', 'data_karyawans.nip', 'data_karyawans.img_karyawan')
                                 ->leftJoin('detail_users', 'detail_users.id', '=', 'users.detail_user_id')
                                 ->leftJoin('data_karyawans', 'data_karyawans.id', '=', 'detail_users.data_karyawan_id')
                                 ->where('users.attendance_id', '=', $attendanceId)
@@ -217,7 +302,8 @@ class VotingController extends Controller
                 'attendance_id' => $userSIP->attendance_id,
                 'sub_section_id' => $userSIP->sub_section_id,
                 'sub_section' => $userSIP->seksi,
-                'nip' => $userSIP->nip
+                'nip' => $userSIP->nip,
+                'photo' => $userSIP->img_karyawan
             ]);
         }
 
