@@ -131,7 +131,7 @@ class VotingController extends Controller
         try {
             $querySearch = request()->search_article;
 
-            $dataSample = SampleProduct::query()->select('id', 'article_name')
+            $dataSample = SampleProduct::query()->select('id', 'article_name', 'entity_name')
                                     ->with(['Thumbnail' => function ($query) {
                                         $query->select('sample_product_id', 'sequence', 'photo');
                                     }])
