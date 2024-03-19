@@ -40,10 +40,28 @@ class VotingController extends Controller
     public function getDetailEvent($id)
     {
         try {
-            $event = VotingEvent::query()->select('voting_events.id', 'start_date', 'title', 'description', 'voting_events.created_at')
+            $event = VotingEvent::query()->select('voting_events.id', 'start_date', 'title', 'description', 'voting_events.created_by', 'voting_events.updated_by', 'voting_events.created_at')
                                 ->with([
-                                    'Member' => fn ($query) => $query->select('voting_event_id', DB::raw('users.attendance_id'), DB::raw('users.name'))->leftJoin('users', 'users.attendance_id', '=', 'voting_members.attendance_id'),
-                                    'Sample' => fn ($query) => $query->select('voting_event_id', 'sample_product_id', DB::raw('sample_products.article_name'), DB::raw('sample_products.entity_name'))->leftJoin('sample_products', 'sample_products.id', '=', 'voting_samples.sample_product_id')
+                                    'Member' => fn ($query) =>
+                                                        $query->select(
+                                                                    'voting_event_id',
+                                                                    DB::raw('users.attendance_id'),
+                                                                    DB::raw('users.name'),
+                                                                    'users.nip',
+                                                                    'users.photo'
+                                                                )->leftJoin('users', 'users.attendance_id', '=', 'voting_members.attendance_id'),
+                                    'Sample' => fn ($query) =>
+                                                        $query->select(
+                                                                    'voting_event_id',
+                                                                    'sample_product_id',
+                                                                    DB::raw('sample_products.id'),
+                                                                    DB::raw('sample_products.article_name'),
+                                                                    DB::raw('sample_products.entity_name')
+                                                                )->leftJoin('sample_products', 'sample_products.id', '=', 'voting_samples.sample_product_id')
+                                                                ->with(['Thumbnail' => fn ($query) =>
+                                                                    $query->select('sample_product_id', 'photo')
+                                                            ])
+                                    // 'Sample.Thumbnail'
                                 ])->find($id);
 
             return response()->json([

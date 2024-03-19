@@ -324,16 +324,27 @@ class SampleProductController extends Controller
     public function getAllHistory()
     {
         try {
-            $startDate = (request()->start_date) ? Carbon::now()->startOfMonth()->format('Y-m-d 00:00:00') : Carbon::parse(request()->start_date)->format('Y-m-d 00:00:00');
-            $endDate = (request()->end_date) ? Carbon::now()->endOfMonth()->format('Y-m-d 23:59:59') : Carbon::parse(request()->end_date)->format('Y-m-d 23:59:59');
+            $startDate = (request()->start_date) ? Carbon::parse(request()->start_date)->format('Y-m-d 00:00:00') : Carbon::now()->startOfMonth()->format('Y-m-d 00:00:00');
+            $endDate = (request()->end_date) ? Carbon::parse(request()->end_date)->format('Y-m-d 23:59:59') : Carbon::now()->endOfMonth()->format('Y-m-d 23:59:59');
 
 
-            $dataHistory = Activity::select('activity_log.id', 'activity_log.subject_id', DB::raw('users.name'), 'properties', 'activity_log.created_at')
-            ->where([['subject_type', '=', 'App\Models\SampleProduct'], ['description', '=', 'deleted']])
-            ->whereBetween('activity_log.created_at', [$startDate, $endDate])
-            ->leftJoin('users', 'users.id', '=', 'activity_log.causer_id')
-            ->orderByDesc('activity_log.created_at')
-            ->get();
+            $dataHistory = Activity::select(
+                                        'activity_log.id',
+                                        'activity_log.subject_id',
+                                        DB::raw('users.name'),
+                                        DB::raw('designer.name AS designer_name'),
+                                        DB::raw('merchandiser.name AS merchandiser_name'),
+                                        DB::raw('leader_designer.name AS leader_designer_name'),
+                                        'properties',
+                                        'activity_log.created_at'
+                                )->where([['subject_type', '=', 'App\Models\SampleProduct'], ['description', '=', 'deleted']])
+                                ->whereBetween('activity_log.created_at', [$startDate, $endDate])
+                                ->leftJoin('users', 'users.id', '=', 'activity_log.causer_id')
+                                ->leftJoin(DB::raw('users AS designer'), 'designer.attendance_id', '=', 'properties->attributes->designer_id')
+                                ->leftJoin(DB::raw('users AS merchandiser'), 'merchandiser.attendance_id', '=', 'properties->attributes->md_id')
+                                ->leftJoin(DB::raw('users AS leader_designer'), 'leader_designer.attendance_id', '=', 'properties->attributes->leader_designer_id')
+                                ->orderByDesc('activity_log.created_at')
+                                ->get();
 
             return response()->json([
                 'status' => 'success',
