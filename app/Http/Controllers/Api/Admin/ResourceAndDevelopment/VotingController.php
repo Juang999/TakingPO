@@ -274,7 +274,7 @@ class VotingController extends Controller
     public function removeInvitation($id)
     {
         try {
-            $dataInvitation = VotingMember::find($id);
+            $dataInvitation = VotingMember::where('attendance_id', '=', $id)->first();
 
             $dataInvitation->delete();
 
