@@ -7,8 +7,8 @@ use Illuminate\Http\Request;
 use App\{User, Models\SIP\UserSIP};
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\{Hash, DB};
-use App\Http\Requests\Admin\Voting\{CreateVotingEventRequest, InviteMemberRequest, AddSampleRequest};
-use App\Models\{VotingEvent, VotingMember, VotingSample, VotingScore};
+use App\Http\Requests\Admin\Voting\{CreateVotingEventRequest, InviteMemberRequest, AddSampleRequest, LoginVotingRequest};
+use App\Models\{VotingEvent, VotingMember, VotingSample, VotingScore, SampleProduct};
 
 class VotingController extends Controller
 {
@@ -115,6 +115,34 @@ class VotingController extends Controller
             return response()->json([
                 'status' => 'success',
                 'data' => true,
+                'error' => null
+            ], 200);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'status' => 'failed',
+                'data' => null,
+                'error' => $th->getMessage()
+            ], 400);
+        }
+    }
+
+    public function getSample()
+    {
+        try {
+            $querySearch = request()->search_article;
+
+            $dataSample = SampleProduct::query()->select('id', 'article_name')
+                                    ->with(['Thumbnail' => function ($query) {
+                                        $query->select('sample_product_id', 'sequence', 'photo');
+                                    }])
+                                    ->when($querySearch, function ($query) use ($querySearch) {
+                                        $query->where('article_name', '=', "%$querySearch%");
+                                    })
+                                    ->get();
+
+            return response()->json([
+                'status' => 'success',
+                'data' => $dataSample,
                 'error' => null
             ], 200);
         } catch (\Throwable $th) {
