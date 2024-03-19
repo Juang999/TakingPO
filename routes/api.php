@@ -146,7 +146,7 @@ Route::middleware('jwt.verify')->group(function () {
             Route::post('/invite-member', 'Api\Admin\ResourceAndDevelopment\VotingController@inviteMember');
             Route::put('/{id}/update-event', 'Api\Admin\ResourceAndDevelopment\VotingController@updateEvent');
             Route::delete('/{id}/delete-event', 'Api\Admin\ResourceAndDevelopment\VotingController@deleteEvent');
-            Route::delete('/{id}/remove-sample', 'Api\Admin\ResourceAndDevelopment\VotingController@removeSample');
+            Route::delete('/{id}/{sampleId}/remove-sample', 'Api\Admin\ResourceAndDevelopment\VotingController@removeSample');
             Route::delete('/{id}/{attendanceId}/cancel-invitation', 'Api\Admin\ResourceAndDevelopment\VotingController@removeInvitation');
         });
     });
