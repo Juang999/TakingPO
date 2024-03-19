@@ -167,7 +167,7 @@ class UserController extends Controller
                                 })
                                 ->when($searchName, fn ($query) =>
                                     $query->where('username', 'LIKE', "%$searchName%")
-                                )->get();
+                                )->orderBy('users.username')->get();
 
             return response()->json([
                 'status' => 'success',
