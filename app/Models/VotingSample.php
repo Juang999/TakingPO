@@ -14,4 +14,9 @@ use LogsActivity;
     protected static $logUnguarded = true;
 
     protected static $logName = 'system';
+
+    public function Thumbnail()
+    {
+        return $this->hasOne(SampleProductPhoto::class, 'sample_product_id', 'sample_product_id');
+    }
 }
