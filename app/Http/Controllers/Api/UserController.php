@@ -155,6 +155,16 @@ class UserController extends Controller
                                 ->leftJoin('detail_users', 'detail_users.id', '=', 'users.detail_user_id')
                                 ->leftJoin('data_karyawans', 'data_karyawans.id', '=', 'detail_users.data_karyawan_id')
                                 ->where('attendance_id', '<>', 0)
+                                ->where('power_lvl', '>', 1)
+                                ->whereNotIn('detail_user_id', function ($query) {
+                                    $query->select('id')
+                                        ->from('detail_users')
+                                        ->whereIn('data_karyawan_id', function ($query) {
+                                            $query->select('id')
+                                                ->from('data_karyawans')
+                                                ->whereIn('status_kerja', [84,277]);
+                                        });
+                                })
                                 ->when($searchName, fn ($query) =>
                                     $query->where('username', 'LIKE', "%$searchName%")
                                 )->get();
