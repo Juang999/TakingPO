@@ -136,7 +136,7 @@ class VotingController extends Controller
                                         $query->select('sample_product_id', 'sequence', 'photo');
                                     }])
                                     ->when($querySearch, function ($query) use ($querySearch) {
-                                        $query->where('article_name', '=', "%$querySearch%");
+                                        $query->where('article_name', 'LIKE', "%$querySearch%");
                                     })
                                     ->get();
 
