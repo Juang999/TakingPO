@@ -143,6 +143,10 @@ Route::middleware('jwt.verify')->group(function () {
             Route::post('/add-sample', 'Api\Admin\ResourceAndDevelopment\VotingController@addNewSample');
             Route::get('/{id}/detail', 'Api\Admin\ResourceAndDevelopment\VotingController@getDetailEvent');
             Route::post('/invite-member', 'Api\Admin\ResourceAndDevelopment\VotingController@inviteMember');
+            Route::put('/{id}/update-event', 'Api\Admin\ResourceAndDevelopment\VotingController@updateEvent');
+            Route::delete('/{id}/delete-event', 'Api\Admin\ResourceAndDevelopment\VotingController@deleteEvent');
+            Route::delete('/{id}/remove-sample', 'Api\Admin\ResourceAndDevelopment\VotingController@removeSample');
+            Route::delete('/{id}/cancel-invitation', 'Api\Admin\ResourceAndDevelopment\VotingController@removeInvitation');
         });
     });
 

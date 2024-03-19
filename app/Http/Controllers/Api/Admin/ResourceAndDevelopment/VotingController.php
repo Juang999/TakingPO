@@ -6,7 +6,7 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use App\{User, Models\SIP\UserSIP};
 use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\{Hash, DB};
+use Illuminate\Support\Facades\{Hash, DB, Auth};
 use App\Http\Requests\Admin\Voting\{
     CreateVotingEventRequest,
     InviteMemberRequest,
@@ -94,11 +94,14 @@ class VotingController extends Controller
     public function createEvent(CreateVotingEventRequest $request)
     {
         try {
+            $userId = Auth::user()->id;
+            $user = DB::table('usres')->select('name')->where('id', '=', $userId)->first();
             DB::beginTransaction();
                 $dataEventVoting = VotingEvent::create([
                     'start_date' => $request->start_date,
                     'title' => $request->title,
                     'description' => $request->description,
+                    'created_by' => $user->name
                 ]);
 
                 $this->inputSample($request->sample_id, $dataEventVoting->id);
@@ -210,9 +213,62 @@ class VotingController extends Controller
         }
     }
 
-    public function updateEvent($id)
+    public function updateEvent(UpdateEventRequest $request, $id)
     {
+        try {
+            $updateRequest = $this->updateRequestEvent($request, $id);
 
+            $dataEvent = $updateRequest['votingEvent'];
+            $requests = $updateRequest['requests'];
+
+            $dataEvent->update([
+                'start_date' => $requests['start_date'],
+                'title' => $requests['title'],
+                'description' => $requests['description'],
+                'updated_by' => $requests['updated_by'],
+            ]);
+
+            return response()->json([
+                'status' => 'success',
+                'data' => true,
+                'error' => null
+            ], 200);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'status' => 'failed',
+                'data' => null,
+                'error' => $th->getMessage()
+            ], 400);
+        }
+    }
+
+    public function deleteEvent($id)
+    {
+        try {
+            DB::beginTransaction();
+                $this->deleteInvitation($id);
+                $this->deleteSample($id);
+
+                $dataEvent = VotingEvent::find($id);
+
+                if($dataEvent) {
+                    $dataEvent->delete();
+                }
+            DB::commit();
+
+            return response()->json([
+                'status' => 'success',
+                'data' => true,
+                'error' => null
+            ], 200);
+        } catch (\Throwable $th) {
+            DB::rollBack();
+            return response()->json([
+                'status' => 'failed',
+                'data' => null,
+                'error' => $th->getMessage()
+            ], 400);
+        }
     }
 
     public function removeInvitation($id)
@@ -308,5 +364,50 @@ class VotingController extends Controller
         }
 
         return $attendanceId;
+    }
+
+    private function updateRequestEvent($request, $id)
+    {
+        $userId = Auth::user()->id;
+        $user = DB::table('users')->select('name')->where('id', '=', $userId)->first();
+
+        $votingEvent = VotingEvent::find($id);
+
+        $requests = [
+            'start_date' => ($request->start_date) ? $request->start_date : $votingEvent->start_date,
+            'title' => ($request->title) ? $request->title : $votingEvent->title,
+            'description' => ($request->description) ? $request->description : $votingEvent->description,
+            'updated_by' => $user->name,
+        ];
+
+        $data = compact('votingEvent', 'requests');
+
+        return $data;
+    }
+
+    private function deleteInvitation($id)
+    {
+        $dataInvitation = VotingMember::select('id')->where('voting_event_id', '=', $id)->get();
+
+        if ($dataInvitation) {
+            collect($dataInvitation)->map(function ($index, $item) {
+                $invitation = VotingMember::find($index->id);
+
+                $invitation->delete();
+            });
+        }
+    }
+
+    private function deleteSample($id)
+    {
+        $dataSample = VotingSample::select('id')->where('voting_event_id', '=', $id)->get();
+
+        if ($dataSample) {
+            collect($dataSample)->map(function ($index, $item) {
+                $sample = VotingSample::find($index->id);
+
+                $sample->delete();
+            });
+        }
     }
 }
