@@ -20,6 +20,7 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 });
 
 Route::post('login', 'Api\UserController@login');
+Route::post('/voting-login', 'Api\UserController@loginVoting');
 
 Route::middleware('jwt.verify')->group(function () {
     Route::get('user', 'Api\UserController@getAuthenticatedUser');
@@ -109,8 +110,8 @@ Route::middleware('jwt.verify')->group(function () {
     Route::prefix('resource-and-development')->group(function () {
         Route::prefix('sample')->group(function () {
             // Sample's Route
-            Route::post('/create', 'Api\Admin\ResourceAndDevelopment\SampleProductController@store');
             Route::get('/', 'Api\Admin\ResourceAndDevelopment\SampleProductController@index');
+            Route::post('/create', 'Api\Admin\ResourceAndDevelopment\SampleProductController@store');
             Route::get('/{id}/detail', 'Api\Admin\ResourceAndDevelopment\SampleProductController@show');
             Route::put('/{id}/update', 'Api\Admin\ResourceAndDevelopment\SampleProductController@update');
             Route::delete('/{id}/delete', 'Api\Admin\ResourceAndDevelopment\SampleProductController@destroy');
@@ -146,7 +147,7 @@ Route::middleware('jwt.verify')->group(function () {
             Route::put('/{id}/update-event', 'Api\Admin\ResourceAndDevelopment\VotingController@updateEvent');
             Route::delete('/{id}/delete-event', 'Api\Admin\ResourceAndDevelopment\VotingController@deleteEvent');
             Route::delete('/{id}/remove-sample', 'Api\Admin\ResourceAndDevelopment\VotingController@removeSample');
-            Route::delete('/{id}/cancel-invitation', 'Api\Admin\ResourceAndDevelopment\VotingController@removeInvitation');
+            Route::delete('/{id}/{attendanceId}/cancel-invitation', 'Api\Admin\ResourceAndDevelopment\VotingController@removeInvitation');
         });
     });
 

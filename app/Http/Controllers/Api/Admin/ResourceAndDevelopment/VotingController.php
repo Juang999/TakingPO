@@ -57,6 +57,7 @@ class VotingController extends Controller
                                 ->with([
                                     'Member' => fn ($query) =>
                                                         $query->select(
+                                                                    'voting_members.id',
                                                                     'voting_event_id',
                                                                     DB::raw('users.attendance_id'),
                                                                     DB::raw('users.name'),
@@ -271,10 +272,10 @@ class VotingController extends Controller
         }
     }
 
-    public function removeInvitation($id)
+    public function removeInvitation($id, $attendanceId)
     {
         try {
-            $dataInvitation = VotingMember::where('attendance_id', '=', $id)->first();
+            $dataInvitation = VotingMember::where([['id', '=', $id],['attendance_id', '=', $id]])->first();
 
             $dataInvitation->delete();
 
