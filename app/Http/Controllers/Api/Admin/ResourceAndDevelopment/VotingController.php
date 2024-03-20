@@ -66,7 +66,7 @@ class VotingController extends Controller
                                                                 )->leftJoin('users', 'users.attendance_id', '=', 'voting_members.attendance_id'),
                                     'Sample' => fn ($query) =>
                                                         $query->select(
-                                                                    'voting_samples.id',
+                                                                    DB::raw('voting_samples.id as vid'),
                                                                     'voting_event_id',
                                                                     'sample_product_id',
                                                                     DB::raw('sample_products.id'),
@@ -297,7 +297,7 @@ class VotingController extends Controller
     public function removeSample($id, $sampleId)
     {
         try {
-            $dataSample = VotingSample::where([['id', '=', $id], ['product_sample_id', '=', $sampleId]])->first();
+            $dataSample = VotingSample::where([['id', '=', $id], ['sample_product_id', '=', $sampleId]])->first();
 
             $dataSample->delete();
 
