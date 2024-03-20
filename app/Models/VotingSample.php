@@ -19,4 +19,14 @@ use LogsActivity;
     {
         return $this->hasOne(SampleProductPhoto::class, 'sample_product_id', 'sample_product_id');
     }
+
+    public function PhotoSample()
+    {
+        return $this->hasMany(SampleProductPhoto::class, 'sample_product_id', 'sample_product_id');
+    }
+
+    public function SampleProduct()
+    {
+        return $this->belongsTo(SampleProduct::class, 'sample_product_id', 'id');
+    }
 }

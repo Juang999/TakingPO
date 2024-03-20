@@ -25,10 +25,10 @@ class VoteSampleRequest extends FormRequest
     {
         return [
             'voting_event_id' => 'required|integer',
-            'sample_product_id' => 'required|integer',
-            'attendance_id' => 'required|integer',
+            'sample_id' => 'required|integer',
+            'product_id' => 'required|integer',
             'score' => 'required|integer',
-            'note' => 'required|integer',
+            'note' => 'required|string',
         ];
     }
 }

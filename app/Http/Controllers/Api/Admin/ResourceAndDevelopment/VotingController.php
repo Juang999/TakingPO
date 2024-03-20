@@ -190,31 +190,6 @@ class VotingController extends Controller
         }
     }
 
-    public function voteSample(VoteSampleRequest $request)
-    {
-        try {
-            $dataVoting = VotingScore::create([
-                'voting_event_id' => $request->voting_event_id,
-                'sample_product_id' => $request->sample_product_id,
-                'attendance_id' => $request->attendance_id,
-                'score' => $request->score,
-                'note' => $request->note,
-            ]);
-
-            return response()->json([
-                'status' => 'success',
-                'data' => $dataVoting,
-                'error' => null
-            ], 200);
-        } catch (\Throwable $th) {
-            return response()->json([
-                'status' => 'failed',
-                'data' => null,
-                'error' => $th->getMessage()
-            ], 400);
-        }
-    }
-
     public function updateEvent(UpdateEventRequest $request, $id)
     {
         try {
@@ -312,6 +287,46 @@ class VotingController extends Controller
                 'data' => null,
                 'error' => $th->getMessage()
             ], 400);
+        }
+    }
+
+    public function showingSampleForAdmin($id)
+    {
+        try {
+            $this->turnOff($id);
+
+            VotingSample::where('id', '=', $id)
+                    ->update([
+                        'show' => true
+                    ]);
+
+            return response()->json([
+                'status' => 'success',
+                'data' => true,
+                'error' => null
+            ], 200);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'status' => 'failed',
+                'data' => false,
+                'error' => $th->getMessage()
+            ], 400);
+        }
+    }
+
+    private function turnOff($id)
+    {
+        $data = VotingSample::where([['voting_event_id', '=', function ($query) use ($id) {
+            $query->select('voting_event_id')
+                ->from('voting_samples')
+                ->where('id', '=', $id)
+                ->first();
+        }], [
+            'show', '=', true
+        ]])->first();
+
+        if ($data) {
+            $data->update(['show' => false]);
         }
     }
 
