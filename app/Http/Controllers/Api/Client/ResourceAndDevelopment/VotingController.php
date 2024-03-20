@@ -13,8 +13,9 @@ class VotingController extends Controller
     public function showSampleForClient()
     {
         try {
-            $dataSample = SampleProduct::select(DB::raw('voting_samples.id AS vid'), 'sample_products.id', 'date','article_name','style_id','entity_name','material','size','accessories','note_and_description')
+            $dataSample = SampleProduct::select(DB::raw('voting_events.id AS voting_event_id'), DB::raw('voting_samples.id AS sample_id'), DB::raw('sample_products.id AS product_id'), 'date','article_name','style_id','entity_name','material','size','accessories','note_and_description')
                                 ->leftJoin('voting_samples', 'voting_samples.sample_product_id', '=', 'sample_products.id')
+                                ->leftJoin('voting_events', 'voting_events.id', '=', 'voting_samples.voting_event_id')
                                 ->with([
                                     'PhotoSampleProduct' => fn ($query) => $query->select('id', 'sample_product_id', 'photo'),
                                     'FabricTexture' => fn ($query) => $query->select('id', 'sample_product_id', 'photo', 'description')
