@@ -25,13 +25,13 @@ class VotingController extends Controller
                                             ['voting_event_id', '=', function ($query) {
                                                 $query->select('id')
                                                     ->from('voting_events')
-                                                    ->latest()
+                                                    ->where('is_activate', '=', true)
                                                     ->first();
                                             }]
                                         ])->first();
                                 })->first();
 
-            $dataEvent = VotingEvent::select('id', 'start_date', 'title', 'description')->latest()->first();
+            $dataEvent = VotingEvent::select('id', 'start_date', 'title', 'description')->where('is_activate', '=', true)->first();
 
             return response()->json([
                 'status' => 'success',

@@ -314,6 +314,43 @@ class VotingController extends Controller
         }
     }
 
+    public function activateEvent($id)
+    {
+        try {
+            $this->turnOffEvent();
+
+            $userId = Auth::user()->id;
+            $user = DB::table('users')->where('id', '=', $userId)->first();
+
+            VotingEvent::where('id', '=', $id)
+                    ->update([
+                        'is_activate' => true,
+                        'updated_by' => $user->name
+                    ]);
+
+            return response()->json([
+                'status' => 'success',
+                'data' => true,
+                'error' => null
+            ], 200);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'status' => 'failed',
+                'data' => null,
+                'error' => $th->getMessage()
+            ], 400);
+        }
+    }
+
+    private function turnOffEvent()
+    {
+        $userId = Auth::user()->id;
+        $user = DB::table('users')->where('id', '=', $userId)->first();
+        $dataEvent = VotingEvent::where('is_activate', '=', true)->first();
+
+        if ($dataEvent) $dataEvent->update(['updated_by' => $user->name, 'is_activate' => false]);
+    }
+
     private function turnOff($id)
     {
         $data = VotingSample::where([['voting_event_id', '=', function ($query) use ($id) {
@@ -325,9 +362,7 @@ class VotingController extends Controller
             'show', '=', true
         ]])->first();
 
-        if ($data) {
-            $data->update(['show' => false]);
-        }
+        if ($data) $data->update(['show' => false]);
     }
 
     private function inputSample($sampleId, $eventId)
