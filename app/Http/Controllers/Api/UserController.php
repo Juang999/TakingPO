@@ -216,19 +216,19 @@ class UserController extends Controller
             if (!$findUser) {
                 return response()->json([
                     'message' => 'unauthorize!'
-                ]);
+                ], 400);
             }
 
             if (!Hash::check($request->password, $findUser->password)) {
                 return response()->json([
                     'message' => 'unauthorize!'
-                ]);
+                ], 400);
             }
 
             if ($this->checkInvitation($findUser->attendance_id) == false) {
                 return response()->json([
                     'message' => 'you are not invited!',
-                ]);
+                ], 403);
             }
 
             $findUser = User::select('id', 'name', 'email', 'attendance_id', 'sub_section_id', 'sub_section', 'nip')
