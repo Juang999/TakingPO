@@ -250,6 +250,26 @@ class UserController extends Controller
         }
     }
 
+    public function checkLogin()
+    {
+        try {
+            $dataUser = Auth::user();
+            $user = User::where('attendance_id', '=', $dataUser->attendance_id)->first();
+
+            return response()->json([
+                'status' => ($user) ? 'success' : 'failed',
+                'data' => ($user) ? 'logged in!' : 'not logged in yet',
+                'error' => null
+            ], ($user) ? 200 : 403);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'status' => 'failed',
+                'data' => null,
+                'error' => $th->getMessage()
+            ], 400);
+        }
+    }
+
     private function checkInvitation($attendanceId)
     {
         $votingMember = VotingMember::select('id', 'voting_event_id')
