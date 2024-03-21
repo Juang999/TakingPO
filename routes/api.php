@@ -45,7 +45,7 @@ Route::middleware('jwt.verify')->group(function () {
         Route::post('/create', 'Api\UserController@createUser');
         Route::get('/user-sip', 'Api\UserController@getUserSIP');
         Route::get('/{attendanceId}/check', 'Api\UserController@checkUser');
-        Route::post('/verification', 'Api\UserController@checkLogin');
+        Route::get('/verification', 'Api\UserController@checkLogin');
     });
 
     // route atpo v2
