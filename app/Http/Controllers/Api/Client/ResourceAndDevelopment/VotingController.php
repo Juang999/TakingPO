@@ -13,6 +13,8 @@ class VotingController extends Controller
     public function showSampleForClient()
     {
         try {
+            $user = Auth::user();
+
             $dataSample = SampleProduct::select(DB::raw('voting_events.id AS voting_event_id'), DB::raw('voting_samples.id AS sample_id'), DB::raw('sample_products.id AS id'), 'date','article_name','style_id', DB::raw('styles.style_name'),'entity_name','material','size','accessories','note_and_description')
                                 ->leftJoin('voting_samples', 'voting_samples.sample_product_id', '=', 'sample_products.id')
                                 ->leftJoin('voting_events', 'voting_events.id', '=', 'voting_samples.voting_event_id')
@@ -36,9 +38,11 @@ class VotingController extends Controller
 
             $dataEvent = VotingEvent::select('id', 'start_date', 'title', 'description')->where('is_activate', '=', true)->first();
 
+            $score = VotingScore::where('attendance_id', '=', $user->attendance_id)->first();
+
             return response()->json([
                 'status' => 'success',
-                'data' => compact('dataSample', 'dataEvent'),
+                'data' => ['dataSample' => ($score) ? null : $dataSample, 'dataEvent' => $dataEvent],
                 'error' => null
             ], 200);
         } catch (\Throwable $th) {
