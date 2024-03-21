@@ -514,7 +514,7 @@ class SampleProductController extends Controller
         $checkUser = User::select('name')->where('attendance_id', '=', $attendanceId)->first();
 
         if($checkUser == null) {
-            $userSIP = UserSIP::select('username', 'attendance_id', 'sub_section_id', 'seksi', 'data_karyawans.nip', 'data_karyawans.img_karyawan')
+            $userSIP = UserSIP::select('username', 'password', 'attendance_id', 'sub_section_id', 'seksi', 'data_karyawans.nip', 'data_karyawans.img_karyawan')
                                 ->leftJoin('detail_users', 'detail_users.id', '=', 'users.detail_user_id')
                                 ->leftJoin('data_karyawans', 'data_karyawans.id', '=', 'detail_users.data_karyawan_id')
                                 ->where('users.attendance_id', '=', $attendanceId)
@@ -523,7 +523,7 @@ class SampleProductController extends Controller
             User::create([
                 'name' => $userSIP->username,
                 'email' => "$userSIP->username@mutif.atpo",
-                'password' => Hash::make($userSIP->username),
+                'password' => $$userSIP->password,
                 'attendance_id' => $userSIP->attendance_id,
                 'sub_section_id' => $userSIP->sub_section_id,
                 'sub_section' => $userSIP->seksi,
