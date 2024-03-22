@@ -5,8 +5,8 @@ namespace App\Http\Controllers\Api\Client\ResourceAndDevelopment;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\{DB, Auth};
-use App\Http\Requests\Admin\Voting\VoteSampleRequest;
 use App\Models\{VotingEvent, VotingScore, SampleProduct};
+use App\Http\Requests\Client\ResourceAndDevelopment\{VoteSampleRequest, UpdateVotingRequest};
 
 class VotingController extends Controller
 {
@@ -36,7 +36,7 @@ class VotingController extends Controller
                                         ])->first();
                                 })->first();
 
-            $dataEvent = VotingEvent::select('id', 'start_date', 'title', 'description')->where('is_activate', '=', true)->first();
+            $dataEvent = $this->eventIsActive();
 
             $score = VotingScore::where('attendance_id', '=', $user->attendance_id)->first();
 
@@ -90,20 +90,25 @@ class VotingController extends Controller
     {
         try {
             $user = Auth::user();
-            $eventId = request()->event_id;
+            $eventId = $this->eventIsActive();
 
             $history = VotingScore::select(
                                         'voting_scores.id',
+                                        'voting_scores.sample_product_id',
                                         DB::raw('voting_events.title'),
                                         DB::raw('voting_events.start_date'),
                                         DB::raw('sample_products.article_name'),
                                         DB::raw('sample_products.entity_name'),
                                         'voting_scores.score',
+                                        'voting_scores.note',
                                         'voting_scores.created_at'
                                     )->leftJoin('voting_events', 'voting_events.id', '=', 'voting_scores.voting_event_id')
                                 ->leftJoin('sample_products', 'sample_products.id', '=', 'voting_scores.sample_product_id')
-                                ->where('voting_scores.attendance_id', '=', $user->attendance_id)
-                                ->when($eventId, fn ($query) => $query->where('voting_event_id', '=', $eventId))
+                                ->with(['Thumbnail' => fn ($query) => $query->select('sample_product_photos.id', 'sample_product_photos.photo')])
+                                ->where([
+                                        ['voting_scores.attendance_id', '=', $user->attendance_id],
+                                        ['voting_scores.voting_event_id', '=', $eventId->id]
+                                    ])
                                 ->orderByDesc('voting_scores.created_at')
                                 ->get();
 
@@ -119,5 +124,72 @@ class VotingController extends Controller
                 'error' => $th->getMessage()
             ], 400);
         }
+    }
+
+    public function updateVote(UpdateVotingRequest $request, $id)
+    {
+        try {
+            $requestUpdateVote = $this->requestUpdateVote($request, $id);
+
+            $dataScore = $requestUpdateVote['dataScore'];
+            $requests = $requestUpdateVote['requests'];
+
+            $dataScore->update([
+                'score' => $requests['score'],
+                'note' => $requests['note']
+            ]);
+
+            return response()->json([
+                'status' => 'success',
+                'data' => true,
+                'error' => null
+            ], 200);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'status' => 'failed',
+                'data' => null,
+                'error' => $th->getMessage()
+            ], 400);
+        }
+    }
+
+    public function eventActive()
+    {
+        try {
+            $data = $this->eventIsActive();
+
+            return response()->json([
+                'status' => 'success',
+                'data' => $data,
+                'error' => null
+            ], 200);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'status' => 'failed',
+                'data' => null,
+                'error' => $th->getMessage()
+            ], 400);
+        }
+    }
+
+    private function requestUpdateVote($request, $id)
+    {
+        $dataScore = VotingScore::where('id', '=', $id)->first();
+
+        $requests = [
+            'score' => ($request->score) ? $request->score : $dataScore->score,
+            'note' => ($request->note) ? $request->note : $dataScore->note
+        ];
+
+        $compact = compact('dataScore', 'requests');
+
+        return $compact;
+    }
+
+    private function eventIsActive()
+    {
+        $dataEvent = VotingEvent::select('id', 'start_date', 'title', 'description')->where('is_activate', '=', true)->first();
+
+        return $dataEvent;
     }
 }

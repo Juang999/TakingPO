@@ -14,4 +14,9 @@ class VotingScore extends Model
     protected static $logUnguarded = true;
 
     protected static $logName = 'system';
+
+    public function Thumbnail()
+    {
+        return $this->hasOneThrough(SampleProductPhoto::class, SampleProduct::class, 'id', 'sample_product_id', 'sample_product_id', 'id');
+    }
 }

@@ -141,48 +141,49 @@ Route::middleware('jwt.verify')->group(function () {
         Route::prefix('voting')->group(function () {
             Route::get('/sample', 'Api\Admin\ResourceAndDevelopment\VotingController@getSample');
             Route::get('/data', 'Api\Admin\ResourceAndDevelopment\VotingController@getAllEvent');
+            Route::delete('/{id}/delete-event', 'Api\Admin\ResourceAndDevelopment\VotingController@deleteEvent');
             Route::post('/create', 'Api\Admin\ResourceAndDevelopment\VotingController@createEvent');
             Route::post('/add-sample', 'Api\Admin\ResourceAndDevelopment\VotingController@addNewSample');
             Route::get('/{id}/detail', 'Api\Admin\ResourceAndDevelopment\VotingController@getDetailEvent');
             Route::post('/invite-member', 'Api\Admin\ResourceAndDevelopment\VotingController@inviteMember');
             Route::put('/{id}/update-event', 'Api\Admin\ResourceAndDevelopment\VotingController@updateEvent');
-            Route::delete('/{id}/delete-event', 'Api\Admin\ResourceAndDevelopment\VotingController@deleteEvent');
+            Route::delete('/{id}/{sampleId}/remove-sample', 'Api\Admin\ResourceAndDevelopment\VotingController@removeSample');
             Route::patch('/{id}/activate-event', 'Api\Admin\ResourceAndDevelopment\VotingController@activateEvent');
             Route::patch('/{id}/activate', 'Api\Admin\ResourceAndDevelopment\VotingController@showingSampleForAdmin');
-            Route::delete('/{id}/{sampleId}/remove-sample', 'Api\Admin\ResourceAndDevelopment\VotingController@removeSample');
             Route::delete('/{id}/{attendanceId}/cancel-invitation', 'Api\Admin\ResourceAndDevelopment\VotingController@removeInvitation');
         });
 
         Route::prefix('voting-client')->group(function () {
             Route::post('/vote-sample', 'Api\Client\ResourceAndDevelopment\VotingController@voteSample');
-            Route::get('/get-sample', 'Api\Client\ResourceAndDevelopment\VotingController@showSampleForClient');
+            Route::patch('/{id}/update', 'Api\Client\ResourceAndDevelopment\VotingController@updateVote');
             Route::get('/history-sample', 'Api\Client\ResourceAndDevelopment\VotingController@getHistoryVote');
+            Route::get('/get-sample', 'Api\Client\ResourceAndDevelopment\VotingController@showSampleForClient');
         });
     });
 
     // route with exception
-    Route::apiResource('entity', 'Api\Admin\EntityController')
-    ->parameters(['entity' => 'entity'])
-    ->only('index', 'update');
+    // Route::apiResource('entity', 'Api\Admin\EntityController')
+    // ->parameters(['entity' => 'entity'])
+    // ->only('index', 'update');
 
-    Route::apiResource('last-brand', 'Api\LastBrandController')
-    ->parameters(['last-brand' => 'entity'])
-    ->except('show', 'store');
+    // Route::apiResource('last-brand', 'Api\LastBrandController')
+    // ->parameters(['last-brand' => 'entity'])
+    // ->except('show', 'store');
 
-    Route::apiResource('total-product', 'Api\TotalProductController')
-    ->only('index');
+    // Route::apiResource('total-product', 'Api\TotalProductController')
+    // ->only('index');
 
-    Route::apiResource('total-pre-order', 'Api\TotalPreOrderController')
-    ->only('index', 'show');
+    // Route::apiResource('total-pre-order', 'Api\TotalPreOrderController')
+    // ->only('index', 'show');
 
-    Route::apiResource('phone', 'Api\Admin\PhoneController')
-    ->except('store');
+    // Route::apiResource('phone', 'Api\Admin\PhoneController')
+    // ->except('store');
 
     // single route
     Route::get('/logs', 'Api\Admin\Logger');
-    Route::post('logout', 'Api\UserController@logout');
     Route::get('/status', 'Api\Admin\SessionStatus');
     Route::get('get-new-member', 'Api\AccRegistration');
+    Route::post('logout', 'Api\UserController@logout');
     Route::get('/highest-order', 'Api\Admin\HighestOrder');
     Route::put('/is-active/{clothes}', 'Api\ActivateClothes');
     Route::post('single-agent', 'Api\Admin\CreateSingleAgent');
@@ -227,6 +228,7 @@ Route::prefix('client')->group( function () {
     });
 
     Route::post('verification', 'Api\Client\Event\ClientController@verification');
+    Route::get('event-active', 'Api\Client\ResourceAndDevelopment\VotingController@eventActive');
 });
 
 Route::prefix('exapro')->group(function () {
