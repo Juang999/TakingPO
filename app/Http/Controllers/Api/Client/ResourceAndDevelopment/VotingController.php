@@ -42,7 +42,11 @@ class VotingController extends Controller
 
             return response()->json([
                 'status' => 'success',
-                'data' => ['dataSample' => ($score) ? null : $dataSample, 'dataEvent' => $dataEvent],
+                'data' => [
+                    'dataSample' => ($score) ? null : $dataSample,
+                    'dataEvent' => $dataEvent,
+                    'voted' => ($score) ? true : false
+                ],
                 'error' => null
             ], 200);
         } catch (\Throwable $th) {
