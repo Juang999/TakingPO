@@ -152,7 +152,9 @@ Route::middleware('jwt.verify')->group(function () {
             Route::patch('/{id}/activate', 'Api\Admin\ResourceAndDevelopment\VotingController@showingSampleForAdmin');
             Route::delete('/{id}/{attendanceId}/cancel-invitation', 'Api\Admin\ResourceAndDevelopment\VotingController@removeInvitation');
         });
+    });
 
+    Route::middleware('jwt.verify', 'voting-middleware')->prefix('resource-and-development')->group(function () {
         Route::prefix('voting-client')->group(function () {
             Route::post('/vote-sample', 'Api\Client\ResourceAndDevelopment\VotingController@voteSample');
             Route::patch('/{id}/update', 'Api\Client\ResourceAndDevelopment\VotingController@updateVote');

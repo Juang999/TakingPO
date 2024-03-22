@@ -274,8 +274,8 @@ class UserController extends Controller
     {
         $votingMember = VotingMember::select('id', 'voting_event_id')
                                     ->where([
-                                        ['voting_event_id', '=', fn ($query) => $query->select('id')->from('voting_events')->latest()->first()],
-                                        // ['attendance_id', '=', $attendanceId]
+                                        ['voting_event_id', '=', fn ($query) => $query->select('id')->from('voting_events')->where('is_activate', '=', true)->first()],
+                                        ['attendance_id', '=', $attendanceId]
                                     ])->first();
 
         return ($votingMember) ? true : false;

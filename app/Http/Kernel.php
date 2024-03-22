@@ -67,5 +67,6 @@ class Kernel extends HttpKernel
         'Logger' => \App\Http\Middleware\Logger::class,
         'client-check' => \App\Http\Middleware\ClientCheckMIddleware::class,
         'check-event' => \App\Http\Middleware\CheckEventMiddleware::class,
+        'voting-middleware' => \App\Http\Middleware\VotingMiddleware::class,
     ];
 }
