@@ -162,22 +162,22 @@ Route::middleware('jwt.verify')->group(function () {
     });
 
     // route with exception
-    // Route::apiResource('entity', 'Api\Admin\EntityController')
-    // ->parameters(['entity' => 'entity'])
-    // ->only('index', 'update');
+    Route::apiResource('entity', 'Api\Admin\EntityController')
+    ->parameters(['entity' => 'entity'])
+    ->only('index', 'update');
 
-    // Route::apiResource('last-brand', 'Api\LastBrandController')
-    // ->parameters(['last-brand' => 'entity'])
-    // ->except('show', 'store');
+    Route::apiResource('last-brand', 'Api\LastBrandController')
+    ->parameters(['last-brand' => 'entity'])
+    ->except('show', 'store');
 
-    // Route::apiResource('total-product', 'Api\TotalProductController')
-    // ->only('index');
+    Route::apiResource('total-product', 'Api\TotalProductController')
+    ->only('index');
 
-    // Route::apiResource('total-pre-order', 'Api\TotalPreOrderController')
-    // ->only('index', 'show');
+    Route::apiResource('total-pre-order', 'Api\TotalPreOrderController')
+    ->only('index', 'show');
 
-    // Route::apiResource('phone', 'Api\Admin\PhoneController')
-    // ->except('store');
+    Route::apiResource('phone', 'Api\Admin\PhoneController')
+    ->except('store');
 
     // single route
     Route::get('/logs', 'Api\Admin\Logger');
