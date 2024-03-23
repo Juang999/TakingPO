@@ -71,7 +71,8 @@ class VotingController extends Controller
                                                                     'sample_product_id',
                                                                     DB::raw('sample_products.id'),
                                                                     DB::raw('sample_products.article_name'),
-                                                                    DB::raw('sample_products.entity_name')
+                                                                    DB::raw('sample_products.entity_name'),
+                                                                    'show'
                                                                 )->leftJoin('sample_products', 'sample_products.id', '=', 'voting_samples.sample_product_id')
                                                                 ->with(['Thumbnail' => fn ($query) =>
                                                                     $query->select('sample_product_id', 'photo')
