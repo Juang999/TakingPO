@@ -15,6 +15,8 @@ class UpdateColumnVotingEventsTable extends Migration
     {
         Schema::table('voting_events', function (Blueprint $table) {
             $table->boolean('is_activate')->nullable()->default(false)->change();
+            $table->string('craeted_by')->nullable()->change();
+            $table->string('updated_by')->nullable()->change();
         });
     }
 
