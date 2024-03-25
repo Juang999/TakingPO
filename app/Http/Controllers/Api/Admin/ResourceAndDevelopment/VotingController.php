@@ -366,6 +366,8 @@ class VotingController extends Controller
                         $query->select([
                                 'sample_id',
                                 DB::raw('users.name'),
+                                DB::raw('users.photo'),
+                                DB::raw('users.nip'),
                                 'score'
                             ])->leftJoin('users', 'users.attendance_id', '=', 'voting_scores.attendance_id')
                 ])->groupBy([
