@@ -442,7 +442,7 @@ class VotingController extends Controller
 
     private function checkUser($attendanceId)
     {
-        $dataUser = User::select('name')->where('attendance_id', '=', $attendanceId)->first();
+        $dataUser = User::where('attendance_id', '=', $attendanceId)->first();
 
         $userSIP = UserSIP::select('username', 'password', 'attendance_id', 'sub_section_id', 'seksi', 'data_karyawans.nip', 'data_karyawans.img_karyawan')
                                 ->leftJoin('detail_users', 'detail_users.id', '=', 'users.detail_user_id')
@@ -462,7 +462,7 @@ class VotingController extends Controller
                 'photo' => $userSIP->img_karyawan
             ]);
         } else {
-            $dataUser->update([
+            User::where('attendance_id', '=', $attendanceId)->update([
                 'name' => $userSIP->username,
                 'email' => "$userSIP->username@mutif.atpo",
                 'password' => $userSIP->password,
