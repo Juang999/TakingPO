@@ -99,7 +99,7 @@ class VotingController extends Controller
     {
         try {
             $userId = Auth::user()->id;
-            $user = DB::table('usres')->select('name')->where('id', '=', $userId)->first();
+            $user = DB::table('users')->select('name')->where('id', '=', $userId)->first();
             DB::beginTransaction();
                 $dataEventVoting = VotingEvent::create([
                     'start_date' => $request->start_date,
