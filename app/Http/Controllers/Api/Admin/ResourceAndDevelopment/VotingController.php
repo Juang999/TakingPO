@@ -76,7 +76,7 @@ class VotingController extends Controller
                                                                 )->leftJoin('sample_products', 'sample_products.id', '=', 'voting_samples.sample_product_id')
                                                                 ->with([
                                                                         'Thumbnail' => fn ($query) => $query->select('sample_product_id', 'photo'),
-                                                                        'VotingScore' => fn ($query) => $query->select('sample_id', DB::raw('users.name'), 'score')->leftJoin('users', 'users.attendance_id', '=', 'voting_scores.attendance_id')
+                                                                        // 'VotingScore' => fn ($query) => $query->select('sample_id', DB::raw('users.name'), 'score')->leftJoin('users', 'users.attendance_id', '=', 'voting_scores.attendance_id')
                                                                     ])
                                     // 'Sample.Thumbnail'
                                 ])->find($id);
@@ -344,6 +344,52 @@ class VotingController extends Controller
         }
     }
 
+    public function getResultVoting($eventId, $vid)
+    {
+        try {
+            $data = VotingSample::select([
+                    DB::raw('voting_samples.id as vid'),
+                    DB::raw('voting_events.title AS title'),
+                    DB::raw('sample_products.article_name AS article_name'),
+                    DB::raw('sample_products.entity_name AS entity_name'),
+                    DB::raw('AVG(voting_scores.score) AS average'),
+                    DB::raw('MAX(voting_scores.score) AS max'),
+                    DB::raw('MIN(voting_scores.score) AS min'),
+                ])->leftJoin('voting_events', 'voting_events.id', '=', 'voting_samples.voting_event_id')
+                ->leftJoin('sample_products', 'sample_products.id', '=', 'voting_samples.sample_product_id')
+                ->leftJoin('voting_scores', 'voting_scores.sample_id', '=', 'voting_samples.id')
+                ->where([
+                    ['voting_samples.id', '=', $vid],
+                    ['voting_samples.voting_event_id', '=', $eventId]
+                ])->with([
+                    'VotingScore' => fn ($query) =>
+                        $query->select([
+                                'sample_id',
+                                DB::raw('users.name'),
+                                'score'
+                            ])->leftJoin('users', 'users.attendance_id', '=', 'voting_scores.attendance_id')
+                ])->groupBy([
+                    'vid',
+                    'title',
+                    'article_name',
+                    'entity_name'
+                ])
+                ->first();
+
+            return response()->json([
+                'status' => 'success',
+                'data' => $data,
+                'error' => null
+            ], 200);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'status' => 'failed',
+                'data' => null,
+                'error' => $th->getMessage()
+            ], 400);
+        }
+    }
+
     private function turnOffEvent()
     {
         $userId = Auth::user()->id;
@@ -398,14 +444,25 @@ class VotingController extends Controller
     {
         $dataUser = User::select('name')->where('attendance_id', '=', $attendanceId)->first();
 
-        if($dataUser == null) {
-            $userSIP = UserSIP::select('username', 'password', 'attendance_id', 'sub_section_id', 'seksi', 'data_karyawans.nip', 'data_karyawans.img_karyawan')
+        $userSIP = UserSIP::select('username', 'password', 'attendance_id', 'sub_section_id', 'seksi', 'data_karyawans.nip', 'data_karyawans.img_karyawan')
                                 ->leftJoin('detail_users', 'detail_users.id', '=', 'users.detail_user_id')
                                 ->leftJoin('data_karyawans', 'data_karyawans.id', '=', 'detail_users.data_karyawan_id')
                                 ->where('users.attendance_id', '=', $attendanceId)
                                 ->first();
 
+        if($dataUser == null) {
             User::create([
+                'name' => $userSIP->username,
+                'email' => "$userSIP->username@mutif.atpo",
+                'password' => $userSIP->password,
+                'attendance_id' => $userSIP->attendance_id,
+                'sub_section_id' => $userSIP->sub_section_id,
+                'sub_section' => $userSIP->seksi,
+                'nip' => $userSIP->nip,
+                'photo' => $userSIP->img_karyawan
+            ]);
+        } else {
+            $dataUser->update([
                 'name' => $userSIP->username,
                 'email' => "$userSIP->username@mutif.atpo",
                 'password' => $userSIP->password,
