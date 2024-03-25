@@ -30,7 +30,7 @@ class VotingController extends Controller
         try {
             $searchName = request()->search;
 
-            $dataEvent = VotingEvent::select('id', 'title')
+            $dataEvent = VotingEvent::select('id', 'title', 'is_activate')
                                     ->when($searchName, function ($query) use ($searchName) {
                                         $query->where('title', 'like', "%$searchName%");
                                     })
@@ -74,9 +74,10 @@ class VotingController extends Controller
                                                                     DB::raw('sample_products.entity_name'),
                                                                     'show'
                                                                 )->leftJoin('sample_products', 'sample_products.id', '=', 'voting_samples.sample_product_id')
-                                                                ->with(['Thumbnail' => fn ($query) =>
-                                                                    $query->select('sample_product_id', 'photo')
-                                                            ])
+                                                                ->with([
+                                                                        'Thumbnail' => fn ($query) => $query->select('sample_product_id', 'photo'),
+                                                                        'VotingScore' => fn ($query) => $query->select('sample_id', DB::raw('users.name'), 'score')->leftJoin('users', 'users.attendance_id', '=', 'voting_scores.attendance_id')
+                                                                    ])
                                     // 'Sample.Thumbnail'
                                 ])->find($id);
 

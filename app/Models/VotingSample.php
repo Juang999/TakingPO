@@ -29,4 +29,9 @@ use LogsActivity;
     {
         return $this->belongsTo(SampleProduct::class, 'sample_product_id', 'id');
     }
+
+    public function VotingScore()
+    {
+        return $this->hasMany(VotingScore::class, 'sample_id', 'vid');
+    }
 }
