@@ -21,7 +21,8 @@ class VotingController extends Controller
                                 ->leftJoin('styles', 'styles.id', '=', 'sample_products.style_id')
                                 ->with([
                                     'PhotoSampleProduct' => fn ($query) => $query->select('id', 'sample_product_id', 'photo'),
-                                    'FabricTexture' => fn ($query) => $query->select('id', 'sample_product_id', 'photo', 'description')
+                                    'FabricTexture' => fn ($query) => $query->select('id', 'sample_product_id', 'photo', 'description'),
+                                    'SampleDesign' => fn ($query) => $query->select('id', 'sample_product_id', 'design_photo')
                                 ])->where('sample_products.id', '=', function ($query) {
                                     $query->select('sample_product_id')
                                         ->from('voting_samples')

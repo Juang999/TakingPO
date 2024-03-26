@@ -225,6 +225,7 @@ class SampleProductController extends Controller
             DB::beginTransaction();
                 $this->deleteFabric($id);
                 $this->deleteSamplePhoto($id);
+                $this->helperDeleteSampleDesign($id);
 
                 $dataSampleProduct = SampleProduct::where('id', '=', $id)->first();
                 $dataSampleProduct->delete();
@@ -418,7 +419,9 @@ class SampleProductController extends Controller
     public function deleteSampleDesign($id)
     {
         try {
-            SampleDesign::where('id', '=', $id)->delete();
+            $dataDesignSample = SampleDesign::where('id', '=', $id)->first();
+
+            $dataDesignSample->delete();
 
             return response()->json([
                 'status' => 'success',
@@ -607,5 +610,18 @@ class SampleProductController extends Controller
                 'design_photo' => $item
             ]);
         });
+    }
+
+    private function helperDeleteSampleDesign($sampleProductId)
+    {
+        $dataSampleDesign = SampleDesign::where('sample_product_id', '=', $sampleProductId)->get('id');
+
+        if ($dataSampleDesign) {
+            foreach ($dataSampleDesign as $sampleDesign) {
+                $dataSample = SampleDesign::where('id', '=', $sampleDesign['id'])->first();
+
+                $dataSample->delete();
+            }
+        }
     }
 }
