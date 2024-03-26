@@ -32,6 +32,7 @@ class UpdateSampleProductRequest extends FormRequest
             'size' => 'nullable|string',
             'accessories' => 'nullable|string',
             'note_description' => 'nullable|string',
+            'design_file' => 'nullable|string',
             'designer_id' => 'nullable|integer',
             'md_id' => 'nullable|integer',
             'leader_designer_id' => 'nullable|integer'

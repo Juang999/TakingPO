@@ -32,10 +32,12 @@ class SampleProductRequest extends FormRequest
             'size' => 'required|string',
             'accessories' => 'required|string',
             'note_description' => 'nullable|string',
+            'design_file' => 'nullable|string',
             'designer_id' => 'nullable|integer',
             'md_id' => 'nullable|integer',
             'leader_designer_id' => 'nullable|integer',
             'photo' => 'required|string',
+            'sample_design' => 'required|string',
             'description_fabric' => 'required|string',
             'photo_fabric' => 'required|string'
         ];

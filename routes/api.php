@@ -68,6 +68,7 @@ Route::middleware('jwt.verify')->group(function () {
 
         Route::prefix('product')->group(function () {
             Route::get('/get', 'Api\Admin\Event\ProductController@getAllProduct'); //diubah
+            Route::post('/input-price', 'Api\Admin\Event\ProductController@inputPriceList');
             Route::post('/create', 'Api\Admin\Event\ProductController@storeProduct');
             Route::post('/input-photo', 'Api\Admin\Event\ProductController@inputImage');
             Route::put('/{id}/update', 'Api\Admin\Event\ProductController@updateProduct');
@@ -130,6 +131,10 @@ Route::middleware('jwt.verify')->group(function () {
             // Fabric Texture's Route
             Route::post('/input-fabric-texture', 'Api\Admin\ResourceAndDevelopment\SampleProductController@inputFabricTexture');
             Route::delete('/{id}/{sampleProductId}/delete-fabric', 'Api\Admin\ResourceAndDevelopment\SampleProductController@deleteFabricTexture');
+
+            // input data sample design
+            Route::post('/input-sample-design', 'Api\Admin\ResourceAndDevelopment\SampleProductController@inputSampleDesign');
+            Route::delete('/{id}/delete-sample-design', 'Api\Admin\ResourceAndDevelopment\SampleProductController@deleteSampleDesign');
         });
 
         Route::prefix('staff-rnd')->group(function () {

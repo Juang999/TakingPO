@@ -10,10 +10,12 @@ use App\Http\Requests\Admin\SampleProduct\{
     InsertSamplePhotoRequest,
     InputFabricTextureRequest,
     UpdateSampleProductRequest,
+    InputSampleDesignRequest
 };
 use App\{
     User,
     Models\SIP\UserSIP,
+    Models\SampleDesign,
     Models\SampleProduct,
     Models\FabricTexture,
     Models\SampleProductPhoto,
@@ -86,12 +88,14 @@ class SampleProductController extends Controller
                     'size' => $request->size,
                     'accessories' => $request->accessories,
                     'note_and_description' => ($request->note_description) ? $request->note_description : '-',
+                    'design_file' => $request->design_file,
                     'designer_id' => $designerId,
                     'md_id' => $merchandiserId,
                     'leader_designer_id' => $leaderDesignerId,
                 ]);
 
                 $this->inputSamplePhoto(['sp_id' => $sampleProduct->id, 'photo' => $request->photo]);
+                $this->helperInputSampleDesign(['design_photo' => $request->sample_design, 'sample_product_id' => $sampleProduct->id]);
                 $this->inputFabricPhoto(['sample_product_id' => $sampleProduct->id, 'description_fabric' => $request->description_fabric, 'photo_fabric' => $request->photo_fabric]);
             DB::commit();
 
@@ -130,6 +134,7 @@ class SampleProductController extends Controller
                 'size',
                 'accessories',
                 'note_and_description',
+                'design_file',
                 'designer_id',
                 DB::raw('designer.name AS designer_name'),
                 'md_id',
@@ -142,7 +147,8 @@ class SampleProductController extends Controller
             ->leftJoin('styles', 'styles.id', '=', 'sample_products.style_id')
             ->with([
                     'PhotoSampleProduct' => fn ($query) => $query->select('id', 'sample_product_id', 'sequence', 'photo')->orderBy('sequence', 'ASC'),
-                    'FabricTexture' => fn ($query) => $query->select('id', 'sample_product_id', 'description', 'photo')->orderBy('sequence', 'ASC')
+                    'FabricTexture' => fn ($query) => $query->select('id', 'sample_product_id', 'description', 'photo')->orderBy('sequence', 'ASC'),
+                    'SampleDesign' => fn ($query) => $query->select('id', 'sample_product_id', 'design_photo')
                 ])->find($id);
 
             return response()->json([
@@ -389,6 +395,44 @@ class SampleProductController extends Controller
         }
     }
 
+    public function inputSampleDesign(InputSampleDesignRequest $request)
+    {
+        try {
+            $this->helperInputSampleDesign(['design_photo' => $request->design_photo, 'sample_product_id' => $request->sample_product_id]);
+
+            return response()->json([
+                'status' => 'success',
+                'data' => true,
+                'error' => null
+            ], 200);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'status' => 'failed',
+                'data' => null,
+                'error' => $th->getMessage()
+            ], 400);
+        }
+    }
+
+    public function deleteSampleDesign($id)
+    {
+        try {
+            SampleDesign::where('id', '=', $id)->delete();
+
+            return response()->json([
+                'status' => 'success',
+                'data' => true,
+                'error' => null
+            ], 200);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'status' => 'failed',
+                'data' => null,
+                'error' => $th->getMessage()
+            ], 400);
+        }
+    }
+
     private function deleteFabric($sampleProductId)
     {
         $dataFabric = FabricTexture::select('id')->where('sample_product_id', '=', $sampleProductId)->get();
@@ -511,7 +555,7 @@ class SampleProductController extends Controller
 
     private function createUserStaffDesigner($attendanceId)
     {
-        $checkUser = User::select('name')->where('attendance_id', '=', $attendanceId)->first();
+        $checkUser = User::where('attendance_id', '=', $attendanceId)->first();
 
         $userSIP = UserSIP::select('username', 'password', 'attendance_id', 'sub_section_id', 'seksi', 'data_karyawans.nip', 'data_karyawans.img_karyawan')
                                 ->leftJoin('detail_users', 'detail_users.id', '=', 'users.detail_user_id')
@@ -534,7 +578,7 @@ class SampleProductController extends Controller
             User::where('attendance_id', '=', $attendanceId)->update([
                 'name' => $userSIP->username,
                 'email' => "$userSIP->username@mutif.atpo",
-                'password' => $$userSIP->password,
+                'password' => $userSIP->password,
                 'attendance_id' => $userSIP->attendance_id,
                 'sub_section_id' => $userSIP->sub_section_id,
                 'sub_section' => $userSIP->seksi,
@@ -544,5 +588,22 @@ class SampleProductController extends Controller
         }
 
         return $attendanceId;
+    }
+
+    private function helperInputSampleDesign($request)
+    {
+        $explodedData = explode(',', $request['design_photo']);
+
+        collect($explodedData)->map(function ($item, $index) use ($request) {
+            $sampleProductId = $request['sample_product_id'];
+
+            $index++;
+
+            SampleDesign::create([
+                'sample_product_id' => $sampleProductId,
+                'sequence' => $index++,
+                'design_photo' => $item
+            ]);
+        });
     }
 }

@@ -49,4 +49,9 @@ class SampleProduct extends Model
     {
         return $this->hasMany(FabricTexture::class, 'sample_product_id', 'id');
     }
+
+    public function SampleDesign()
+    {
+        return $this->hasMany(SampleDesign::class, 'sample_product_id', 'id');
+    }
 }
