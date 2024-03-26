@@ -190,6 +190,7 @@ class SampleProductController extends Controller
                     'size' => $requests['size'],
                     'accessories' => $requests['accessories'],
                     'note_and_description' => $requests['note_and_description'],
+                    'file_design' => $requests['file_design'],
                     'designer_id' => $requests['designer_id'],
                     'md_id' => $requests['md_id'],
                     'leader_designer_id' => $requests['leader_designer_id'],
@@ -510,7 +511,7 @@ class SampleProductController extends Controller
 
     private function requestUpdateSampelProduct($request, $id)
     {
-        $sampleProduct = SampleProduct::select('id','date','article_name', 'style_id', 'entity_name', 'material', 'size', 'accessories', 'note_and_description', 'designer_id', 'md_id', 'leader_designer_id')
+        $sampleProduct = SampleProduct::select('id','date','article_name', 'style_id', 'entity_name', 'material', 'size', 'accessories', 'note_and_description', 'file_design', 'designer_id', 'md_id', 'leader_designer_id')
                                     ->where('id', '=', $id)
                                     ->first();
 
@@ -527,6 +528,7 @@ class SampleProductController extends Controller
             'size' => ($request->size) ? $request->size : $sampleProduct->size,
             'accessories' => ($request->accessories) ? $request->accessories : $sampleProduct->accessories,
             'note_and_description' => ($request->note_description) ? $request->note_description : $sampleProduct->note_and_description,
+            'file_design' => ($request->file_design) ? $request->file_design : $sampleProduct->file_design,
             'designer_id' => $designerId,
             'md_id' => $merchandiserId,
             'leader_designer_id' => $leaderDesignerId,
