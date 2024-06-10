@@ -77,7 +77,7 @@ class VotingController extends Controller
                                     'voting_events.event_reference_id',
                                     DB::raw('event_reference.title AS reference_title'),
                                     'voting_events.description',
-                                    
+
                                     'voting_events.created_by',
                                     'voting_events.updated_by',
                                     'voting_events.created_at'
@@ -199,14 +199,20 @@ class VotingController extends Controller
         try {
             $querySearch = request()->search_article;
 
-            $dataSample = SampleProduct::query()->select('id', 'article_name', 'entity_name')
-                                    ->with(['Thumbnail' => function ($query) {
-                                        $query->select('sample_product_id', 'sequence', 'photo');
-                                    }])
+            $dataSample = SampleProduct::select(DB::raw('DISTINCT(sample_products.id)'), 'sample_products.article_name', 'sample_products.entity_name')
+                                    ->leftJoin('voting_samples', 'voting_samples.sample_product_id', '=', 'sample_products.id')
+                                    ->leftJoin('voting_events', 'voting_events.id', '=', 'voting_samples.voting_event_id')
+                                    ->with([
+                                        'Thumbnail' => fn ($query) => $query->select('sample_product_id', 'sequence', 'photo'),
+                                        'EventUsed' => fn ($query) => $query->select('voting_events.id', 'title', 'start_date')
+                                    ])
                                     ->when($querySearch, function ($query) use ($querySearch) {
                                         $query->where('article_name', 'LIKE', "%$querySearch%");
                                     })
-                                    ->get();
+                                    ->orderBy('sample_products.id')
+                            ->get();
+
+            // dd($dataSample);
 
             return response()->json([
                 'status' => 'success',

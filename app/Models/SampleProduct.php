@@ -74,4 +74,9 @@ class SampleProduct extends Model
     {
         return $this->belongsTo('app\Models\SampleProduct', 'reference_sample_id', 'id');
     }
+
+    public function EventUsed()
+    {
+        return $this->hasManyThrough(VotingEvent::class, VotingSample::class, 'sample_product_id', 'id', 'id', 'voting_event_id');
+    }
 }
