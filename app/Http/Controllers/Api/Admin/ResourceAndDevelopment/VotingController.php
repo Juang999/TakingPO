@@ -69,8 +69,19 @@ class VotingController extends Controller
     public function getDetailEvent($id)
     {
         try {
-            $event = VotingEvent::query()->select('voting_events.id', 'start_date', 'title', 'type', 'description', 'voting_events.created_by', 'voting_events.updated_by', 'voting_events.created_at')
-                                ->with([
+            $event = VotingEvent::query()->select([
+                                    'voting_events.id',
+                                    'voting_events.start_date',
+                                    'voting_events.title',
+                                    'voting_events.type',
+                                    'voting_events.event_reference_id',
+                                    DB::raw('event_reference.title AS reference_title'),
+                                    'voting_events.description',
+                                    
+                                    'voting_events.created_by',
+                                    'voting_events.updated_by',
+                                    'voting_events.created_at'
+                                ])->with([
                                     'Member' => fn ($query) =>
                                                         $query->select(
                                                                     'voting_members.id',
@@ -95,7 +106,8 @@ class VotingController extends Controller
                                                                         // 'VotingScore' => fn ($query) => $query->select('sample_id', DB::raw('users.name'), 'score')->leftJoin('users', 'users.attendance_id', '=', 'voting_scores.attendance_id')
                                                                     ])
                                     // 'Sample.Thumbnail'
-                                ])->find($id);
+                                ])->leftJoin('voting_events AS event_reference', 'event_reference.id', '=', 'voting_events.event_reference_id')
+                                ->find($id);
 
             return response()->json([
                 'status' => 'success',
@@ -122,6 +134,7 @@ class VotingController extends Controller
                     'title' => $request->title,
                     'description' => $request->description,
                     'type' => $request->type,
+                    'event_reference_id' => $request->event_id,
                     'created_by' => $user->name
                 ]);
 
@@ -221,6 +234,7 @@ class VotingController extends Controller
                 'start_date' => $requests['start_date'],
                 'title' => $requests['title'],
                 'description' => $requests['description'],
+                'event_reference_id' => $requests['event_reference_id'],
                 'updated_by' => $requests['updated_by'],
             ]);
 
@@ -601,6 +615,7 @@ class VotingController extends Controller
             'start_date' => ($request->start_date) ? $request->start_date : $votingEvent->start_date,
             'title' => ($request->title) ? $request->title : $votingEvent->title,
             'description' => ($request->description) ? $request->description : $votingEvent->description,
+            'event_reference_id' => ($request->event_reference_id) ? $request->event_reference_id : $votingEvent->event_reference_id,
             'updated_by' => $user->name,
         ];
 
