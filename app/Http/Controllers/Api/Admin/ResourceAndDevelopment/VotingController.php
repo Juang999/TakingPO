@@ -198,6 +198,7 @@ class VotingController extends Controller
     {
         try {
             $querySearch = request()->search_article;
+            $eventId = request()->event_id;
 
             $dataSample = SampleProduct::select(DB::raw('DISTINCT(sample_products.id)'), 'sample_products.article_name', 'sample_products.entity_name')
                                     ->leftJoin('voting_samples', 'voting_samples.sample_product_id', '=', 'sample_products.id')
@@ -209,10 +210,15 @@ class VotingController extends Controller
                                     ->when($querySearch, function ($query) use ($querySearch) {
                                         $query->where('article_name', 'LIKE', "%$querySearch%");
                                     })
+                                    ->when($eventId, function ($query) use ($eventId) {
+                                        $query->whereIn('sample_products.id', function ($query) use ($eventId) {
+                                            $query->select('sample_product_id')
+                                                ->from('voting_samples')
+                                                ->where('voting_event_id', '=', $eventId);
+                                        });
+                                    })
                                     ->orderBy('sample_products.id')
                             ->get();
-
-            // dd($dataSample);
 
             return response()->json([
                 'status' => 'success',
