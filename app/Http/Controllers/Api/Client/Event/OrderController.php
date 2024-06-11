@@ -79,45 +79,13 @@ class OrderController extends Controller
     {
         try {
             $headerPhone = request()->header('phone');
-            $request = $this->checkRequestCreate($request, $headerPhone);
+            $collection = collect(json_decode($request->data, true));
 
-            $inputChart = Chart::create([
-                'client_id' => $request['client_id'],
-                'event_id' => $request['event_id'],
-                'session_id' => $request['session_id'],
-                'product_id' => $request['product_id'],
-                'size_S' => $request['size_S'],
-                'size_M' => $request['size_M'],
-                'size_L' => $request['size_L'],
-                'size_XL' => $request['size_XL'],
-                'size_XXL' => $request['size_XXL'],
-                'size_XXXL' => $request['size_XXXL'],
-                'size_2' => $request['size_2'],
-                'size_4' => $request['size_4'],
-                'size_6' => $request['size_6'],
-                'size_8' => $request['size_8'],
-                'size_10' => $request['size_10'],
-                'size_12' => $request['size_12'],
-                'size_27' => $request['size_27'],
-                'size_28' => $request['size_28'],
-                'size_29' => $request['size_29'],
-                'size_30' => $request['size_30'],
-                'size_31' => $request['size_31'],
-                'size_32' => $request['size_32'],
-                'size_33' => $request['size_33'],
-                'size_34' => $request['size_34'],
-                'size_35' => $request['size_35'],
-                'size_36' => $request['size_36'],
-                'size_37' => $request['size_37'],
-                'size_38' => $request['size_38'],
-                'size_39' => $request['size_39'],
-                'size_40' => $request['size_40'],
-                'size_41' => $request['size_41'],
-                'size_42' => $request['size_42'],
-                'size_other' => $request['size_other'],
-                'discount' => $request['discount'],
-                'total_order' => $request['total_order']
-            ]);
+            $array = $collection->map(function ($dataRequest) use ($headerPhone, $request) {
+                return $this->checkRequestCreate($dataRequest, $headerPhone);
+            })->toArray();
+
+            $inputChart = DB::table('charts')->insert($array);
 
             return response()->json([
                 'status' => 'success',
@@ -526,6 +494,8 @@ class OrderController extends Controller
             'size_other' => (array_key_exists('size_other', $request)) ? $request['size_other'] : 0,
             'discount' => $dataClient->discount,
             'total_order' => (array_key_exists('total_order', $request)) ? $request['total_order'] : 0,
+            'created_at' => Carbon::now()->format('Y-m-d H:i:s'),
+            'updated_at' => Carbon::now()->format('Y-m-d H:i:s'),
         ];
     }
 
