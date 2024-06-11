@@ -134,7 +134,7 @@ class VotingController extends Controller
                     'title' => $request->title,
                     'description' => $request->description,
                     'type' => $request->type,
-                    'event_reference_id' => $request->event_id,
+                    'event_reference_id' => $request->event_reference_id,
                     'created_by' => $user->name
                 ]);
 
