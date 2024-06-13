@@ -111,9 +111,12 @@ class VotingController extends Controller
                                         'voting_scores.sample_product_id',
                                         DB::raw('voting_events.title'),
                                         DB::raw('voting_events.start_date'),
+                                        DB::raw('voting_events.type'),
                                         DB::raw('sample_products.article_name'),
                                         DB::raw('sample_products.entity_name'),
+                                        'voting_scores.voting',
                                         'voting_scores.score',
+                                        'voting_scores.fiksasi',
                                         'voting_scores.note',
                                         'voting_scores.created_at'
                                     )->leftJoin('voting_events', 'voting_events.id', '=', 'voting_scores.voting_event_id')
