@@ -15,9 +15,20 @@ class VotingController extends Controller
         try {
             $user = Auth::user();
 
-            $dataSample = SampleProduct::select(DB::raw('voting_events.id AS voting_event_id'), DB::raw('voting_samples.id AS sample_id'), DB::raw('sample_products.id AS id'), 'date','article_name','style_id', DB::raw('styles.style_name'),'entity_name','material','size','accessories','note_and_description')
-                                ->leftJoin('voting_samples', 'voting_samples.sample_product_id', '=', 'sample_products.id')
-                                ->leftJoin('voting_events', 'voting_events.id', '=', 'voting_samples.voting_event_id')
+            $dataSample = SampleProduct::select([
+                                    DB::raw('voting_samples.voting_event_id AS voting_event_id'),
+                                    DB::raw('voting_samples.id as sample_id'),
+                                    DB::raw('sample_products.id'),
+                                    'date',
+                                    'article_name',
+                                    'style_id',
+                                    DB::raw('styles.style_name'),
+                                    'entity_name',
+                                    'material',
+                                    'size',
+                                    'note_and_description'
+                                ])->leftJoin('voting_samples', 'voting_samples.sample_product_id', '=', 'sample_products.id')
+                                // ->leftJoin('voting_events', 'voting_events.id', '=', 'voting_samples.voting_event_id')
                                 ->leftJoin('styles', 'styles.id', '=', 'sample_products.style_id')
                                 ->with([
                                     'PhotoSampleProduct' => fn ($query) => $query->select('id', 'sample_product_id', 'photo'),
@@ -26,19 +37,16 @@ class VotingController extends Controller
                                     'Accessories' => fn ($query) => $query->select('id', 'sample_product_id', 'description', 'photo')->orderBy('sequence', 'ASC'),
                                     'AccessoriesProduct' => fn ($query) => $query->select('id', 'sample_product_id', 'description', 'photo')->orderBy('sequence', 'ASC'),
                                     'SampleDesign' => fn ($query) => $query->select('id', 'sample_product_id', 'design_photo')
-                                ])->where('sample_products.id', '=', function ($query) {
-                                    $query->select('sample_product_id')
-                                        ->from('voting_samples')
-                                        ->where([
-                                            ['show', '=', true],
-                                            ['voting_event_id', '=', function ($query) {
-                                                $query->select('id')
-                                                    ->from('voting_events')
-                                                    ->where('is_activate', '=', true)
-                                                    ->first();
-                                            }]
-                                        ])->first();
-                                })->first();
+                                ])
+                                ->where([
+                                    ['voting_samples.show', '=', true],
+                                    ['voting_samples.voting_event_id', '=', function ($query) {
+                                        $query->select('id')
+                                            ->from('voting_events')
+                                            ->where('is_activate', '=', true)
+                                            ->first();
+                                    }]
+                                ])->first();
 
             $dataEvent = $this->eventIsActive();
 
