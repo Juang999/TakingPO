@@ -42,7 +42,7 @@ class VotingController extends Controller
 
             $dataEvent = $this->eventIsActive();
 
-            $score = VotingScore::where([['attendance_id', '=', $user->attendance_id], ['voting_event_id', '=', $dataEvent->id]])->first();
+            $score = VotingScore::where([['attendance_id', '=', $user->attendance_id], ['voting_event_id', '=', $dataEvent->id], ['sample_product_id', '=', $dataSample->id]])->first();
 
             return response()->json([
                 'status' => 'success',
