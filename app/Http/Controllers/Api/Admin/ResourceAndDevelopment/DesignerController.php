@@ -13,16 +13,22 @@ class DesignerController extends Controller
         try {
             $requestName = request()->searchName;
 
+            $buInel = UserSIP::select('id', 'username', 'attendance_id', 'seksi', 'sub_section_id')
+                                ->where('id', '=', 87)
+                                ->first()->toArray();
+
             $designer = UserSIP::select('id', 'username', 'attendance_id', 'seksi', 'sub_section_id')
                                 ->where('sub_section_id', '=', 10021)
                                 ->whereIn('power_lvl', [4, 6])
                                 ->when($requestName, fn ($query) =>
                                     $query->where('username', 'like', "%$requestName%")
-                                )->get();
+                                )->get()->toArray();
+
+            $data = array_merge($designer, [$buInel]);
 
             return response()->json([
                 'status' => 'success',
-                'data' => $designer,
+                'data' => $data,
                 'error' => null
             ], 200);
         } catch (\Throwable $th) {
