@@ -471,7 +471,7 @@ class VotingController extends Controller
                                 DB::raw('users.name'),
                                 DB::raw('users.photo'),
                                 DB::raw('users.nip'),
-                                'voting',
+                                DB::raw('voting AS voted'),
                                 'score',
                                 'fiksasi',
                             ])->leftJoin('users', 'users.attendance_id', '=', 'voting_scores.attendance_id')
