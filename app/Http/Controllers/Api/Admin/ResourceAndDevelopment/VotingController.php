@@ -479,7 +479,8 @@ class VotingController extends Controller
                     'vid',
                     'title',
                     'article_name',
-                    'entity_name'
+                    'entity_name',
+                    'type'
                 ])
                 ->first();
 
