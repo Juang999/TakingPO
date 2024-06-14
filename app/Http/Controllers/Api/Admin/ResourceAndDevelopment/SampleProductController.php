@@ -102,18 +102,18 @@ class SampleProductController extends Controller
                 $leaderDesignerId = $this->createUserStaffDesigner($request->leader_designer_id);
 
                 $sampleProduct = SampleProduct::create([
-                    'date' => $request->date,
-                    'tgl_jahit' => $request->date_tailor,
+                    'date' => ($request->date) ? $request->date : null,
+                    'tgl_jahit' => ($request->date_tailor) ? $request->date_tailor : null,
                     'reference_sample_id' => ($request->reference_sample_id) ? $request->reference_sample_id : null,
-                    'article_name' => $request->article_name,
-                    'style_id' => $request->style_id,
+                    'article_name' => ($request->article_name) ? $request->article_name : null,
+                    'style_id' => ($request->style_id) ? $request->style_id : null,
                     'sub_style_id' => ($request->sub_style_id) ? $request->sub_style_id : null,
-                    'entity_name' => $request->entity_name,
+                    'entity_name' => ($request->entity_name) ? $request->entity_name : null,
                     'material' => '-',
-                    'size' => $request->size,
+                    'size' => ($request->size) ? $request->size : null,
                     'note_and_description' => ($request->note_description) ? $request->note_description : '-',
-                    'design_file' => $request->design_file,
-                    'designer_id' => $designerId,
+                    'design_file' => ($request->design_file) ? $request->design_file : null,
+                    'designer_id' => ($designerId),
                     'md_id' => $merchandiserId,
                     'leader_designer_id' => $leaderDesignerId,
                     'note_and_description_2' => $request->note_and_description_2
@@ -123,10 +123,10 @@ class SampleProductController extends Controller
                 $this->helperInputSampleDesign(['design_photo' => $request->sample_design, 'sample_product_id' => $sampleProduct->id]);
 
                 // input material
-                $this->inputFabricPhoto(['sample_product_id' => $sampleProduct->id, 'material_type' => 'material', 'material_id' => $request->material_id]);
-                $this->inputFabricPhoto(['sample_product_id' => $sampleProduct->id, 'material_type' => 'material_additional', 'material_id' => $request->material_additional_id]);
-                $this->inputFabricPhoto(['sample_product_id' => $sampleProduct->id, 'material_type' => 'accessories', 'material_id' => $request->accessories_id]);
-                $this->inputFabricPhoto(['sample_product_id' => $sampleProduct->id, 'material_type' => 'accessories_product', 'material_id' => $request->accessories_product_id]);
+                if ($request->material_id) $this->inputFabricPhoto(['sample_product_id' => $sampleProduct->id, 'material_type' => 'material', 'material_id' => $request->material_id]);
+                if ($request->material_additional_id) $this->inputFabricPhoto(['sample_product_id' => $sampleProduct->id, 'material_type' => 'material_additional', 'material_id' => $request->material_additional_id]);
+                if ($request->accessories_id) $this->inputFabricPhoto(['sample_product_id' => $sampleProduct->id, 'material_type' => 'accessories', 'material_id' => $request->accessories_id]);
+                if ($request->accessories_product_id) $this->inputFabricPhoto(['sample_product_id' => $sampleProduct->id, 'material_type' => 'accessories_product', 'material_id' => $request->accessories_product_id]);
             DB::commit();
 
             return response()->json([
