@@ -368,6 +368,7 @@ class VotingController extends Controller
                                     'title',
                                     'description',
                                     'is_activate',
+                                    'type',
                                     DB::raw('MAX(voting_scores.score) AS highest_score'),
                                     DB::raw('AVG(voting_scores.score) AS average_score'),
                                     DB::raw('MIN(voting_scores.score) AS lowest_score'),
@@ -469,7 +470,9 @@ class VotingController extends Controller
                                 DB::raw('users.name'),
                                 DB::raw('users.photo'),
                                 DB::raw('users.nip'),
-                                'score'
+                                'voting',
+                                'score',
+                                'fiksasi',
                             ])->leftJoin('users', 'users.attendance_id', '=', 'voting_scores.attendance_id')
                 ])->groupBy([
                     'vid',
@@ -505,7 +508,11 @@ class VotingController extends Controller
                                                         DB::raw('voting_event_id AS event_id'),
                                                         DB::raw('sample_product_id AS vid'),
                                                         DB::raw('sample_products.article_name AS article_name'),
-                                                        DB::Raw('AVG(score) AS total_score')
+                                                        DB::raw("SUM(CASE WHEN voting = 'Y' THEN 1 ELSE 0 END) AS voting_y"),
+                                                        DB::raw("SUM(CASE WHEN voting = 'N' THEN 1 ELSE 0 END) AS voting_n"),
+                                                        DB::Raw('AVG(score) AS total_score'),
+                                                        DB::raw("SUM(CASE WHEN fiksasi = 'Y' THEN 1 ELSE 0 END) AS fiksasi_y"),
+                                                        DB::raw("SUM(CASE WHEN fiksasi = 'N' THEN 1 ELSE 0 END) AS fiksasi_n"),
                                                     ])->with('Thumbnail')
                                                     ->leftJoin('sample_products', 'sample_products.id', '=', 'voting_scores.sample_product_id')
                                                     ->groupBy('sample_id', 'voting_event_id', 'article_name', 'event_id', 'vid')
