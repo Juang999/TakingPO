@@ -457,6 +457,7 @@ class VotingController extends Controller
                     DB::raw('AVG(voting_scores.score) AS average'),
                     DB::raw('MAX(voting_scores.score) AS max'),
                     DB::raw('MIN(voting_scores.score) AS min'),
+                    DB::raw('voting_events.type AS type'),
                 ])->leftJoin('voting_events', 'voting_events.id', '=', 'voting_samples.voting_event_id')
                 ->leftJoin('sample_products', 'sample_products.id', '=', 'voting_samples.sample_product_id')
                 ->leftJoin('voting_scores', 'voting_scores.sample_id', '=', 'voting_samples.id')
