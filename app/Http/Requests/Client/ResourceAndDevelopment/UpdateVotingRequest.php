@@ -24,7 +24,9 @@ class UpdateVotingRequest extends FormRequest
     public function rules()
     {
         return [
+            'voting' => 'nullable|string',
             'score' => 'nullable|integer',
+            'fiksasi' => 'nullable|string',
             'note' => 'nullable|string'
         ];
     }

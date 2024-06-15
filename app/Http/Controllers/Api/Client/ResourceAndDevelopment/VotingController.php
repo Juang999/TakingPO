@@ -194,7 +194,9 @@ class VotingController extends Controller
         $dataScore = VotingScore::where('id', '=', $id)->first();
 
         $requests = [
+            'voting' => ($request->voting) ? $request->voting : $dataScore->voting,
             'score' => ($request->score) ? $request->score : $dataScore->score,
+            'fiksasi' => ($request->fiksasi) ? $request->fiksasi : $dataScore->fiksasi,
             'note' => ($request->note) ? $request->note : $dataScore->note
         ];
 
