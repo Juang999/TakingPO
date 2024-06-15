@@ -538,6 +538,67 @@ class VotingController extends Controller
         }
     }
 
+    public function getRecapitulation($id)
+    {
+        try {
+            $votingEvent = VotingEvent::select([
+                'voting_events.id',
+                'voting_events.type',
+                DB::raw("CASE
+                            WHEN voting_events.type = 1 THEN 'VOTING'
+                            WHEN voting_events.type = 2 THEN 'SCORING'
+                            ELSE 'FIKSASI'
+                        END AS type_name
+                    "),
+                'voting_events.start_date',
+                'voting_events.title',
+                'voting_events.description',
+                'voting_events.event_reference_id',
+                DB::raw('event_references.title AS event_reference_title'),
+                'voting_events.is_activate',
+                'voting_events.created_by',
+                'voting_events.updated_by'
+            ])->leftJoin('voting_events AS event_references', 'event_references.id', '=', 'voting_events.event_reference_id')
+            ->with([
+                'Sample' => fn ($query) => $query->select(
+                                                'voting_samples.voting_event_id',
+                                                'voting_samples.id AS sample_id',
+                                                'voting_samples.sample_product_id AS product_id',
+                                                'sample_products.article_name'
+                                            )->leftJoin('sample_products', 'sample_products.id', '=', 'voting_samples.sample_product_id')
+                                            ->with([
+                                                    'Score' => fn ($query) => $query->select(
+                                                        'voting_scores.voting_event_id',
+                                                        'voting_scores.sample_id',
+                                                        DB::raw("(SELECT type FROM voting_events WHERE id = $id) AS type"),
+                                                        DB::raw('(SELECT name FROM users WHERE attendance_id = voting_scores.attendance_id) AS username'),
+                                                        DB::raw("
+                                                            CASE
+                                                                WHEN (SELECT type FROM voting_events WHERE id = $id) = 1 THEN voting_scores.voting
+                                                                WHEN (SELECT type FROM voting_events WHERE id = $id) = 2 THEN voting_scores.score
+                                                                ELSE voting_scores.fiksasi
+                                                            END AS score
+                                                        "),
+                                                    )
+                                                ])
+            ])
+            ->where('voting_events.id', '=', $id)
+            ->first();
+
+            return response()->json([
+                'status' => 'success',
+                'data' => $votingEvent,
+                'error' => null
+            ], 200);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'status' => 'failed',
+                'data' => null,
+                'error' => $th->getMessage()
+            ], 400);
+        }
+    }
+
     private function turnOffEvent()
     {
         $userId = Auth::user()->id;

@@ -188,6 +188,7 @@ Route::middleware('jwt.verify')->group(function () {
             Route::delete('/{id}/{sampleId}/remove-sample', 'Api\Admin\ResourceAndDevelopment\VotingController@removeSample');
             Route::delete('/{id}/{attendanceId}/cancel-invitation', 'Api\Admin\ResourceAndDevelopment\VotingController@removeInvitation');
             Route::get('/active-event', 'Api\Admin\ResourceAndDevelopment\VotingController@getActiveEvent');
+            Route::get('/{id}/recapitulation', 'Api\Admin\ResourceAndDevelopment\VotingController@getRecapitulation');
         });
     });
 
