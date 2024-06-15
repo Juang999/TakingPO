@@ -24,7 +24,7 @@ class VotingEvent extends Model
     public function Sample()
     {
         return $this->hasMany(VotingSample::class, 'voting_event_id', 'id');
-    }
+    } 
 
     public function ScoreVoting()
     {

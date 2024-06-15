@@ -34,4 +34,10 @@ use LogsActivity;
     {
         return $this->hasMany(VotingScore::class, 'sample_id', 'vid');
     }
+
+    public function Score()
+    {
+        return $this->hasMany(VotingScore::class, 'sample_id', 'sample_id');
+    }
+
 }
