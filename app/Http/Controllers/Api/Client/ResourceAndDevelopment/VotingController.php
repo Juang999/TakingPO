@@ -152,7 +152,9 @@ class VotingController extends Controller
             $requests = $requestUpdateVote['requests'];
 
             $dataScore->update([
+                'voting' => $requests['voting'],
                 'score' => $requests['score'],
+                'fiksasi' => $requests['fiksasi'],
                 'note' => $requests['note']
             ]);
 
