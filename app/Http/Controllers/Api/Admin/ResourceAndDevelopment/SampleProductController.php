@@ -203,6 +203,7 @@ class SampleProductController extends Controller
                 'size',
                 'accessories',
                 'note_and_description',
+                'note_and_description_2',
                 'design_file',
                 'designer_id',
                 'designer_name',
