@@ -166,6 +166,7 @@ class SampleProductController extends Controller
                 'size',
                 // 'accessories',
                 'note_and_description',
+                'note_and_description_2',
                 'design_file',
                 'designer_id',
                 DB::raw('designer.name AS designer_name'),
