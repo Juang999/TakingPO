@@ -560,6 +560,7 @@ class VotingController extends Controller
                 'voting_events.updated_by'
             ])->leftJoin('voting_events AS event_references', 'event_references.id', '=', 'voting_events.event_reference_id')
             ->with([
+                'Member' => fn ($query) => $query->select('voting_members.id', 'voting_event_id', 'users.name')->leftJoin("users", "users.attendance_id", '=', 'voting_members.attendance_id'),
                 'Sample' => fn ($query) => $query->select(
                                                 'voting_samples.voting_event_id',
                                                 'voting_samples.id AS sample_id',
