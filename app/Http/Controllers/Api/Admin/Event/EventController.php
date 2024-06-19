@@ -302,10 +302,13 @@ class EventController extends Controller
     public function currentEvent()
     {
         try {
+            $articleName = request()->article_name;
+
             $dataEvent = Event::select('id', 'event_name', 'event_desc', 'start_date', 'end_date')->where('is_active', '=', true)
                             ->with([
                                     'Product' => fn ($query) => $query->select('products.id', 'entity_name', 'article_name', 'is_active', 'group_article', DB::raw('partnumber_products.partnumber AS partnumber'))
                                                                     ->leftJoin('partnumber_products', 'partnumber_products.product_id', '=', 'products.id')
+                                                                    ->when($articleName, fn ($query) => $query->where('products.article_name', 'LIKE', "%$articleName%"))
                                                                     ->with(['Thumbnail' => fn ($query) => $query->select('id', 'product_id', 'photo')])
                                 ])
                             ->first();
