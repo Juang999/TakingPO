@@ -571,6 +571,7 @@ class VotingController extends Controller
                                                         'voting_scores.voting_event_id',
                                                         'voting_scores.sample_id',
                                                         DB::raw("(SELECT type FROM voting_events WHERE id = $id) AS type"),
+                                                        'voting_scores.attendance_id',
                                                         DB::raw('(SELECT name FROM users WHERE attendance_id = voting_scores.attendance_id) AS username'),
                                                         DB::raw("
                                                             CASE
