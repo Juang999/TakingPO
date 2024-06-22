@@ -225,6 +225,7 @@ class ReportController extends Controller
                         'orders.size_41',
                         'orders.size_42',
                         'orders.size_other',
+                        'orders.created_at'
                     )
                     ->leftJoin('distributors', 'distributors.id', '=', 'orders.client_id')
                     ->leftJoin('distributors AS db', 'db.id', '=', 'distributors.distributor_id')
@@ -265,7 +266,8 @@ class ReportController extends Controller
                         'orders.size_40',
                         'orders.size_41',
                         'orders.size_42',
-                        'orders.size_other'
+                        'orders.size_other',
+                        'orders.created_at'
                     )
                     ;
             }])
