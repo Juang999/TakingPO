@@ -574,7 +574,9 @@ class OrderController extends Controller
             'size_42',
             'size_other',
             'discount',
-            'total_order'
+            'total_order',
+            'created_at',
+            'updated_at'
         )->where([
             ['charts.client_id', '=', $clientId],
             ['event_id', '=', $eventId]
@@ -615,8 +617,8 @@ class OrderController extends Controller
                 'size_41' => $data->size_41,
                 'size_42' => $data->size_42,
                 'size_other' => $data->size_other,
-                'created_at' => Carbon::now()->format('Y-m-d H:i:s'),
-                'updated_at' => Carbon::now()->format('Y-m-d H:i:s'),
+                'created_at' => $data->created_at,
+                'updated_at' => $data->updated_at,
                 'discount' => $data->discount,
                 'total_order' => $data->total_order
             ];
