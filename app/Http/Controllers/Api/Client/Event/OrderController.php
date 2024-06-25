@@ -107,6 +107,8 @@ class OrderController extends Controller
             $phoneNumber = request()->header('phone');
             $dataBuyer = $this->getDataBuyer($phoneNumber);
             $statusOrder = $this->getStatusOrder($phoneNumber);
+            $orderedProduct = $this->getTotalProductInChart($dataBuyer->id);
+            $totalProducts = $this->getTotalProduct();
 
             $searchProduct = request()->searchproduct;
 
@@ -171,6 +173,9 @@ class OrderController extends Controller
 
             return response()->json([
                 'status' => 'success',
+                'ordered_product' => $orderedProduct,
+                'total_products' => $totalProducts,
+                'status_event' => ($orderedProduct < $totalProducts) ? true : false,
                 'order_status' => $statusOrder,
                 'data' => $dataChart,
                 'error' => null
@@ -680,6 +685,27 @@ class OrderController extends Controller
         $activeEvent = Event::where('is_active', '=', true)->first();
 
         return $activeEvent;
+    }
+
+    private function getTotalProductInChart($db_id)
+    {
+        $result = Chart::select([
+            DB::raw('DISTINCT(product_id)')
+        ])->where([
+            ['group_article', '=', $this->activeEvent()->id],
+            ['client_id', '=', $db_id]
+        ])->count();
+
+        return $result;
+    }
+
+    private function getTotalProduct()
+    {
+        $result = Chart::where([
+            ['group_article', '=', $this->activeEvent()->id],
+        ])->count();
+
+        return $result;
     }
 
     private function inputTotalOrder($clientId, $eventId, $discount, $totalOrder)
