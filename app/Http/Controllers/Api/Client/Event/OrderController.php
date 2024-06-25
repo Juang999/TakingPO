@@ -175,7 +175,7 @@ class OrderController extends Controller
                 'status' => 'success',
                 'chart_counted' => $countedChart,
                 'total_products' => $totalProducts,
-                'status_event' => ($countedChart < $totalProducts) ? true : false,
+                'current_event_status' => ($countedChart < $totalProducts) ? true : false,
                 'order_status' => $statusOrder,
                 'data' => $dataChart,
                 'error' => null
