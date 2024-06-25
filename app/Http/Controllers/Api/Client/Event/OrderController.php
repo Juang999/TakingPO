@@ -692,16 +692,17 @@ class OrderController extends Controller
         $result = Chart::select([
             DB::raw('DISTINCT(product_id)')
         ])->where([
-            ['group_article', '=', $this->activeEvent()->id],
+            ['event_id', '=', $this->activeEvent()->id],
             ['client_id', '=', $db_id]
-        ])->count();
+        ])
+        ->count();
 
         return $result;
     }
 
     private function getTotalProduct()
     {
-        $result = Chart::where([
+        $result = Product::where([
             ['group_article', '=', $this->activeEvent()->id],
         ])->count();
 
