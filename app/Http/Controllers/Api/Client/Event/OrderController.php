@@ -107,7 +107,7 @@ class OrderController extends Controller
             $phoneNumber = request()->header('phone');
             $dataBuyer = $this->getDataBuyer($phoneNumber);
             $statusOrder = $this->getStatusOrder($phoneNumber);
-            $orderedProduct = $this->getTotalProductInChart($dataBuyer->id);
+            $countedChart = $this->getTotalProductInChart($dataBuyer->id);
             $totalProducts = $this->getTotalProduct();
 
             $searchProduct = request()->searchproduct;
@@ -173,9 +173,9 @@ class OrderController extends Controller
 
             return response()->json([
                 'status' => 'success',
-                'ordered_product' => $orderedProduct,
+                'chart_counted' => $countedChart,
                 'total_products' => $totalProducts,
-                'status_event' => ($orderedProduct < $totalProducts) ? true : false,
+                'status_event' => ($countedChart < $totalProducts) ? true : false,
                 'order_status' => $statusOrder,
                 'data' => $dataChart,
                 'error' => null
