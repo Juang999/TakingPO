@@ -24,6 +24,8 @@ class UpdateOrderRequest extends FormRequest
     public function rules()
     {
         return [
+            'size_XXS' => 'nullable|integer',
+            'size_XS' => 'nullable|integer',
             'size_S' => 'nullable|integer',
             'size_M' => 'nullable|integer',
             'size_L' => 'nullable|integer',
@@ -36,6 +38,8 @@ class UpdateOrderRequest extends FormRequest
             'size_8' => 'nullable|integer',
             'size_10' => 'nullable|integer',
             'size_12' => 'nullable|integer',
+            'size_14' => 'nullable|integer',
+            'size_16' => 'nullable|integer',
             'size_27' => 'nullable|integer',
             'size_28' => 'nullable|integer',
             'size_29' => 'nullable|integer',
