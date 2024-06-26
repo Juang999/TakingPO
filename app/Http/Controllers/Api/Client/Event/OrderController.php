@@ -173,7 +173,9 @@ class OrderController extends Controller
             })->with([
                 'Photo' => fn ($query) => $query->select('photo'),
                 'PriceList' => fn ($query) => $query->select('clothes_id', 'sizes.size', 'price_lists.price')->leftJoin('sizes', 'sizes.id', '=', 'price_lists.size_id')
-            ])->get();
+            ])
+            ->orderBy('charts.created_at')
+            ->get();
 
             return response()->json([
                 'status' => 'success',
