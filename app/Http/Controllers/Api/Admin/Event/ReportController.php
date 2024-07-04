@@ -88,7 +88,7 @@ class ReportController extends Controller
                                 'orders.size_42',
                                 'orders.size_other',
                                 DB::raw('CAST(orders.created_at AS DATE) AS created_at'),
-                                DB::raw('CAST(orders.updated_at AS DATE) AS updated_at'),
+                                DB::raw('CAST(orders.updated_at AS DATE) AS updated_at')
                             )->leftJoin('products', 'products.id', '=', 'orders.product_id')
                             ->leftJoin('events', 'events.id', '=', 'orders.event_id')
                             ->leftJoin('types', 'types.id', '=', 'products.type_id')
@@ -184,7 +184,7 @@ class ReportController extends Controller
                 'products.entity_name',
                 'products.article_name',
                 'products.type_id',
-                DB::raw('SUM(size_S + size_M + size_L + size_XL + size_XXL + size_XXXL + size_2 + size_4 + size_6 + size_8 + size_10 + size_12 + size_27 + size_28 + size_29 + size_30 + size_31 + size_32 + size_33 + size_34 + size_35 + size_36 + size_37 + size_38 + size_39 + size_40 + size_41 + size_42 + size_other) AS total_order'),
+                DB::raw('SUM(size_S + size_M + size_L + size_XL + size_XXL + size_XXXL + size_2 + size_4 + size_6 + size_8 + size_10 + size_12 + size_27 + size_28 + size_29 + size_30 + size_31 + size_32 + size_33 + size_34 + size_35 + size_36 + size_37 + size_38 + size_39 + size_40 + size_41 + size_42 + size_other) AS total_order')
             )->leftJoin('orders', 'orders.product_id', '=', 'products.id')
             ->where('products.id', '=', $id)
             ->with(['DetailOrder' => function ($query) {
@@ -331,6 +331,8 @@ class ReportController extends Controller
     public function getAllReport()
     {
         try {
+            $eventId = (strlen(request()->event_id) != 0) ? explode(',', request()->event_id) : [];
+
             $order = Order::select(
                 'orders.id',
                 'entities.entity_name',
@@ -377,6 +379,9 @@ class ReportController extends Controller
             ->leftJoin('distributors AS db', 'db.id', '=', 'distributors.distributor_id')
             ->leftJoin('entities', 'entities.entity_name', '=', 'products.entity_name')
             ->leftJoin('types', 'types.id', '=', 'products.type_id')
+            ->when(count($eventId) != 0, function ($query) use ($eventId) {
+                $query->whereIn('orders.event_id', $eventId);
+            })
             ->groupBy(
                 'orders.id',
                 'entities.entity_name',
@@ -437,13 +442,17 @@ class ReportController extends Controller
     public function getReportDistributor()
     {
         try {
+            $eventId = request()->event_id;
+
+            $subQuery = $this->subQueryDistributor($eventId);
+
             $dataOrder = Distributor::select(
                     DB::raw('distributors.id AS db_id'),
                     'distributors.name',
-                    DB::raw("(SELECT SUM(size_S + size_M + size_L + size_XL + size_XXL + size_XXXL + size_2 + size_4 + size_6 + size_8 + size_10 + size_12 + size_27 + size_28 + size_29 + size_30 + size_31 + size_32 + size_33 + size_34 + size_35 + size_36 + size_37 + size_38 + size_39 + size_40 + size_41 + size_42 + size_other) FROM orders WHERE (client_id IN (SELECT id FROM distributors WHERE distributor_id = db_id) OR client_id = db_id) AND product_id IN (SELECT id FROM products WHERE entity_name = 'MUTIF')) AS MUTIF"),
-                    DB::raw("(SELECT SUM(size_S + size_M + size_L + size_XL + size_XXL + size_XXXL + size_2 + size_4 + size_6 + size_8 + size_10 + size_12 + size_27 + size_28 + size_29 + size_30 + size_31 + size_32 + size_33 + size_34 + size_35 + size_36 + size_37 + size_38 + size_39 + size_40 + size_41 + size_42 + size_other) FROM orders WHERE (client_id IN (SELECT id FROM distributors WHERE distributor_id = db_id) OR client_id = db_id) AND product_id IN (SELECT id FROM products WHERE entity_name = 'DAMOZA')) AS DAMOZA"),
-                    DB::raw("(SELECT SUM(size_S + size_M + size_L + size_XL + size_XXL + size_XXXL + size_2 + size_4 + size_6 + size_8 + size_10 + size_12 + size_27 + size_28 + size_29 + size_30 + size_31 + size_32 + size_33 + size_34 + size_35 + size_36 + size_37 + size_38 + size_39 + size_40 + size_41 + size_42 + size_other) FROM orders WHERE (client_id IN (SELECT id FROM distributors WHERE distributor_id = db_id) OR client_id = db_id) AND product_id IN (SELECT id FROM products WHERE entity_name = 'UPMORE')) AS UPMORE"),
-                    DB::raw('(SELECT SUM(size_S + size_M + size_L + size_XL + size_XXL + size_XXXL + size_2 + size_4 + size_6 + size_8 + size_10 + size_12 + size_27 + size_28 + size_29 + size_30 + size_31 + size_32 + size_33 + size_34 + size_35 + size_36 + size_37 + size_38 + size_39 + size_40 + size_41 + size_42 + size_other) FROM orders WHERE (client_id IN (SELECT id FROM distributors WHERE distributor_id = db_id) OR client_id = db_id)) as TOTAL')
+                    DB::raw($subQuery['MUTIF']),
+                    DB::raw($subQuery['DAMOZA']),
+                    DB::raw($subQuery['UPMORE']),
+                    DB::raw($subQuery['TOTAL'])
                 )->where('distributors.partner_group_id', '=', 1)
                 ->orderByDesc('TOTAL')
                 ->get();
@@ -465,6 +474,8 @@ class ReportController extends Controller
     public function sumOrderedProduct()
     {
         try {
+            $eventId = (strlen(request()->event_id) != 0) ? explode(',', request()->event_id) : [];
+
             $dataOrder = Order::select(
                 'products.entity_name',
                 'products.article_name',
@@ -502,6 +513,9 @@ class ReportController extends Controller
             )->leftJoin('products', 'products.id', '=', 'orders.product_id')
             ->leftJoin('entities', 'entities.entity_name', '=', 'products.entity_name')
             ->groupBy('products.entity_name', 'products.type_id', 'products.article_name', 'entities.id')
+            ->when(count($eventId) != 0, function ($query) use ($eventId) {
+                $query->whereIn('orders.event_id', $eventId);
+            })
             ->orderBy('entities.id')
             ->orderByDesc('TOTAL')
             ->get();
@@ -522,11 +536,13 @@ class ReportController extends Controller
 
     public function getDetailOrderDistributor($id)
     {
+        $eventId = (request()->event_id) ? request()->event_id : 0;
+
         try {
             $dataBuyer = Distributor::select(
                                         DB::raw('distributors.id AS db_id'),
                                         DB::raw('distributors.name'),
-                                        DB::raw('(SELECT
+                                        DB::raw("(SELECT
                                                     SUM(
                                                         orders.size_S +
                                                         orders.size_M +
@@ -561,7 +577,9 @@ class ReportController extends Controller
                                                     WHERE
                                                         client_id IN (SELECT id FROM distributors WHERE distributor_id = db_id)
                                                     OR
-                                                        client_Id = db_id) AS total_order')
+                                                        client_Id = db_id
+                                                    AND
+                                                        orders.event_id = $eventId) AS total_order")
                                     )->where('partner_group_id', '=', 1)
                                     ->orderByDesc('total_order')
                                     ->get();
@@ -618,5 +636,24 @@ class ReportController extends Controller
         $entity = Entity::select('entity_name')->pluck('entity_name')->toArray();
 
         return $entity;
+    }
+
+    private function subQueryDistributor($eventId)
+    {
+        if (strlen($eventId) != 0) {
+            return [
+                "MUTIF" => "(SELECT SUM(size_XXS + size_XS + size_S + size_M + size_L + size_XL + size_XXL + size_XXXL + size_2 + size_4 + size_6 + size_8 + size_10 + size_12 + size_14 + size_16 + size_27 + size_28 + size_29 + size_30 + size_31 + size_32 + size_33 + size_34 + size_35 + size_36 + size_37 + size_38 + size_39 + size_40 + size_41 + size_42 + size_other) FROM orders WHERE (client_id IN (SELECT id FROM distributors WHERE distributor_id = db_id) OR client_id = db_id) AND event_id IN ($eventId) AND product_id IN (SELECT id FROM products WHERE entity_name = 'MUTIF')) AS MUTIF",
+                "DAMOZA" => "(SELECT SUM(size_XXS + size_XS + size_S + size_M + size_L + size_XL + size_XXL + size_XXXL + size_2 + size_4 + size_6 + size_8 + size_10 + size_12 + size_14 + size_16 + size_27 + size_28 + size_29 + size_30 + size_31 + size_32 + size_33 + size_34 + size_35 + size_36 + size_37 + size_38 + size_39 + size_40 + size_41 + size_42 + size_other) FROM orders WHERE (client_id IN (SELECT id FROM distributors WHERE distributor_id = db_id) OR client_id = db_id) AND event_id IN ($eventId) AND product_id IN (SELECT id FROM products WHERE entity_name = 'DAMOZA')) AS DAMOZA",
+                "UPMORE" => "(SELECT SUM(size_XXS + size_XS + size_S + size_M + size_L + size_XL + size_XXL + size_XXXL + size_2 + size_4 + size_6 + size_8 + size_10 + size_12 + size_14 + size_16 + size_27 + size_28 + size_29 + size_30 + size_31 + size_32 + size_33 + size_34 + size_35 + size_36 + size_37 + size_38 + size_39 + size_40 + size_41 + size_42 + size_other) FROM orders WHERE (client_id IN (SELECT id FROM distributors WHERE distributor_id = db_id) OR client_id = db_id) AND event_id IN ($eventId) AND product_id IN (SELECT id FROM products WHERE entity_name = 'UPMORE')) AS UPMORE",
+                "TOTAL" => "(SELECT SUM(size_XXS + size_XS + size_S + size_M + size_L + size_XL + size_XXL + size_XXXL + size_2 + size_4 + size_6 + size_8 + size_10 + size_12 + size_14 + size_16 + size_27 + size_28 + size_29 + size_30 + size_31 + size_32 + size_33 + size_34 + size_35 + size_36 + size_37 + size_38 + size_39 + size_40 + size_41 + size_42 + size_other) FROM orders WHERE (client_id IN (SELECT id FROM distributors WHERE distributor_id = db_id) OR client_id = db_id) AND event_id IN ($eventId)) as TOTAL"
+            ];
+        } else {
+            return [
+                "MUTIF" => "(SELECT SUM(size_XXS + size_XS + size_S + size_M + size_L + size_XL + size_XXL + size_XXXL + size_2 + size_4 + size_6 + size_8 + size_10 + size_12 + size_14 + size_16 + size_27 + size_28 + size_29 + size_30 + size_31 + size_32 + size_33 + size_34 + size_35 + size_36 + size_37 + size_38 + size_39 + size_40 + size_41 + size_42 + size_other) FROM orders WHERE (client_id IN (SELECT id FROM distributors WHERE distributor_id = db_id) OR client_id = db_id) AND product_id IN (SELECT id FROM products WHERE entity_name = 'MUTIF')) AS MUTIF",
+                "DAMOZA" => "(SELECT SUM(size_XXS + size_XS + size_S + size_M + size_L + size_XL + size_XXL + size_XXXL + size_2 + size_4 + size_6 + size_8 + size_10 + size_12 + size_14 + size_16 + size_27 + size_28 + size_29 + size_30 + size_31 + size_32 + size_33 + size_34 + size_35 + size_36 + size_37 + size_38 + size_39 + size_40 + size_41 + size_42 + size_other) FROM orders WHERE (client_id IN (SELECT id FROM distributors WHERE distributor_id = db_id) OR client_id = db_id) AND product_id IN (SELECT id FROM products WHERE entity_name = 'DAMOZA')) AS DAMOZA",
+                "UPMORE" => "(SELECT SUM(size_XXS + size_XS + size_S + size_M + size_L + size_XL + size_XXL + size_XXXL + size_2 + size_4 + size_6 + size_8 + size_10 + size_12 + size_14 + size_16 + size_27 + size_28 + size_29 + size_30 + size_31 + size_32 + size_33 + size_34 + size_35 + size_36 + size_37 + size_38 + size_39 + size_40 + size_41 + size_42 + size_other) FROM orders WHERE (client_id IN (SELECT id FROM distributors WHERE distributor_id = db_id) OR client_id = db_id) AND product_id IN (SELECT id FROM products WHERE entity_name = 'UPMORE')) AS UPMORE",
+                "TOTAL" => "(SELECT SUM(size_XXS + size_XS + size_S + size_M + size_L + size_XL + size_XXL + size_XXXL + size_2 + size_4 + size_6 + size_8 + size_10 + size_12 + size_14 + size_16 + size_27 + size_28 + size_29 + size_30 + size_31 + size_32 + size_33 + size_34 + size_35 + size_36 + size_37 + size_38 + size_39 + size_40 + size_41 + size_42 + size_other) FROM orders WHERE (client_id IN (SELECT id FROM distributors WHERE distributor_id = db_id) OR client_id = db_id)) as TOTAL"
+            ];
+        }
     }
 }
