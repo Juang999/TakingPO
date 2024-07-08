@@ -161,6 +161,32 @@ class EventController extends Controller
         }
     }
 
+    public function activateProductWithKeyword(String $keyword)
+    {
+        try {
+            $products = $this->getProductByKeyword($keyword);
+
+            collect($products)->each(function ($item) {
+                Product::where([
+                    ['id', '=', $item->id],
+                    ['group_article', '=', fn ($query) => $query->select('id')->from('events')->where('is_active', '=', true)]
+                ])->update(['is_active' => ($item->is_active == true) ? false : true ]);
+            });
+
+            return response()->json([
+                'status' => 'success',
+                'data' => true,
+                'error' => null
+            ], 200);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'status' => 'failed',
+                'data' => null,
+                'error' => $th->getMessage()
+            ], 400);
+        }
+    }
+
     public function activateProduct($id)
     {
         try {
@@ -358,5 +384,12 @@ class EventController extends Controller
         ])->first();
 
         return $product;
+    }
+
+    private function getProductByKeyword($keyword)
+    {
+        $products = Product::select('id', 'is_active')->where('keyword', '=', $keyword)->get();
+
+        return $products;
     }
 }
