@@ -577,10 +577,12 @@ class ReportController extends Controller
                                                     WHERE
                                                         client_id IN (SELECT id FROM distributors WHERE distributor_id = db_id)
                                                     OR
-                                                        client_Id = db_id
+                                                        client_Id = db_id)
                                                     AS total_order")
-                                    )->where('partner_group_id', '=', 1)
-                                    ->orderByDesc('total_order')
+                                    )->where([
+                                        ['partner_group_id', '=', 1],
+                                        ['distributors.id', '=', $id]
+                                    ])->orderByDesc('total_order')
                                     ->get();
 
             $useCollectionForDataBuyer = collect($dataBuyer)->map(function ($data) {
