@@ -536,7 +536,7 @@ class ReportController extends Controller
 
     public function getDetailOrderDistributor($id)
     {
-        $eventId = (request()->event_id) ? request()->event_id : 0;
+        // $eventId = (request()->event_id) ? request()->event_id : 0;
 
         try {
             $dataBuyer = Distributor::select(
@@ -578,8 +578,7 @@ class ReportController extends Controller
                                                         client_id IN (SELECT id FROM distributors WHERE distributor_id = db_id)
                                                     OR
                                                         client_Id = db_id
-                                                    AND
-                                                        orders.event_id = $eventId) AS total_order")
+                                                    AS total_order")
                                     )->where('partner_group_id', '=', 1)
                                     ->orderByDesc('total_order')
                                     ->get();
