@@ -442,17 +442,17 @@ class ReportController extends Controller
     public function getReportDistributor()
     {
         try {
-            $eventId = request()->event_id != '' ? request()->event_id : null;
+            // $eventId = request()->event_id != '' ? request()->event_id : null;
 
-            $subQuery = $this->subQueryDistributor($eventId);
+            // $subQuery = $this->subQueryDistributor($eventId);
 
             $dataOrder = Distributor::select(
                     DB::raw('distributors.id AS db_id'),
                     'distributors.name',
-                    DB::raw($subQuery['MUTIF']),
-                    DB::raw($subQuery['DAMOZA']),
-                    DB::raw($subQuery['UPMORE']),
-                    DB::raw($subQuery['TOTAL'])
+                    DB::raw("(SELECT SUM(size_XXS + size_XS + size_S + size_M + size_L + size_XL + size_XXL + size_XXXL + size_2 + size_4 + size_6 + size_8 + size_10 + size_12 + size_14 + size_16 + size_27 + size_28 + size_29 + size_30 + size_31 + size_32 + size_33 + size_34 + size_35 + size_36 + size_37 + size_38 + size_39 + size_40 + size_41 + size_42 + size_other) FROM orders WHERE (client_id IN (SELECT id FROM distributors WHERE distributor_id = db_id) OR client_id = db_id) AND product_id IN (SELECT id FROM products WHERE entity_name = 'MUTIF')) AS MUTIF"),
+                    DB::raw("(SELECT SUM(size_XXS + size_XS + size_S + size_M + size_L + size_XL + size_XXL + size_XXXL + size_2 + size_4 + size_6 + size_8 + size_10 + size_12 + size_14 + size_16 + size_27 + size_28 + size_29 + size_30 + size_31 + size_32 + size_33 + size_34 + size_35 + size_36 + size_37 + size_38 + size_39 + size_40 + size_41 + size_42 + size_other) FROM orders WHERE (client_id IN (SELECT id FROM distributors WHERE distributor_id = db_id) OR client_id = db_id) AND product_id IN (SELECT id FROM products WHERE entity_name = 'DAMOZA')) AS DAMOZA"),
+                    DB::raw("(SELECT SUM(size_XXS + size_XS + size_S + size_M + size_L + size_XL + size_XXL + size_XXXL + size_2 + size_4 + size_6 + size_8 + size_10 + size_12 + size_14 + size_16 + size_27 + size_28 + size_29 + size_30 + size_31 + size_32 + size_33 + size_34 + size_35 + size_36 + size_37 + size_38 + size_39 + size_40 + size_41 + size_42 + size_other) FROM orders WHERE (client_id IN (SELECT id FROM distributors WHERE distributor_id = db_id) OR client_id = db_id) AND product_id IN (SELECT id FROM products WHERE entity_name = 'UPMORE')) AS UPMORE"),
+                    DB::raw("(SELECT SUM(size_XXS + size_XS + size_S + size_M + size_L + size_XL + size_XXL + size_XXXL + size_2 + size_4 + size_6 + size_8 + size_10 + size_12 + size_14 + size_16 + size_27 + size_28 + size_29 + size_30 + size_31 + size_32 + size_33 + size_34 + size_35 + size_36 + size_37 + size_38 + size_39 + size_40 + size_41 + size_42 + size_other) FROM orders WHERE (client_id IN (SELECT id FROM distributors WHERE distributor_id = db_id) OR client_id = db_id)) as TOTAL")
                 )->where('distributors.partner_group_id', '=', 1)
                 ->orderByDesc('TOTAL')
                 ->get();
@@ -649,10 +649,10 @@ class ReportController extends Controller
             ];
         } else {
             return [
-                "MUTIF" => "(SELECT SUM(size_XXS + size_XS + size_S + size_M + size_L + size_XL + size_XXL + size_XXXL + size_2 + size_4 + size_6 + size_8 + size_10 + size_12 + size_14 + size_16 + size_27 + size_28 + size_29 + size_30 + size_31 + size_32 + size_33 + size_34 + size_35 + size_36 + size_37 + size_38 + size_39 + size_40 + size_41 + size_42 + size_other) FROM orders WHERE (client_id IN (SELECT id FROM distributors WHERE distributor_id = db_id) OR client_id = db_id) AND product_id IN (SELECT id FROM products WHERE entity_name = 'MUTIF')) AS MUTIF",
-                "DAMOZA" => "(SELECT SUM(size_XXS + size_XS + size_S + size_M + size_L + size_XL + size_XXL + size_XXXL + size_2 + size_4 + size_6 + size_8 + size_10 + size_12 + size_14 + size_16 + size_27 + size_28 + size_29 + size_30 + size_31 + size_32 + size_33 + size_34 + size_35 + size_36 + size_37 + size_38 + size_39 + size_40 + size_41 + size_42 + size_other) FROM orders WHERE (client_id IN (SELECT id FROM distributors WHERE distributor_id = db_id) OR client_id = db_id) AND product_id IN (SELECT id FROM products WHERE entity_name = 'DAMOZA')) AS DAMOZA",
-                "UPMORE" => "(SELECT SUM(size_XXS + size_XS + size_S + size_M + size_L + size_XL + size_XXL + size_XXXL + size_2 + size_4 + size_6 + size_8 + size_10 + size_12 + size_14 + size_16 + size_27 + size_28 + size_29 + size_30 + size_31 + size_32 + size_33 + size_34 + size_35 + size_36 + size_37 + size_38 + size_39 + size_40 + size_41 + size_42 + size_other) FROM orders WHERE (client_id IN (SELECT id FROM distributors WHERE distributor_id = db_id) OR client_id = db_id) AND product_id IN (SELECT id FROM products WHERE entity_name = 'UPMORE')) AS UPMORE",
-                "TOTAL" => "(SELECT SUM(size_XXS + size_XS + size_S + size_M + size_L + size_XL + size_XXL + size_XXXL + size_2 + size_4 + size_6 + size_8 + size_10 + size_12 + size_14 + size_16 + size_27 + size_28 + size_29 + size_30 + size_31 + size_32 + size_33 + size_34 + size_35 + size_36 + size_37 + size_38 + size_39 + size_40 + size_41 + size_42 + size_other) FROM orders WHERE (client_id IN (SELECT id FROM distributors WHERE distributor_id = db_id) OR client_id = db_id)) as TOTAL"
+                "MUTIF"     => "(SELECT SUM(size_XXS + size_XS + size_S + size_M + size_L + size_XL + size_XXL + size_XXXL + size_2 + size_4 + size_6 + size_8 + size_10 + size_12 + size_14 + size_16 + size_27 + size_28 + size_29 + size_30 + size_31 + size_32 + size_33 + size_34 + size_35 + size_36 + size_37 + size_38 + size_39 + size_40 + size_41 + size_42 + size_other) FROM orders WHERE (client_id IN (SELECT id FROM distributors WHERE distributor_id = db_id) OR client_id = db_id) AND product_id IN (SELECT id FROM products WHERE entity_name = 'MUTIF')) AS MUTIF",
+                "DAMOZA"    => "(SELECT SUM(size_XXS + size_XS + size_S + size_M + size_L + size_XL + size_XXL + size_XXXL + size_2 + size_4 + size_6 + size_8 + size_10 + size_12 + size_14 + size_16 + size_27 + size_28 + size_29 + size_30 + size_31 + size_32 + size_33 + size_34 + size_35 + size_36 + size_37 + size_38 + size_39 + size_40 + size_41 + size_42 + size_other) FROM orders WHERE (client_id IN (SELECT id FROM distributors WHERE distributor_id = db_id) OR client_id = db_id) AND product_id IN (SELECT id FROM products WHERE entity_name = 'DAMOZA')) AS DAMOZA",
+                "UPMORE"    => "(SELECT SUM(size_XXS + size_XS + size_S + size_M + size_L + size_XL + size_XXL + size_XXXL + size_2 + size_4 + size_6 + size_8 + size_10 + size_12 + size_14 + size_16 + size_27 + size_28 + size_29 + size_30 + size_31 + size_32 + size_33 + size_34 + size_35 + size_36 + size_37 + size_38 + size_39 + size_40 + size_41 + size_42 + size_other) FROM orders WHERE (client_id IN (SELECT id FROM distributors WHERE distributor_id = db_id) OR client_id = db_id) AND product_id IN (SELECT id FROM products WHERE entity_name = 'UPMORE')) AS UPMORE",
+                "TOTAL"     => "(SELECT SUM(size_XXS + size_XS + size_S + size_M + size_L + size_XL + size_XXL + size_XXXL + size_2 + size_4 + size_6 + size_8 + size_10 + size_12 + size_14 + size_16 + size_27 + size_28 + size_29 + size_30 + size_31 + size_32 + size_33 + size_34 + size_35 + size_36 + size_37 + size_38 + size_39 + size_40 + size_41 + size_42 + size_other) FROM orders WHERE (client_id IN (SELECT id FROM distributors WHERE distributor_id = db_id) OR client_id = db_id)) as TOTAL"
             ];
         }
     }
