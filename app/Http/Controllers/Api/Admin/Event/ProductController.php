@@ -67,6 +67,7 @@ class ProductController extends Controller
                                     'products.color',
                                     'products.material',
                                     'products.combo',
+                                    'products.type_id',
                                     'products.special_feature',
                                     'products.keyword',
                                     'products.description',
