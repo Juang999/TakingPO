@@ -580,8 +580,7 @@ class ReportController extends Controller
                                                         client_Id = db_id)
                                                     AS total_order")
                                     )->where([
-                                        ['partner_group_id', '=', 1],
-                                        ['distributors.id', '=', $id]
+                                        ['partner_group_id', '=', 1]
                                     ])->orderByDesc('total_order')
                                     ->get();
 
