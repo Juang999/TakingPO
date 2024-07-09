@@ -234,6 +234,7 @@ Route::middleware('jwt.verify')->group(function () {
     Route::get('/search-products/{search}', 'Api\Admin\SearchProduct');
     Route::get('/search-distributor/{search}', 'Api\Admin\SearchDistributor');
     Route::post('/photo/{clothes_id}', 'Api\Admin\ImageController@uploadPhoto');
+    Route::post('/image/{clothes_id}', 'Api\Admin\Event\ProductController@uploadPhoto');
 
     // API for report
     Route::get('/total', 'Api\Admin\TotalController@totalOrder');

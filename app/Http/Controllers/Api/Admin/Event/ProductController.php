@@ -291,6 +291,28 @@ class ProductController extends Controller
         }
     }
 
+    public function uploadPhoto(Request $request, $product_id)
+    {
+        try {
+            $photo = Photo::create([
+                'product_id' => $product_id,
+                'photo' => $request->photo
+            ]);
+
+            return response()->json([
+                'status' => 'success',
+                'data' => $photo,
+                'error' => null
+            ], 200);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'status' => 'failed',
+                'data' => null,
+                'error' => $th->getMessage()
+            ], 400);
+        }
+    }
+
     private function checkRequest($request, $id)
     {
         $clothes = Product::where('id', '=', $id)->first();
