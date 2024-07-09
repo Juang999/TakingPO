@@ -331,7 +331,7 @@ class ReportController extends Controller
     public function getAllReport()
     {
         try {
-            $eventId = (strlen(request()->event_id) != 0) ? explode(',', request()->event_id) : [];
+            // $eventId = (strlen(request()->event_id) != 0) ? explode(',', request()->event_id) : [];
 
             $order = Order::select(
                 'orders.id',
@@ -379,9 +379,9 @@ class ReportController extends Controller
             ->leftJoin('distributors AS db', 'db.id', '=', 'distributors.distributor_id')
             ->leftJoin('entities', 'entities.entity_name', '=', 'products.entity_name')
             ->leftJoin('types', 'types.id', '=', 'products.type_id')
-            ->when(count($eventId) != 0, function ($query) use ($eventId) {
-                $query->whereIn('orders.event_id', $eventId);
-            })
+            // ->when(count($eventId) != 0, function ($query) use ($eventId) {
+            //     $query->whereIn('orders.event_id', $eventId);
+            // })
             ->groupBy(
                 'orders.id',
                 'entities.entity_name',
@@ -442,7 +442,7 @@ class ReportController extends Controller
     public function getReportDistributor()
     {
         try {
-            $eventId = request()->event_id;
+            $eventId = request()->event_id != '' ? request()->event_id : null;
 
             $subQuery = $this->subQueryDistributor($eventId);
 
@@ -474,7 +474,7 @@ class ReportController extends Controller
     public function sumOrderedProduct()
     {
         try {
-            $eventId = (strlen(request()->event_id) != 0) ? explode(',', request()->event_id) : [];
+            // $eventId = (strlen(request()->event_id) != 0) ? explode(',', request()->event_id) : [];
 
             $dataOrder = Order::select(
                 'products.entity_name',
@@ -513,9 +513,9 @@ class ReportController extends Controller
             )->leftJoin('products', 'products.id', '=', 'orders.product_id')
             ->leftJoin('entities', 'entities.entity_name', '=', 'products.entity_name')
             ->groupBy('products.entity_name', 'products.type_id', 'products.article_name', 'entities.id')
-            ->when(count($eventId) != 0, function ($query) use ($eventId) {
-                $query->whereIn('orders.event_id', $eventId);
-            })
+            // ->when(count($eventId) != 0, function ($query) use ($eventId) {
+            //     $query->whereIn('orders.event_id', $eventId);
+            // })
             ->orderBy('entities.id')
             ->orderByDesc('TOTAL')
             ->get();
@@ -640,7 +640,7 @@ class ReportController extends Controller
 
     private function subQueryDistributor($eventId)
     {
-        if (strlen($eventId) != 0) {
+        if ($eventId != null) {
             return [
                 "MUTIF" => "(SELECT SUM(size_XXS + size_XS + size_S + size_M + size_L + size_XL + size_XXL + size_XXXL + size_2 + size_4 + size_6 + size_8 + size_10 + size_12 + size_14 + size_16 + size_27 + size_28 + size_29 + size_30 + size_31 + size_32 + size_33 + size_34 + size_35 + size_36 + size_37 + size_38 + size_39 + size_40 + size_41 + size_42 + size_other) FROM orders WHERE (client_id IN (SELECT id FROM distributors WHERE distributor_id = db_id) OR client_id = db_id) AND event_id IN ($eventId) AND product_id IN (SELECT id FROM products WHERE entity_name = 'MUTIF')) AS MUTIF",
                 "DAMOZA" => "(SELECT SUM(size_XXS + size_XS + size_S + size_M + size_L + size_XL + size_XXL + size_XXXL + size_2 + size_4 + size_6 + size_8 + size_10 + size_12 + size_14 + size_16 + size_27 + size_28 + size_29 + size_30 + size_31 + size_32 + size_33 + size_34 + size_35 + size_36 + size_37 + size_38 + size_39 + size_40 + size_41 + size_42 + size_other) FROM orders WHERE (client_id IN (SELECT id FROM distributors WHERE distributor_id = db_id) OR client_id = db_id) AND event_id IN ($eventId) AND product_id IN (SELECT id FROM products WHERE entity_name = 'DAMOZA')) AS DAMOZA",
