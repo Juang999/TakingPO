@@ -251,6 +251,9 @@ Route::prefix('client')->group( function () {
         Route::post('register', 'Api\Client\Event\ClientController@register');
         Route::get('partner-group', 'Api\Client\Event\ClientController@partnerGroupList');
         Route::post('register-distributor', 'Api\Client\Event\ClientController@registerDistributor');
+        Route::get('/provinces', 'Api\Client\Event\ClientController@getProvince');
+        Route::get('/{provinceId}/cities', 'Api\Client\Event\ClientController@getCity');
+        Route::get('/{cityId}/districts', 'Api\Client\Event\ClientController@getDistrict');
     });
 
     Route::prefix('master')->group(function () {

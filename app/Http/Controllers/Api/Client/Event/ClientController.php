@@ -8,6 +8,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\{Auth, DB};
 use App\Http\Requests\Client\Auth\{ClientRegisterRequest, DistributorRegisterRequest};
 use App\{Distributor, PartnerAddress, PartnerGroup, MutifStoreMaster, MutifStoreAddress};
+use App\Models\{Province, City, District};
 
 class ClientController extends Controller
 {
@@ -140,6 +141,83 @@ class ClientController extends Controller
             return response()->json([
                 'status' => 'failed',
                 'data' => null,
+                'error' => $th->getMessage()
+            ], 400);
+        }
+    }
+
+    public function getProvince()
+    {
+        try {
+            $searchname = (request()->searchname) ? request()->searchname : '';
+
+            $dataProvince = Province::select('id', 'province_id', 'title')
+                                    ->when($searchname, function ($query) use ($searchname) {
+                                        $query->where('title', 'LIKE', "%$searchname%");
+                                    })
+                                    ->get();
+
+            return response()->json([
+                'status' => 'success',
+                'data' => $dataProvince,
+                'error' => NULL
+            ], 200);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'status' => 'failed',
+                'data' => NULL,
+                'error' => $th->getMessage()
+            ], 400);
+        }
+    }
+
+    public function getCity($provinceId)
+    {
+        try {
+            $searchname = (request()->searchname) ? request()->searchname : '';
+
+            $dataCity = City::select('id', 'city_id', 'title')
+                                    ->where('province_id', '=', $provinceId)
+                                    ->when($searchname, function ($query) use ($searchname) {
+                                        $query->where('title', 'LIKE', "%$searchname%");
+                                    })
+                                    ->get();
+
+            return response()->json([
+                'status' => 'success',
+                'data' => $dataCity,
+                'error' => NULL
+            ], 200);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'status' => 'failed',
+                'data' => NULL,
+                'error' => $th->getMessage()
+            ], 400);
+        }
+    }
+
+    public function getDistrict($cityId)
+    {
+        try {
+            $searchname = (request()->searchname) ? request()->searchname : '';
+
+            $dataDistrict = District::select('id', 'city_id', 'title')
+                                    ->where('city_id', '=', $cityId)
+                                    ->when($searchname, function ($query) use ($searchname) {
+                                        $query->where('title', 'LIKE', "%$searchname%");
+                                    })
+                                    ->get();
+
+            return response()->json([
+                'status' => 'success',
+                'data' => $dataDistrict,
+                'error' => NULL
+            ], 200);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'status' => 'failed',
+                'data' => NULL,
                 'error' => $th->getMessage()
             ], 400);
         }
