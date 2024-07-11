@@ -202,7 +202,7 @@ class ClientController extends Controller
         try {
             $searchname = (request()->searchname) ? request()->searchname : '';
 
-            $dataDistrict = District::select('id', 'city_id', 'title')
+            $dataDistrict = District::select('id', 'district_id', 'title')
                                     ->where('city_id', '=', $cityId)
                                     ->when($searchname, function ($query) use ($searchname) {
                                         $query->where('title', 'LIKE', "%$searchname%");
