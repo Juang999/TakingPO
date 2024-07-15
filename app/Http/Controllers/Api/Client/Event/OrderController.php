@@ -18,51 +18,25 @@ class OrderController extends Controller
             $phoneNumber = request()->header('phone');
             $dataBuyer = $this->getDataBuyer($phoneNumber);
             $statusOrder = $this->getStatusOrder($phoneNumber);
+            $discount = $dataBuyer->discount;
 
-            $products = Product::select(
-                                'products.id',
-                                'entity_name',
-                                'article_name',
-                                'color',
-                                // 'combo',
-                                'material',
-                                'type_id',
-                                'types.type as type_name',
-                                'keyword',
-                                'description',
-                                'price',
-                                DB::raw("$dataBuyer->discount AS discount")
-                            )->leftJoin('types', 'types.id', '=', 'products.type_id')
-                            ->where([
-                                ['products.is_active', '=', true],
-                                ['products.group_article', '=', fn ($query) => $query->select('id')->from('events')->where('is_active', '=', true)]
-                            ])->whereNotIn('products.id', fn ($query) => $query->select('product_id')->from('charts')->where([
-                                            [
-                                                'client_id', '=', fn ($query) => $query->select('id')->from('distributors')->where('phone', '=', $phoneNumber)
-                                            ],[
-                                                'event_id', '=', fn ($query) => $query->select('id')->from('events')->where('is_active', '=', true)
-                                            ]
-                            ]))->when($searchName, function ($query) use ($searchName) {
-                                $query->where('products.article_name', 'like', "%$searchName%");
-                            })->with([
-                                'DataMaterial' => fn ($query) => $query->select('id', 'product_id', 'material_name', 'material_type', 'description', 'photo'),
-                                'MaterialAdditional' => fn ($query) => $query->select('id', 'product_id', 'material_name', 'material_type', 'description', 'photo'),
-                                'Accessories' => fn ($query) => $query->select('id', 'product_id', 'material_name', 'material_type', 'description', 'photo'),
-                                'AccessoriesProduct' => fn ($query) => $query->select('id', 'product_id', 'material_name', 'material_type', 'description', 'photo'),
-                                'Photo' => fn ($query) => $query->select('id', 'product_id', 'photo'),
-                                'PriceList' => function ($query) use ($dataBuyer) {
-                                    $query->select('price_lists.id', 'clothes_id', 'size_id', DB::raw('sizes.size AS size'), DB::raw('price AS normal_price'))
-                                        ->leftJoin('sizes', 'sizes.id', '=', 'price_lists.size_id');
-                                }
-                            ])->get();
+            $getKeyword = Product::select(DB::raw('DISTINCT keyword'))
+                                ->where([
+                                    ['products.is_active', '=', true],
+                                    ['products.group_article', '=', fn ($query) => $query->select('id')->from('events')->where('is_active', '=', true)]
+                                ])
+                                ->paginate(1)->toArray();
 
-            // foreach ($products as $product) {
-            //     $product->combo = explode(', ', $product->combo);
-            // }
+            $dataProducts = collect($getKeyword['data'])->map(function ($item) use ($discount, $searchName, $phoneNumber) {
+                return [
+                    'keyword' => $item['keyword'],
+                    'products' => $this->getProductByKeyword($item['keyword'], $discount, $searchName, $phoneNumber)
+                ];
+            });
 
             return response()->json([
                 'status' => 'success',
-                'data' => ($statusOrder == false) ? $products : [],
+                'data' => ($statusOrder == false) ? $dataProducts : [],
                 'status_order' => $statusOrder,
                 'error' => null
             ], 200);
@@ -750,4 +724,45 @@ class OrderController extends Controller
 
         return $totalOrder;
     }
+
+    private function getProductByKeyword($keyword, $discount, $searchName, $phoneNumber)
+    {
+        $products = Product::select(
+            'products.id',
+            'entity_name',
+            'article_name',
+            'color',
+            'material',
+            'type_id',
+            'types.type as type_name',
+            'keyword',
+            'description',
+            'price',
+            DB::raw("$discount AS discount")
+        )->leftJoin('types', 'types.id', '=', 'products.type_id')
+        ->where([
+            ['products.is_active', '=', true],
+            ['keyword', '=', $keyword],
+            ['products.group_article', '=', fn ($query) => $query->select('id')->from('events')->where('is_active', '=', true)]
+        ])->whereNotIn('products.id', fn ($query) => $query->select('product_id')->from('charts')->where([
+                        [
+                            'client_id', '=', fn ($query) => $query->select('id')->from('distributors')->where('phone', '=', $phoneNumber)
+                        ],[
+                            'event_id', '=', fn ($query) => $query->select('id')->from('events')->where('is_active', '=', true)
+                        ]
+        ]))->when($searchName, function ($query) use ($searchName) {
+            $query->where('products.article_name', 'like', "%$searchName%");
+        })->with([
+            'DataMaterial' => fn ($query) => $query->select('id', 'product_id', 'material_name', 'material_type', 'description', 'photo'),
+            'MaterialAdditional' => fn ($query) => $query->select('id', 'product_id', 'material_name', 'material_type', 'description', 'photo'),
+            'Accessories' => fn ($query) => $query->select('id', 'product_id', 'material_name', 'material_type', 'description', 'photo'),
+            'AccessoriesProduct' => fn ($query) => $query->select('id', 'product_id', 'material_name', 'material_type', 'description', 'photo'),
+            'Photo' => fn ($query) => $query->select('id', 'product_id', 'photo'),
+            'PriceList' => fn ($query) => $query->select('price_lists.id', 'clothes_id', 'size_id', DB::raw('sizes.size AS size'), DB::raw('price AS normal_price'))->leftJoin('sizes', 'sizes.id', '=', 'price_lists.size_id')
+
+        ])->get();
+
+        return $products;
+    }
+
 }
