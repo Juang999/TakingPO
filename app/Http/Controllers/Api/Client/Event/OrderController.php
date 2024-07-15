@@ -20,12 +20,7 @@ class OrderController extends Controller
             $statusOrder = $this->getStatusOrder($phoneNumber);
             $discount = $dataBuyer->discount;
 
-            $getKeyword = Product::select(DB::raw('DISTINCT keyword'))
-                                ->where([
-                                    ['products.is_active', '=', true],
-                                    ['products.group_article', '=', fn ($query) => $query->select('id')->from('events')->where('is_active', '=', true)]
-                                ])
-                                ->paginate(1)->toArray();
+            $getKeyword =$this->getKeyword($phoneNumber);
 
             $getKeyword['data'] = collect($getKeyword['data'])->map(function ($item) use ($discount, $searchName, $phoneNumber) {
                 return [
@@ -55,7 +50,7 @@ class OrderController extends Controller
             $headerPhone = request()->header('phone');
             $collection = collect(json_decode($request->data, true));
 
-            $array = $collection->map(function ($dataRequest) use ($headerPhone, $request) {
+            $array = $collection->map(function ($dataRequest) use ($headerPhone) {
                 return $this->checkRequestCreate($dataRequest, $headerPhone);
             })->toArray();
 
@@ -765,4 +760,24 @@ class OrderController extends Controller
         return $products;
     }
 
+    private function getKeyword($phoneNumber)
+    {
+        $keyword = Product::select(DB::raw('DISTINCT keyword'))
+        ->where([
+            ['products.is_active', '=', true],
+            ['products.group_article', '=', fn ($query) => $query->select('id')->from('events')->where('is_active', '=', true)]
+        ])->whereNotIn('products.keyword', function ($query) use ($phoneNumber) {
+            $query->select('keyword')->from('products')->whereIn('products.id', function ($query) use ($phoneNumber) {
+                $query->select('product_id')->from('charts')->where([
+                    [
+                        'client_id', '=', fn ($query) => $query->select('id')->from('distributors')->where('phone', '=', $phoneNumber)
+                    ],[
+                        'event_id', '=', fn ($query) => $query->select('id')->from('events')->where('is_active', '=', true)
+                    ]
+                ]);
+            });
+        })->paginate(1)->toArray();
+
+        return $keyword;
+    }
 }
