@@ -27,7 +27,7 @@ class OrderController extends Controller
                                 ])
                                 ->paginate(1)->toArray();
 
-            $dataProducts = collect($getKeyword['data'])->map(function ($item) use ($discount, $searchName, $phoneNumber) {
+            $getKeyword['data'] = collect($getKeyword['data'])->map(function ($item) use ($discount, $searchName, $phoneNumber) {
                 return [
                     'keyword' => $item['keyword'],
                     'products' => $this->getProductByKeyword($item['keyword'], $discount, $searchName, $phoneNumber)
@@ -36,7 +36,7 @@ class OrderController extends Controller
 
             return response()->json([
                 'status' => 'success',
-                'data' => ($statusOrder == false) ? $dataProducts : [],
+                'data' => ($statusOrder == false) ? $getKeyword : [],
                 'status_order' => $statusOrder,
                 'error' => null
             ], 200);
