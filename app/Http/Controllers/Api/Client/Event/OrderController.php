@@ -50,18 +50,21 @@ class OrderController extends Controller
             $headerPhone = request()->header('phone');
             $collection = collect(json_decode($request->data, true));
 
-            $array = $collection->map(function ($dataRequest) use ($headerPhone) {
-                return $this->checkRequestCreate($dataRequest, $headerPhone);
-            })->toArray();
-
-            $inputChart = DB::table('charts')->insert($array);
+            DB::beginTransaction();
+                $collection->map(function ($dataProduct) use ($headerPhone) {
+                    if ($this->checkDataChartExistance($headerPhone, $dataProduct['product_id']) == 0) {
+                        DB::table('charts')->insert($this->checkRequestCreate($dataProduct, $headerPhone));
+                    }
+                });
+            DB::commit();
 
             return response()->json([
                 'status' => 'success',
-                'data' => $inputChart,
+                'data' => true,
                 'error' => null
             ], 200);
         } catch (\Throwable $th) {
+            DB::rollBack();
             return response()->json([
                 'status' => 'failed',
                 'data' => null,
@@ -779,5 +782,15 @@ class OrderController extends Controller
         })->paginate(1)->toArray();
 
         return $keyword;
+    }
+
+    private function checkDataChartExistance($phoneNumber, $productId)
+    {
+        $dataChart = Chart::where([
+            ['client_id', '=', fn ($query) => $query->select('id')->from('distributors')->where('phone', '=', $phoneNumber)],
+            ['product_id', '=', $productId]
+        ])->count();
+
+        return $dataChart;
     }
 }
