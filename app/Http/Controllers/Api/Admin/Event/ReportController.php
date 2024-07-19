@@ -16,7 +16,8 @@ class ReportController extends Controller
                                 'orders.client_id',
                                 'distributors.name',
                                 'events.event_name',
-                                DB::raw('sum(size_S + size_M + size_L + size_XL + size_XXL + size_XXXL + size_2 + size_4 + size_6 + size_8 + size_10 + size_12 + size_27 + size_28 + size_29 + size_30 + size_31 + size_32 + size_33 + size_34 + size_35 + size_36 + size_37 + size_38 + size_39 + size_40 + size_41 + size_42 + size_other) as total_order')
+                                DB::raw('sum(size_XXS + size_XS + size_S + size_M + size_L + size_XL + size_XXL + size_XXXL + size_2 + size_4 + size_6 + size_8 + size_10 + size_12 + size_14 + size_16 + size_27 + size_28 + size_29 + size_30 + size_31 + size_32 + size_33 + size_34 + size_35 + size_36 + size_37 + size_38 + size_39 + size_40 + size_41 + size_42 + size_other) as total_order'),
+
                             )->leftJoin('distributors', 'distributors.id', '=', 'orders.client_id')
                             ->leftJoin('events', 'events.id', '=', 'orders.event_id')
                             ->where('event_id', '=', $eventId)
@@ -58,6 +59,8 @@ class ReportController extends Controller
                                 'events.event_desc',
                                 'products.type_id',
                                 'types.type',
+                                'orders.size_XXS',
+                                'orders.size_XS',
                                 'orders.size_S',
                                 'orders.size_M',
                                 'orders.size_L',
@@ -70,6 +73,8 @@ class ReportController extends Controller
                                 'orders.size_8',
                                 'orders.size_10',
                                 'orders.size_12',
+                                'orders.size_14',
+                                'orders.size_16',
                                 'orders.size_27',
                                 'orders.size_28',
                                 'orders.size_29',
@@ -118,7 +123,7 @@ class ReportController extends Controller
                                             'distributor.name',
                                             'distributor.partner_group_id',
                                             'events.event_name',
-                                            DB::raw('sum(size_S + size_M + size_L + size_XL + size_XXL + size_XXXL + size_2 + size_4 + size_6 + size_8 + size_10 + size_12 + size_27 + size_28 + size_29 + size_30 + size_31 + size_32 + size_33 + size_34 + size_35 + size_36 + size_37 + size_38 + size_39 + size_40 + size_41 + size_42 + size_other) as total_order')
+                                            DB::raw('sum(size_XXS + size_XS + size_S + size_M + size_L + size_XL + size_XXL + size_XXXL + size_2 + size_4 + size_6 + size_8 + size_10 + size_12 + size_14 + size_16 + size_27 + size_28 + size_29 + size_30 + size_31 + size_32 + size_33 + size_34 + size_35 + size_36 + size_37 + size_38 + size_39 + size_40 + size_41 + size_42 + size_other) as total_order')
                                         )->leftJoin('distributors AS client', 'client.id', '=', 'orders.client_id')
                                         ->leftJoin('distributors AS distributor', 'distributor.id', '=', 'client.distributor_id')
                                         ->leftJoin('events', 'events.id', '=', 'orders.event_id')
@@ -151,7 +156,7 @@ class ReportController extends Controller
                                             'products.article_name',
                                             'events.event_name',
                                             'entities.entity_name',
-                                            DB::raw('sum(size_S + size_M + size_L + size_XL + size_XXL + size_XXXL + size_2 + size_4 + size_6 + size_8 + size_10 + size_12 + size_27 + size_28 + size_29 + size_30 + size_31 + size_32 + size_33 + size_34 + size_35 + size_36 + size_37 + size_38 + size_39 + size_40 + size_41 + size_42 + size_other) as total_order')
+                                            DB::raw('sum(size_XXS + size_XS + size_S + size_M + size_L + size_XL + size_XXL + size_XXXL + size_2 + size_4 + size_6 + size_8 + size_10 + size_12 + size_14 + size_16 + size_27 + size_28 + size_29 + size_30 + size_31 + size_32 + size_33 + size_34 + size_35 + size_36 + size_37 + size_38 + size_39 + size_40 + size_41 + size_42 + size_other) as total_order')
                                         )->leftJoin('products', 'products.id', '=', 'orders.product_id')
                                         ->leftJoin('events', 'events.id', '=', 'orders.event_id')
                                         ->leftJoin('entities', 'entities.entity_name', '=', 'products.entity_name')
@@ -184,7 +189,7 @@ class ReportController extends Controller
                 'products.entity_name',
                 'products.article_name',
                 'products.type_id',
-                DB::raw('SUM(size_S + size_M + size_L + size_XL + size_XXL + size_XXXL + size_2 + size_4 + size_6 + size_8 + size_10 + size_12 + size_27 + size_28 + size_29 + size_30 + size_31 + size_32 + size_33 + size_34 + size_35 + size_36 + size_37 + size_38 + size_39 + size_40 + size_41 + size_42 + size_other) AS total_order')
+                DB::raw('SUM(size_XXS + size_XS + size_S + size_M + size_L + size_XL + size_XXL + size_XXXL + size_2 + size_4 + size_6 + size_8 + size_10 + size_12 + size_14 + size_16 + size_27 + size_28 + size_29 + size_30 + size_31 + size_32 + size_33 + size_34 + size_35 + size_36 + size_37 + size_38 + size_39 + size_40 + size_41 + size_42 + size_other) AS total_order')
             )->leftJoin('orders', 'orders.product_id', '=', 'products.id')
             ->where('products.id', '=', $id)
             ->with(['DetailOrder' => function ($query) {
@@ -196,6 +201,8 @@ class ReportController extends Controller
                         DB::raw('db.name AS distributor_name'),
                         DB::raw('events.event_name'),
                         DB::raw('SUM(size_S + size_M + size_L + size_XL + size_XXL + size_XXXL + size_2 + size_4 + size_6 + size_8 + size_10 + size_12 + size_27 + size_28 + size_29 + size_30 + size_31 + size_32 + size_33 + size_34 + size_35 + size_36 + size_37 + size_38 + size_39 + size_40 + size_41 + size_42 + size_other) AS total_order'),
+                        'orders.size_XXS',
+                        'orders.size_XS',
                         'orders.size_S',
                         'orders.size_M',
                         'orders.size_L',
@@ -208,6 +215,8 @@ class ReportController extends Controller
                         'orders.size_8',
                         'orders.size_10',
                         'orders.size_12',
+                        'orders.size_14',
+                        'orders.size_16',
                         'orders.size_27',
                         'orders.size_28',
                         'orders.size_29',
@@ -238,6 +247,8 @@ class ReportController extends Controller
                         'db.name',
                         'events.event_name',
                         'products.type_id',
+                        'orders.size_XXS',
+                        'orders.size_XS',
                         'orders.size_S',
                         'orders.size_M',
                         'orders.size_L',
@@ -250,6 +261,8 @@ class ReportController extends Controller
                         'orders.size_8',
                         'orders.size_10',
                         'orders.size_12',
+                        'orders.size_14',
+                        'orders.size_16',
                         'orders.size_27',
                         'orders.size_28',
                         'orders.size_29',
@@ -298,7 +311,7 @@ class ReportController extends Controller
                                     'products.article_name',
                                     'products.entity_name',
                                     'events.event_name',
-                                    DB::raw('SUM(size_S + size_M + size_L + size_XL + size_XXL + size_XXXL + size_2 + size_4 + size_6 + size_8 + size_10 + size_12 + size_27 + size_28 + size_29 + size_30 + size_31 + size_32 + size_33 + size_34 + size_35 + size_36 + size_37 + size_38 + size_39 + size_40 + size_41 + size_42 + size_other) AS total_order')
+                                    DB::raw('SUM(size_XXS + size_XS + size_S + size_M + size_L + size_XL + size_XXL + size_XXXL + size_2 + size_4 + size_6 + size_8 + size_10 + size_12 + size_14 + size_16 + size_27 + size_28 + size_29 + size_30 + size_31 + size_32 + size_33 + size_34 + size_35 + size_36 + size_37 + size_38 + size_39 + size_40 + size_41 + size_42 + size_other) AS total_order')
                         )->leftJoin('orders', 'orders.product_id', '=', 'products.id')
                         ->leftJoin('events', 'events.id', '=', 'orders.event_id')
                         ->whereIn('products.id', function ($query) use ($eventId) {
@@ -343,6 +356,8 @@ class ReportController extends Controller
                 'events.event_name',
                 'products.article_name',
                 'types.type',
+                'orders.size_XXS',
+                'orders.size_XS',
                 'orders.size_S',
                 'orders.size_M',
                 'orders.size_L',
@@ -355,6 +370,8 @@ class ReportController extends Controller
                 'orders.size_8',
                 'orders.size_10',
                 'orders.size_12',
+                'orders.size_14',
+                'orders.size_16',
                 'orders.size_27',
                 'orders.size_28',
                 'orders.size_29',
@@ -392,6 +409,8 @@ class ReportController extends Controller
                 'db.name',
                 'events.event_name',
                 'products.article_name',
+                'orders.size_XXS',
+                'orders.size_XS',
                 'orders.size_S',
                 'orders.size_M',
                 'orders.size_L',
@@ -404,6 +423,8 @@ class ReportController extends Controller
                 'orders.size_8',
                 'orders.size_10',
                 'orders.size_12',
+                'orders.size_14',
+                'orders.size_16',
                 'orders.size_27',
                 'orders.size_28',
                 'orders.size_29',
@@ -480,6 +501,8 @@ class ReportController extends Controller
                 'products.entity_name',
                 'products.article_name',
                 'products.type_id',
+                DB::raw('SUM(size_S) AS size_XXS'),
+                DB::raw('SUM(size_S) AS size_XS'),
                 DB::raw('SUM(size_S) AS size_S'),
                 DB::raw('SUM(size_M) AS size_M'),
                 DB::raw('SUM(size_L) AS size_L'),
@@ -491,7 +514,9 @@ class ReportController extends Controller
                 DB::raw('SUM(size_6) AS size_6'),
                 DB::raw('SUM(size_8) AS size_8'),
                 DB::raw('SUM(size_10) AS size_10'),
-                DB::raw('SUM(size_12) AS size_12'),
+                DB::raw('SUM(size_12) AS size_1Z'),
+                DB::raw('SUM(size_12) AS size_14'),
+                DB::raw('SUM(size_12) AS size_16'),
                 DB::raw('SUM(size_27) AS size_27'),
                 DB::raw('SUM(size_28) AS size_28'),
                 DB::raw('SUM(size_29) AS size_29'),
@@ -544,7 +569,8 @@ class ReportController extends Controller
                                         DB::raw('distributors.name'),
                                         DB::raw("(SELECT
                                                     SUM(
-                                                        orders.size_S +
+                                                        orders.size_XXS +
+                                                        orders.size_XS +
                                                         orders.size_M +
                                                         orders.size_L +
                                                         orders.size_XL +
@@ -556,6 +582,8 @@ class ReportController extends Controller
                                                         orders.size_8 +
                                                         orders.size_10 +
                                                         orders.size_12 +
+                                                        orders.size_14 +
+                                                        orders.size_16 +
                                                         orders.size_27 +
                                                         orders.size_28 +
                                                         orders.size_29 +
@@ -612,7 +640,7 @@ class ReportController extends Controller
 
     private function orderedProduct($client_id)
     {
-        $sum = "SUM(orders.size_S + orders.size_M + orders.size_L + orders.size_XL + orders.size_XXL + orders.size_XXXL + orders.size_2 + orders.size_4 + orders.size_6 + orders.size_8 + orders.size_10 + orders.size_12 + orders.size_27 + orders.size_28 + orders.size_29 + orders.size_30 + orders.size_31 + orders.size_32 + orders.size_33 + orders.size_34 + orders.size_35 + orders.size_36 + orders.size_37 + orders.size_38 + orders.size_39 + orders.size_40 + orders.size_41 + orders.size_42 + orders.size_other)";
+        $sum = "SUM(orders.size_XXS + orders.size_XS + orders.size_S + orders.size_M + orders.size_L + orders.size_XL + orders.size_XXL + orders.size_XXXL + orders.size_2 + orders.size_4 + orders.size_6 + orders.size_8 + orders.size_10 + orders.size_12 + orders.size_14 + orders.size_16 + orders.size_27 + orders.size_28 + orders.size_29 + orders.size_30 + orders.size_31 + orders.size_32 + orders.size_33 + orders.size_34 + orders.size_35 + orders.size_36 + orders.size_37 + orders.size_38 + orders.size_39 + orders.size_40 + orders.size_41 + orders.size_42 + orders.size_other)";
 
         $data = Product::select(
             'products.id',
