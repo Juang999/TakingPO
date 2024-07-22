@@ -514,7 +514,7 @@ class ReportController extends Controller
                 DB::raw('SUM(size_6) AS size_6'),
                 DB::raw('SUM(size_8) AS size_8'),
                 DB::raw('SUM(size_10) AS size_10'),
-                DB::raw('SUM(size_12) AS size_1Z'),
+                DB::raw('SUM(size_12) AS size_12'),
                 DB::raw('SUM(size_12) AS size_14'),
                 DB::raw('SUM(size_12) AS size_16'),
                 DB::raw('SUM(size_27) AS size_27'),
