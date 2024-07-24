@@ -534,7 +534,7 @@ class ReportController extends Controller
                 DB::raw('SUM(size_41) AS size_41'),
                 DB::raw('SUM(size_42) AS size_42'),
                 DB::raw('SUM(size_other) AS size_other'),
-                DB::raw("SUM(size_S + size_M + size_L + size_XL + size_XXL + size_XXXL + size_2 + size_4 + size_6 + size_8 + size_10 + size_12 + size_27 + size_28 + size_29 + size_30 + size_31 + size_32 + size_33 + size_34 + size_35 + size_36 + size_37 + size_38 + size_39 + size_40 + size_41 + size_42 + size_other) AS TOTAL")
+                DB::raw("SUM(size_XXS + size_XS + size_S + size_M + size_L + size_XL + size_XXL + size_XXXL + size_2 + size_4 + size_6 + size_8 + size_10 + size_12 + size_14 + size_16 + size_27 + size_28 + size_29 + size_30 + size_31 + size_32 + size_33 + size_34 + size_35 + size_36 + size_37 + size_38 + size_39 + size_40 + size_41 + size_42 + size_other) AS TOTAL")
             )->leftJoin('products', 'products.id', '=', 'orders.product_id')
             ->leftJoin('entities', 'entities.entity_name', '=', 'products.entity_name')
             ->groupBy('products.entity_name', 'products.type_id', 'products.article_name', 'entities.id')
