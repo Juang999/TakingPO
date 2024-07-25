@@ -567,56 +567,17 @@ class ReportController extends Controller
             $dataBuyer = Distributor::select(
                                         DB::raw('distributors.id AS db_id'),
                                         DB::raw('distributors.name'),
-                                        DB::raw("(SELECT
-                                                    SUM(
-                                                        orders.size_XXS +
-                                                        orders.size_XS +
-                                                        orders.size_M +
-                                                        orders.size_L +
-                                                        orders.size_XL +
-                                                        orders.size_XXL +
-                                                        orders.size_XXXL +
-                                                        orders.size_2 +
-                                                        orders.size_4 +
-                                                        orders.size_6 +
-                                                        orders.size_8 +
-                                                        orders.size_10 +
-                                                        orders.size_12 +
-                                                        orders.size_14 +
-                                                        orders.size_16 +
-                                                        orders.size_27 +
-                                                        orders.size_28 +
-                                                        orders.size_29 +
-                                                        orders.size_30 +
-                                                        orders.size_31 +
-                                                        orders.size_32 +
-                                                        orders.size_33 +
-                                                        orders.size_34 +
-                                                        orders.size_35 +
-                                                        orders.size_36 +
-                                                        orders.size_37 +
-                                                        orders.size_38 +
-                                                        orders.size_39 +
-                                                        orders.size_40 +
-                                                        orders.size_41 +
-                                                        orders.size_42 +
-                                                        orders.size_other
-                                                    ) FROM orders
-                                                    WHERE
-                                                        client_id IN (SELECT id FROM distributors WHERE distributor_id = db_id)
-                                                    OR
-                                                        client_Id = db_id)
-                                                    AS total_order")
+                                        DB::raw('(SELECT SUM(size_XXS + size_XS + size_S + size_M + size_L + size_XL + size_XXL + size_XXXL + size_2 + size_4 + size_6 + size_8 + size_10 + size_12 + size_14 + size_16 + size_27 + size_28 + size_29 + size_30 + size_31 + size_32 + size_33 + size_34 + size_35 + size_36 + size_37 + size_38 + size_39 + size_40 + size_41 + size_42 + size_other) FROM orders WHERE (client_id IN (SELECT id FROM distributors WHERE distributor_id = db_id) OR client_id = db_id)) as TOTAL')
                                     )->where([
                                         ['partner_group_id', '=', 1]
-                                    ])->orderByDesc('total_order')
+                                    ])->orderByDesc('TOTAL')
                                     ->get();
 
             $useCollectionForDataBuyer = collect($dataBuyer)->map(function ($data) {
                 return [
                     'id' => $data->db_id,
                     'name' => $data->name,
-                    'total_order' => $data->total_order,
+                    'total_order' => $data->TOTAL,
 
                     'ordered_product' => $this->orderedProduct($data->db_id)
                 ];
