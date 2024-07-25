@@ -200,7 +200,7 @@ class ReportController extends Controller
                         DB::raw('distributors.name AS agent_name'),
                         DB::raw('db.name AS distributor_name'),
                         DB::raw('events.event_name'),
-                        DB::raw('SUM(size_S + size_M + size_L + size_XL + size_XXL + size_XXXL + size_2 + size_4 + size_6 + size_8 + size_10 + size_12 + size_27 + size_28 + size_29 + size_30 + size_31 + size_32 + size_33 + size_34 + size_35 + size_36 + size_37 + size_38 + size_39 + size_40 + size_41 + size_42 + size_other) AS total_order'),
+                        DB::raw('SUM(size_XXS + size_XS + size_S + size_M + size_L + size_XL + size_XXL + size_XXXL + size_2 + size_4 + size_6 + size_8 + size_10 + size_12 + size_14 + size_16 + size_27 + size_28 + size_29 + size_30 + size_31 + size_32 + size_33 + size_34 + size_35 + size_36 + size_37 + size_38 + size_39 + size_40 + size_41 + size_42 + size_other) AS total_order'),
                         'orders.size_XXS',
                         'orders.size_XS',
                         'orders.size_S',
@@ -389,7 +389,7 @@ class ReportController extends Controller
                 'orders.size_41',
                 'orders.size_42',
                 'orders.size_other',
-                DB::raw('SUM(size_S + size_M + size_L + size_XL + size_XXL + size_XXXL + size_2 + size_4 + size_6 + size_8 + size_10 + size_12 + size_27 + size_28 + size_29 + size_30 + size_31 + size_32 + size_33 + size_34 + size_35 + size_36 + size_37 + size_38 + size_39 + size_40 + size_41 + size_42 + size_other) AS total_order')
+                DB::raw('SUM(size_XXS + size_XS + size_S + size_M + size_L + size_XL + size_XXL + size_XXXL + size_2 + size_4 + size_6 + size_8 + size_10 + size_12 + size_14 + size_16 + size_27 + size_28 + size_29 + size_30 + size_31 + size_32 + size_33 + size_34 + size_35 + size_36 + size_37 + size_38 + size_39 + size_40 + size_41 + size_42 + size_other) AS total_order')
             )->leftJoin('products', 'products.id', '=', 'orders.product_id')
             ->leftJoin('events', 'events.id', '=', 'orders.event_id')
             ->leftJoin('distributors', 'distributors.id', '=', 'orders.client_id')
