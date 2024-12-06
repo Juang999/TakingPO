@@ -24,7 +24,7 @@ class CreatePartnumberRequest extends FormRequest
     public function rules()
     {
         return [
-            'clothes_id' => 'required',
+            'clothes_id' => 'required|unique:partnumbers,clothes_id',
             'image_id' => 'required',
             'partnumber' => 'required',
         ];

@@ -3,18 +3,18 @@
 namespace App\Http\Controllers\Api;
 
 use App\Agent;
-use App\Distributor;
+// use App\;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\AgentRequest;
-use App\MutifStoreAddress;
-use App\MutifStoreMaster;
+// use App\;
 use App\PartnerAddress;
-use App\PartnerGroup;
+// use App\;
 use App\TableName;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Schema;
+// use Illuminate\Support\Facades\;
+// use Illuminate\Support\Facades\Schema;
+use App\Http\Requests\AgentRequest;
+use Illuminate\Support\Facades\{DB, Auth};
+use App\{MutifStoreAddress, Distributor, MutifStoreMaster, PartnerGroup};
 
 class AgentController extends Controller
 {
@@ -205,15 +205,6 @@ class AgentController extends Controller
         try {
         DB::beginTransaction();
             $TableName = TableName::where('distributor_id', $agent->id)->first();
-
-            if ($TableName) {
-                if ($request->phone) {
-                    Schema::rename($TableName->table_name, 'db_'.$request->phone);
-                    $TableName->update([
-                        'table_name' => 'db_'.$request->phone
-                    ]);
-                }
-            }
 
             $user_id = Auth::user()->id;
 

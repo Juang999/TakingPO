@@ -20,7 +20,7 @@ class CreatePartnerGroupsTable extends Migration
             $table->string('prtnr_code');
             $table->string('prtnr_name');
             $table->string('prtnr_desc');
-            $table->integer('discount')->default(0);
+            $table->decimal('discount', 10, 9)->default(0);
             $table->boolean('is_active')->default(0);
             $table->timestamps();
         });

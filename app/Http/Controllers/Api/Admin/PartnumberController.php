@@ -30,23 +30,15 @@ class PartnumberController extends Controller
     public function store(CreatePartnumberRequest $request)
     {
         try {
-            $partnumbers = explode(', ', $request->partnumber);
-
-            $dataPartnumber = [];
-
-            foreach ($partnumbers as $partnumber) {
-                array_push($dataPartnumber, [
-                    'clothes_id' => $request->clothes_id,
-                    'image_id' => $request->image_id,
-                    'partnumber' => $partnumber
-                ]);
-            }
-
-            $inputPartnumber = DB::table('partnumbers')->insert($dataPartnumber);
+            $partnumber = Partnumber::create([
+                'clothes_id' => $request->clothes_id,
+                'image_id' => $request->image_id,
+                'image_id' => $request->partnumber
+            ]);
 
             return response()->json([
                 'status' => 'success!',
-                'data' => $inputPartnumber,
+                'data' => $partnumber,
                 'message' => null
             ], 200);
         } catch (\Throwable $th) {
@@ -87,8 +79,22 @@ class PartnumberController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy($partnumber)
     {
-        //
+        try {
+            Partnumber::where('partnumber', '=', $partnumber)->destroy();
+
+            return response()->json([
+                'status' => 'success',
+                'data' => true,
+                'error' => null
+            ]);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'status' => 'failed',
+                'data' => null,
+                'error' => $th->getMessage()
+            ]);
+        }
     }
 }

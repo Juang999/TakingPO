@@ -3,18 +3,14 @@
 namespace App\Http\Controllers\Api;
 
 use App\TableName;
-use App\Distributor;
-use App\PartnerGroup;
-use App\PartnerAddress;
-use App\MutifStoreMaster;
-use App\MutifStoreAddress;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Controller;
+// use Illuminate\Support\Facades\;
 use Illuminate\Support\Facades\Schema;
-use App\Http\Requests\DistributorRequest;
-use App\Http\Requests\UpdateDistributorRequest;
+// use App\Http\Requests\;
+use Illuminate\Support\Facades\{Auth, DB};
+use App\Http\Requests\{DistributorRequest, UpdateDistributorRequest};
+use App\{PartnerGroup, Distributor, PartnerAddress, MutifStoreMaster};
 
 class DistributorController extends Controller
 {

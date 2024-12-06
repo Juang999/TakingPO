@@ -16,16 +16,6 @@ class Clothes extends Model
         return $this->belongsTo(Type::class);
     }
 
-    public function TemporaryStorage()
-    {
-        return $this->hasMany(TemporaryStorage::class);
-    }
-
-    public function TotalProduct()
-    {
-        return $this->hasMany(TotalProduct::class);
-    }
-
     public function Image()
     {
         return $this->hasMany(Image::class);
@@ -33,11 +23,6 @@ class Clothes extends Model
 
     public function BufferProduct()
     {
-        return $this->hasMany(BufferProduct::class);
+        return $this->hasMany(BufferProduct::class, 'clothes_id', 'id');
     }
-
-    // public function Queue()
-    // {
-    //     return $this->hasOne(Queue::class);
-    // }
 }
